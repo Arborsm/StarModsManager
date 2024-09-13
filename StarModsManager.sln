@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarModsManager", "StarModsManager.csproj", "{8080633E-CB44-4E86-A333-36E8B8C4271E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8080633E-CB44-4E86-A333-36E8B8C4271E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8080633E-CB44-4E86-A333-36E8B8C4271E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8080633E-CB44-4E86-A333-36E8B8C4271E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8080633E-CB44-4E86-A333-36E8B8C4271E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

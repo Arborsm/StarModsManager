@@ -1,0 +1,29 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:StarModsManager.ViewModels"
+             x:DataType="vm:ModViewModel"
+             mc:Ignorable="d" d:DesignWidth="200" d:DesignHeight="200"
+             x:Class="StarModsManager.Views.ModView">
+    
+    <UserControl.Resources>
+        <MenuFlyout x:Key="ContextMenu">
+            <MenuItem Header="访问Mod网页" Click="OpenUrl_OnClick" />
+            <MenuItem Header="刷新Mod" Click="Refresh_OnClick" />
+        </MenuFlyout>
+    </UserControl.Resources>
+    
+    <StackPanel Spacing="5" Width="200">
+        <Border CornerRadius="10" ClipToBounds="True">
+            <Panel Background="Transparent" ContextFlyout="{StaticResource ContextMenu}">
+                <Image Width="200" Height="200" Stretch="Uniform" Source="{Binding Pic}" VerticalAlignment = "Center" />
+                <Panel Height="200" IsVisible="{Binding Pic, Converter={x:Static ObjectConverters.IsNull}}">
+                    <PathIcon Height="75" Width="75" Data="{StaticResource GameRegular}" />
+                </Panel>
+            </Panel>
+        </Border>
+        <TextBlock HorizontalAlignment="Center" Text="{Binding Title}" />
+        <!--TextBlock HorizontalAlignment="Center" Text="{Binding Url}" /-->
+    </StackPanel>
+</UserControl>
