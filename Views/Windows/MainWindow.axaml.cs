@@ -1,16 +1,16 @@
 using System.Threading.Tasks;
-using Avalonia.ReactiveUI;
+using Avalonia.Controls;
 using ReactiveUI;
 using StarModsManager.ViewModels;
 
 namespace StarModsManager.Views.Windows;
 
-public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
+public partial class MainWindow : Window
 {
     public MainWindow()
     {
         InitializeComponent();
-        this.WhenActivated(action => action(ViewModel!.ShowDialog.RegisterHandler(DoShowDialogAsync)));
+        // this.WhenActivated(action => action(ViewModel!.ShowDialog.RegisterHandler(DoShowDialogAsync)));
     }
 
     private async Task DoShowDialogAsync(InteractionContext<ModListViewModel, ModViewModel?> interaction)

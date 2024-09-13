@@ -1,15 +1,12 @@
-﻿using System;
-using Avalonia.ReactiveUI;
-using ReactiveUI;
-using StarModsManager.ViewModels;
+﻿using Avalonia.Controls;
 
 namespace StarModsManager.Views.Windows;
 
-public partial class ModListWindow : ReactiveWindow<ModListViewModel>
+public partial class ModListWindow : Window
 {
     public ModListWindow()
     {
         InitializeComponent();
-        this.WhenActivated(action => action(ViewModel!.BuyMusicCommand.Subscribe(Close)));
+        //this.WhenActivated(action => action(ViewModel!.BuyMusicCommand.Subscribe(Close)));
     }
 }
