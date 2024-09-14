@@ -15,8 +15,6 @@
         Background="Transparent">
     
     <Design.DataContext>
-        <!-- This only sets the DataContext for the previewer in an IDE,
-             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
         <viewModels:MainWindowViewModel/>
     </Design.DataContext>
     
@@ -32,7 +30,7 @@
         </ExperimentalAcrylicBorder>
         
         <Panel>
-            <view:NavigationPages Padding="0 30 0 0"/>
+            <view:NavigationPages Padding="0 30 0 0" />
         </Panel>
     </Panel>
 

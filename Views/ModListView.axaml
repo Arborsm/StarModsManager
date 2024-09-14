@@ -6,17 +6,18 @@
              x:DataType="vm:ModListViewModel"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="StarModsManager.Views.ModListView">
+    
     <DockPanel>
         <StackPanel DockPanel.Dock="Top">
             <TextBox Text="{Binding SearchText}" Watermark="Search for Mod...." />
             <ProgressBar IsIndeterminate="True" IsVisible="{Binding IsBusy}" />
         </StackPanel>
-        <Button Content="Select Mod" Command="{Binding BuyMusicCommand}"
+        <Button Content="Close" Command="{Binding CloseCommand}"
                 DockPanel.Dock="Bottom"
                 HorizontalAlignment="Center" />
         <ListBox ItemsSource="{Binding SearchResults}" 
                  SelectedItem="{Binding SelectedAlbum}"
-                 Background="Transparent" Margin="0 20">
+                 Background="Transparent" Margin="0 15">
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
                     <WrapPanel />

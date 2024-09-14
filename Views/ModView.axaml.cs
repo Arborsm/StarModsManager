@@ -11,20 +11,4 @@ public partial class ModView : UserControl
     {
         InitializeComponent();
     }
-
-    private void OpenUrl_OnClick(object? sender, RoutedEventArgs e)
-    {
-        if (DataContext is ModViewModel modViewModel)
-        {
-            modViewModel.OpenUrl();
-        }
-    }
-
-    private async void Refresh_OnClick(object? sender, RoutedEventArgs e)
-    {
-        if (DataContext is ModViewModel modViewModel)
-        {
-            await modViewModel.LoadCover(true);
-        }
-    }
 }

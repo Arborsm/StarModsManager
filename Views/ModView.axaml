@@ -9,8 +9,10 @@
     
     <UserControl.Resources>
         <MenuFlyout x:Key="ContextMenu">
-            <MenuItem Header="访问Mod网页" Click="OpenUrl_OnClick" />
-            <MenuItem Header="刷新Mod" Click="Refresh_OnClick" />
+            <MenuItem Header="访问Mod网页" Command="{Binding OpenUrlCommand}" />
+            <MenuItem Header="刷新Mod" 
+                      Command="{Binding LoadCoverCommand}"
+                      CommandParameter="{StaticResource True}"/>
         </MenuFlyout>
     </UserControl.Resources>
     

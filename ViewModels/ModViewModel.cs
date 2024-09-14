@@ -1,30 +1,31 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Avalonia.Media.Imaging;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using StarModsManager.Models;
-using ReactiveUI;
 
 namespace StarModsManager.ViewModels;
 
-public class ModViewModel(Mod mod) : ViewModelBase
+public partial class ModViewModel(Mod mod) : ViewModelBase
 {
+    [ObservableProperty]
     private Bitmap? _pic;
-    
-    public  Bitmap? Pic
-    {
-        get => _pic;
-        set => this.RaiseAndSetIfChanged(ref _pic, value);
-    }
-    public string Url => mod.Url;
-    public string Title => mod.Title;
+    private string Url => mod.Url;
+    private string Title => mod.Title;
 
-    public void OpenUrl()
+    [RelayCommand]
+    private void OpenUrl()
     {
         System.Diagnostics.Process.Start("explorer.exe", Url);
     }
     
+    [RelayCommand]
     public async Task LoadCover(bool refresh = false)
     {
+#if DEBUG
+        if (refresh) Console.WriteLine(@"Refreshing cover");
+#endif
         try
         {
             await using var imageStream = await mod.LoadPicBitmapAsync(refresh);

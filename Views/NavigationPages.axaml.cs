@@ -1,4 +1,5 @@
-﻿using Avalonia.Controls;
+﻿using System;
+using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using FluentAvalonia.Core;
 using FluentAvalonia.UI.Controls;
@@ -23,7 +24,10 @@ public partial class NavigationPages : UserControl
     {
         if (e.SelectedItem is NavigationViewItem)
         {
-            var pg = new MainPageView();
+            var pg = new MainPageView
+            {
+                DataContext = new MainPageViewModel()
+            };
             (sender as NavigationView)!.Content = pg;
         }
     }

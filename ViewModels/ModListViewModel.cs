@@ -2,37 +2,40 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Reactive;
-using System.Reactive.Concurrency;
-using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using ReactiveUI;
+using Avalonia.Controls;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using StarModsManager.Models;
 
 namespace StarModsManager.ViewModels;
 
-public class ModListViewModel : ViewModelBase
+public partial class ModListViewModel : ViewModelBase
 {
+    private readonly Window _window;
+
+    [ObservableProperty]
     private string? _searchText;
+    [ObservableProperty]
     private bool _isBusy;
+    [ObservableProperty]
     private ModViewModel? _selectedAlbum;
     private CancellationTokenSource? _cancellationTokenSource;
-    
-    public ReactiveCommand<Unit, ModViewModel?> BuyMusicCommand { get; }
+    public ObservableCollection<ModViewModel> SearchResults { get; } = [];
 
-    public ModListViewModel()
+    public ModListViewModel(Window window)
     {
-        this.WhenAnyValue(x => x.SearchText)
-            .Throttle(TimeSpan.FromMilliseconds(400)) // 停止键入 400 毫秒后
-            .ObserveOn(RxApp.MainThreadScheduler)
-            .Subscribe(DoSearch!);
-
-        BuyMusicCommand = ReactiveCommand.Create(() => SelectedAlbum);
-
-        RxApp.MainThreadScheduler.Schedule(LoadMods);
+        _window = window;
+        Task.Run(LoadMods);
     }
-    
+
+    [RelayCommand]
+    private void Close()
+    { 
+        _window.Close(SelectedAlbum);
+    }
+
     private async void LoadMods()
     {
         IsBusy = true;
@@ -58,7 +61,8 @@ public class ModListViewModel : ViewModelBase
         IsBusy = false;
     }
 
-    private async void DoSearch(string s)
+    [RelayCommand (CanExecute = nameof(CanSearch))]
+    private async Task DoSearch(string s)
     {
         if (string.IsNullOrWhiteSpace(s)) return;
         IsBusy = true;
@@ -90,6 +94,8 @@ public class ModListViewModel : ViewModelBase
         IsBusy = false;
     }
 
+    private bool CanSearch => string.IsNullOrWhiteSpace(SearchText);
+
     private async void TestMods(IEnumerable<Mod> mods, Func<bool> predicate,
         CancellationToken cancellationToken = default)
     {
@@ -120,22 +126,5 @@ public class ModListViewModel : ViewModelBase
                 return;
             }
         }
-    }
-    
-    public ObservableCollection<ModViewModel> SearchResults { get; } = [];
-    public string? SearchText
-    {
-        get => _searchText;
-        set => this.RaiseAndSetIfChanged(ref _searchText, value);
-    }
-    public bool IsBusy
-    {
-        get => _isBusy;
-        set => this.RaiseAndSetIfChanged(ref _isBusy, value);
-    }
-    public ModViewModel? SelectedAlbum
-    {
-        get => _selectedAlbum;
-        set => this.RaiseAndSetIfChanged(ref _selectedAlbum, value);
     }
 }
