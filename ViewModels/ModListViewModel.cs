@@ -5,9 +5,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using StarModsManager.Models;
+using StarModsManager.Common.Mods;
 
 namespace StarModsManager.ViewModels;
 
@@ -27,7 +28,7 @@ public partial class ModListViewModel : ViewModelBase
     public ModListViewModel(Window window)
     {
         _window = window;
-        Task.Run(LoadMods);
+        Dispatcher.UIThread.Post(LoadMods);
     }
 
     [RelayCommand]

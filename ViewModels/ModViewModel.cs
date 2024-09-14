@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using StarModsManager.Models;
+using StarModsManager.Common.Mods;
 
 namespace StarModsManager.ViewModels;
 

@@ -4,9 +4,9 @@ using Avalonia.Markup.Xaml;
 
 namespace StarModsManager.Views.Pages;
 
-public partial class SettingPageView : UserControl
+public partial class SettingsPageView : UserControl
 {
-    public SettingPageView()
+    public SettingsPageView()
     {
         InitializeComponent();
     }

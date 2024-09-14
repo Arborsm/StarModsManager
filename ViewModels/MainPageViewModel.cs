@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.Input;
-using StarModsManager.Models;
+using StarModsManager.Common.Mods;
 using StarModsManager.Views.Windows;
 
 namespace StarModsManager.ViewModels;
@@ -14,7 +14,7 @@ public partial class MainPageViewModel
 
     public MainPageViewModel()
     {
-        Task.Run(LoadMods);
+        Dispatcher.UIThread.Post(LoadMods);
     }
 
     [RelayCommand]
@@ -29,7 +29,7 @@ public partial class MainPageViewModel
         }
     }
 
-    private async Task LoadMods()
+    private async void LoadMods()
     {
         var mods = (await Mod.LoadCachedAsync()).Select(x => new ModViewModel(x));
 

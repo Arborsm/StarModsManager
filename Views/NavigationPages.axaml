@@ -1,20 +1,36 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:ui="using:FluentAvalonia.UI.Controls"
-             xmlns:vm="using:StarModsManager.ViewModels"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="StarModsManager.Views.NavigationPages"
-             x:DataType="vm:NavigationPagesModel">
-    
-    <ui:NavigationView x:Name="MainNav" PaneDisplayMode="Left" IsPaneOpen="False" >
+﻿<UserControl
+    d:DesignHeight="450"
+    d:DesignWidth="900"
+    mc:Ignorable="d"
+    x:Class="StarModsManager.Views.NavigationPages"
+    x:DataType="vm:NavigationPagesModel"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="using:FluentAvalonia.UI.Controls"
+    xmlns:vm="using:StarModsManager.ViewModels"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <ui:NavigationView PaneDisplayMode="Left" x:Name="MainNav">
+        <ui:NavigationView.IsPaneOpen>False</ui:NavigationView.IsPaneOpen>
         <ui:NavigationView.MenuItems>
-            <ui:NavigationViewItem Content="Main" Tag="Main" IconSource="Home"/>
-            <ui:NavigationViewItem Content="Menu Item2" Tag="SamplePage2" IconSource="Save" />
-            <ui:NavigationViewItem Content="Menu Item3" Tag="SamplePage3" IconSource="Refresh" />
-            <ui:NavigationViewItem Content="Menu Item4" Tag="SamplePage4" IconSource="Download" />
+            <ui:NavigationViewItem
+                Content="Main"
+                IconSource="Home"
+                Tag="Main" />
+            <ui:NavigationViewItem
+                Content="Menu Item2"
+                IconSource="Save"
+                Tag="SamplePage2" />
+            <ui:NavigationViewItem
+                Content="Menu Item3"
+                IconSource="Refresh"
+                Tag="SamplePage3" />
+            <ui:NavigationViewItem
+                Content="Menu Item4"
+                IconSource="Download"
+                Tag="SamplePage4" />
         </ui:NavigationView.MenuItems>
     </ui:NavigationView>
-    
+
 </UserControl>

@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.Input;
-using StarModsManager.Models;
 using StarModsManager.Views.Windows;
 
 namespace StarModsManager.ViewModels;

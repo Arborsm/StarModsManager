@@ -1,24 +1,27 @@
-<Application xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:main="clr-namespace:StarModsManager.Common.Main"
-             xmlns:styling="clr-namespace:FluentAvalonia.Styling;assembly=FluentAvalonia"
-             xmlns:system="clr-namespace:System;assembly=System.Runtime"
-             x:Class="StarModsManager.App"
-             RequestedThemeVariant="Dark">
-             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+<Application
+    RequestedThemeVariant="Dark"
+    x:Class="StarModsManager.App"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:main="clr-namespace:StarModsManager.Common.Main"
+    xmlns:styling="clr-namespace:FluentAvalonia.Styling;assembly=FluentAvalonia"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!--  "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options.  -->
 
     <Application.DataTemplates>
-        <main:ViewLocator/>
+        <main:ViewLocator />
     </Application.DataTemplates>
-             
+
     <Application.Resources>
-    <system:Boolean x:Key="True">True</system:Boolean>
-    <system:Boolean x:Key="False">False</system:Boolean>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceInclude Source="avares://StarModsManager/Assets/Resources.axaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Application.Resources>
-  
+
     <Application.Styles>
         <FluentTheme />
-        <styling:FluentAvaloniaTheme />
-        <StyleInclude Source="avares://StarModsManager/Assets/Icons.axaml"></StyleInclude>
+        <styling:FluentAvaloniaTheme PreferSystemTheme="True" PreferUserAccentColor="True" />
+        <StyleInclude Source="avares://StarModsManager/Assets/Icons.axaml" />
     </Application.Styles>
 </Application>

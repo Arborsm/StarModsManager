@@ -1,31 +1,43 @@
-<UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:vm="using:StarModsManager.ViewModels"
-             x:DataType="vm:ModViewModel"
-             mc:Ignorable="d" d:DesignWidth="200" d:DesignHeight="200"
-             x:Class="StarModsManager.Views.ModView">
-    
+<UserControl
+    d:DesignHeight="200"
+    d:DesignWidth="200"
+    mc:Ignorable="d"
+    x:Class="StarModsManager.Views.ModView"
+    x:DataType="vm:ModViewModel"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="using:StarModsManager.ViewModels"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
     <UserControl.Resources>
         <MenuFlyout x:Key="ContextMenu">
-            <MenuItem Header="访问Mod网页" Command="{Binding OpenUrlCommand}" />
-            <MenuItem Header="刷新Mod" 
-                      Command="{Binding LoadCoverCommand}"
-                      CommandParameter="{StaticResource True}"/>
+            <MenuItem Command="{Binding OpenUrlCommand}" Header="访问Mod网页" />
+            <MenuItem
+                Command="{Binding LoadCoverCommand}"
+                CommandParameter="{StaticResource True}"
+                Header="刷新Mod" />
         </MenuFlyout>
     </UserControl.Resources>
-    
+
     <StackPanel Spacing="5" Width="200">
-        <Border CornerRadius="10" ClipToBounds="True">
+        <Border ClipToBounds="True" CornerRadius="10">
             <Panel Background="Transparent" ContextFlyout="{StaticResource ContextMenu}">
-                <Image Width="200" Height="200" Stretch="Uniform" Source="{Binding Pic}" VerticalAlignment = "Center" />
+                <Image
+                    Height="200"
+                    Source="{Binding Pic}"
+                    Stretch="Uniform"
+                    VerticalAlignment="Center"
+                    Width="200" />
                 <Panel Height="200" IsVisible="{Binding Pic, Converter={x:Static ObjectConverters.IsNull}}">
-                    <PathIcon Height="75" Width="75" Data="{StaticResource GameRegular}" />
+                    <PathIcon
+                        Data="{StaticResource GameRegular}"
+                        Height="75"
+                        Width="75" />
                 </Panel>
             </Panel>
         </Border>
         <TextBlock HorizontalAlignment="Center" Text="{Binding Title}" />
-        <!--TextBlock HorizontalAlignment="Center" Text="{Binding Url}" /-->
+        <!--  TextBlock HorizontalAlignment="Center" Text="{Binding Url}" /  -->
     </StackPanel>
 </UserControl>

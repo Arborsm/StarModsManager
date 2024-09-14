@@ -1,29 +1,33 @@
-﻿<Window xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:views="using:StarModsManager.Views"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-        x:Class="StarModsManager.Views.Windows.ModListWindow"
-        Title="ModListWindow"
-        Width="1020" Height="550"
-        WindowStartupLocation="CenterOwner"
-        TransparencyLevelHint="AcrylicBlur"
-        ExtendClientAreaToDecorationsHint="True">
-    
+﻿<Window
+    ExtendClientAreaToDecorationsHint="True"
+    Height="550"
+    Title="ModListWindow"
+    TransparencyLevelHint="AcrylicBlur"
+    Width="1020"
+    WindowStartupLocation="CenterOwner"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mc:Ignorable="d"
+    x:Class="StarModsManager.Views.Windows.ModListWindow"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:views="using:StarModsManager.Views"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
     <Panel>
         <ExperimentalAcrylicBorder IsHitTestVisible="False">
             <ExperimentalAcrylicBorder.Material>
                 <ExperimentalAcrylicMaterial
                     BackgroundSource="Digger"
-                    TintColor="Black"
-                    TintOpacity="1"
-                    MaterialOpacity="0.65" />
+                    MaterialOpacity="0.65"
+                    TintColor="{DynamicResource BackgroundBrush}"
+                    TintOpacity="1" />
             </ExperimentalAcrylicBorder.Material>
         </ExperimentalAcrylicBorder>
 
         <Panel Margin="40">
-            <views:ModListView/>
+            <views:ModListView />
         </Panel>
     </Panel>
 </Window>

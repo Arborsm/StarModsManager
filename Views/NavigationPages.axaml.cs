@@ -13,7 +13,6 @@ public partial class NavigationPages : UserControl
     public NavigationPages()
     {
         InitializeComponent();
-        
         // Default NavView
         var nv = this.FindControl<NavigationView>("MainNav");
         nv!.SelectionChanged += OnMainNavSelectionChanged;
@@ -22,7 +21,15 @@ public partial class NavigationPages : UserControl
 
     private void OnMainNavSelectionChanged(object? sender, NavigationViewSelectionChangedEventArgs e)
     {
-        if (e.SelectedItem is NavigationViewItem)
+        if (e.IsSettingsSelected)
+        {
+            var pg = new SettingsPageView
+            {
+                DataContext = new SettingsPageViewModel()
+            };
+            (sender as NavigationView)!.Content = pg;
+        }
+        else if (e.SelectedItem is NavigationViewItem)
         {
             var pg = new MainPageView
             {
@@ -30,10 +37,5 @@ public partial class NavigationPages : UserControl
             };
             (sender as NavigationView)!.Content = pg;
         }
-    }
-    
-    private void InitializeComponent()
-    {
-        AvaloniaXamlLoader.Load(this);
     }
 }

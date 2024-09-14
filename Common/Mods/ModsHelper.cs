@@ -6,7 +6,7 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
 
-namespace StarModsManager.Models;
+namespace StarModsManager.Common.Mods;
 
 public class ModsHelper
 {
