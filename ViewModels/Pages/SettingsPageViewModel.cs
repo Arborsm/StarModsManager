@@ -1,29 +1,58 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Diagnostics;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Media;
 using Avalonia.Styling;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using FluentAvalonia.Styling;
+using StarModsManager.Common.Config;
+using StarModsManager.Common.Main;
 
-namespace StarModsManager.ViewModels;
+namespace StarModsManager.ViewModels.Pages;
 
-public partial class SettingsPageViewModel: ViewModelBase
+public partial class SettingsPageViewModel : ViewModelBase
 {
+    private const string System = "System";
+    private const string Dark = "Dark";
+    private const string Light = "Light";
+    private readonly FluentAvaloniaTheme _faTheme;
+
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(CustomAccentColor))]
+    private string _currentAppTheme = System;
+
+    [ObservableProperty] private FlowDirection _currentFlowDirection;
+
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(ListBoxColor))]
+    private Color _customAccentColor = Colors.SlateBlue;
+
+    [ObservableProperty] private Color? _listBoxColor;
+
+    [ObservableProperty] private string _modDir;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CustomAccentColor))]
+    [NotifyPropertyChangedFor(nameof(ListBoxColor))]
+    private bool _useCustomAccentColor;
+
     public SettingsPageViewModel()
     {
         GetPredefColors();
-        _faTheme = (FluentAvaloniaTheme) Application.Current!.Styles.First(it => it is FluentAvaloniaTheme);
+        _faTheme = (FluentAvaloniaTheme)Application.Current!.Styles.First(it => it is FluentAvaloniaTheme);
+        _modDir = Program.MainConfig.DirectoryPath;
+#if DEBUG
+        _modDir = "E:\\SteamLibrary\\steamapps\\common\\Stardew Valley\\mods";
+#endif
     }
 
     public string[] AppThemes { get; } =
-        [System, Light , Dark /*, FluentAvaloniaTheme.HighContrastTheme*/];
+        [System, Light, Dark /*, FluentAvaloniaTheme.HighContrastTheme*/];
 
     public FlowDirection[] AppFlowDirections { get; } =
         [FlowDirection.LeftToRight, FlowDirection.RightToLeft];
+
+    public List<Color> PredefinedColors { get; private set; } = [];
 
     private ThemeVariant GetThemeVariant(string value)
     {
@@ -33,8 +62,6 @@ public partial class SettingsPageViewModel: ViewModelBase
             _ => ThemeVariant.Dark
         };
     }
-
-    public List<Color> PredefinedColors { get; private set; } = [];
 
     private void GetPredefColors()
     {
@@ -127,7 +154,7 @@ public partial class SettingsPageViewModel: ViewModelBase
     partial void OnUseCustomAccentColorChanged(bool value)
     {
         if (value)
-        {                    
+        {
             if (_faTheme.TryGetResource("SystemAccentColor", null, out var curColor))
             {
                 CustomAccentColor = (Color)curColor;
@@ -152,7 +179,7 @@ public partial class SettingsPageViewModel: ViewModelBase
         ListBoxColor = value;
         UpdateAppAccentColor(value);
     }
-    
+
     partial void OnListBoxColorChanged(Color? value)
     {
         if (value == null) return;
@@ -160,23 +187,20 @@ public partial class SettingsPageViewModel: ViewModelBase
         UpdateAppAccentColor(value.Value);
     }
 
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(CustomAccentColor))]
-    [NotifyPropertyChangedFor(nameof(ListBoxColor))]
-    private bool _useCustomAccentColor;
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(ListBoxColor))]
-    private Color _customAccentColor = Colors.SlateBlue;
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(CustomAccentColor))]
-    private string _currentAppTheme = System;
-    [ObservableProperty]
-    private FlowDirection _currentFlowDirection;
-    [ObservableProperty]
-    private Color? _listBoxColor;
+    partial void OnModDirChanged(string value)
+    {
+        Program.MainConfig.DirectoryPath = value;
+        ConfigManager<MainConfig>.Save(Program.MainConfig);
+    }
 
-    private const string System = "System";
-    private const string Dark = "Dark";
-    private const string Light = "Light";
-    private readonly FluentAvaloniaTheme _faTheme;
+    [RelayCommand]
+    private void AutoDetectModDirectory()
+    {
+    }
+
+    [RelayCommand]
+    private void OpenModDirectory()
+    {
+        Process.Start("explorer.exe", ModDir);
+    }
 }

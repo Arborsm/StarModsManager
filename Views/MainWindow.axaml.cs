@@ -1,11 +1,11 @@
 using Avalonia.Controls;
 
-namespace StarModsManager.Views.Windows;
+namespace StarModsManager.Views;
 
 public partial class MainWindow : Window
 {
-    public static MainWindow Instance = null!;
-    
+    public static MainWindow Instance { get; private set; } = null!;
+
     public MainWindow()
     {
         Instance = this;

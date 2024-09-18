@@ -1,21 +1,28 @@
-﻿using System;
-using Avalonia;
+﻿using Avalonia;
+using StarModsManager.Common.Config;
 
 namespace StarModsManager.Common.Main;
 
 internal static class Program
 {
-    // Initialization code. Don't use any Avalonia, third-party APIs or any
-    // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
-    // yet and stuff might break.
-    [STAThread]
-    public static void Main(string[] args) => BuildAvaloniaApp()
-        .StartWithClassicDesktopLifetime(args);
+    public static readonly string AppSavingPath =
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "StarModsManager");
 
-    // Avalonia configuration, don't remove; also used by visual designer.
+    public static readonly MainConfig MainConfig = ConfigManager<MainConfig>.Load();
+    public static readonly TransConfig TransConfig = ConfigManager<TransConfig>.Load();
+
+    [STAThread]
+    public static void Main(string[] args)
+    {
+        BuildAvaloniaApp()
+            .StartWithClassicDesktopLifetime(args);
+    }
+
     private static AppBuilder BuildAvaloniaApp()
-        => AppBuilder.Configure<App>()
+    {
+        return AppBuilder.Configure<App>()
             .UsePlatformDetect()
             .WithInterFont()
             .LogToTrace();
+    }
 }

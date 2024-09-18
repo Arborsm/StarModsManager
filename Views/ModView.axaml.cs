@@ -1,7 +1,4 @@
 using Avalonia.Controls;
-using Avalonia.Input;
-using Avalonia.Interactivity;
-using StarModsManager.ViewModels;
 
 namespace StarModsManager.Views;
 

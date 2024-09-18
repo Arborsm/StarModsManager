@@ -1,15 +1,15 @@
 ﻿<UserControl
-    mc:Ignorable="d"
     x:Class="StarModsManager.Views.FancyDayNightButton"
     xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    mc:Ignorable="d">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.ThemeDictionaries>
                 <ResourceDictionary x:Key="Dark">
-                    <SolidColorBrush Color="#303e56" x:Key="Background" />
+                    <SolidColorBrush x:Key="Background" Color="#303e56" />
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
         </ResourceDictionary>
@@ -22,9 +22,9 @@
             <Setter Property="Transitions">
                 <Transitions>
                     <ThicknessTransition
-                        Duration="0:0:0.4"
                         Easing="CubicEaseInOut"
-                        Property="Margin" />
+                        Property="Margin"
+                        Duration="0:0:0.4" />
                 </Transitions>
             </Setter>
             <Style Selector="^#cloud1">
@@ -62,10 +62,10 @@
             <Setter Property="Transitions">
                 <Transitions>
                     <ThicknessTransition
-                        Duration="0:0:0.35"
                         Easing="CubicEaseInOut"
-                        Property="Margin" />
-                    <DoubleTransition Duration="0:0:0.35" Property="Opacity" />
+                        Property="Margin"
+                        Duration="0:0:0.35" />
+                    <DoubleTransition Property="Opacity" Duration="0:0:0.35" />
                 </Transitions>
             </Setter>
         </Style>
@@ -86,10 +86,10 @@
             <Setter Property="Transitions">
                 <Transitions>
                     <TransformOperationsTransition
-                        Duration="0:0:0.35"
                         Easing="CubicEaseInOut"
-                        Property="RenderTransform" />
-                    <BrushTransition Duration="0:0:0.35" Property="Fill" />
+                        Property="RenderTransform"
+                        Duration="0:0:0.35" />
+                    <BrushTransition Property="Fill" Duration="0:0:0.35" />
                 </Transitions>
             </Setter>
         </Style>
@@ -103,7 +103,7 @@
             <Setter Property="Background" Value="#8cbcfa" />
             <Setter Property="Transitions">
                 <Transitions>
-                    <BrushTransition Duration="0:0:0.35" Property="Background" />
+                    <BrushTransition Property="Background" Duration="0:0:0.35" />
                 </Transitions>
             </Setter>
             <Setter Property="Template">
@@ -156,10 +156,10 @@
                                 Canvas.Top="30"
                                 Opacity="0.3" />
                         </Canvas>
-                        <Path Classes="cloud" Name="cloud1" />
-                        <Path Classes="cloud" Name="cloud2" />
-                        <Path Classes="cloud" Name="cloud3" />
-                        <Path Classes="cloud" Name="cloud4" />
+                        <Path Name="cloud1" Classes="cloud" />
+                        <Path Name="cloud2" Classes="cloud" />
+                        <Path Name="cloud3" Classes="cloud" />
+                        <Path Name="cloud4" Classes="cloud" />
                         <Ellipse Name="planet" />
                     </Panel>
                 </ControlTemplate>
@@ -172,12 +172,12 @@
             <Setter Property="Background" Value="{DynamicResource Background}" />
             <Setter Property="Transitions">
                 <Transitions>
-                    <BrushTransition Duration="0:0:0.35" Property="Background" />
+                    <BrushTransition Property="Background" Duration="0:0:0.35" />
                 </Transitions>
             </Setter>
         </Style>
     </UserControl.Styles>
     <Panel Name="ButtonPanel">
-        <ToggleButton Classes="fancy" Name="ThemeSwitch" />
+        <ToggleButton Name="ThemeSwitch" Classes="fancy" />
     </Panel>
 </UserControl>

@@ -1,6 +1,7 @@
-﻿using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
+﻿using Avalonia.Controls;
+using Avalonia.Interactivity;
+using Avalonia.Platform.Storage;
+using StarModsManager.ViewModels.Pages;
 
 namespace StarModsManager.Views.Pages;
 
@@ -9,5 +10,16 @@ public partial class SettingsPageView : UserControl
     public SettingsPageView()
     {
         InitializeComponent();
+    }
+
+    private async void OpenModFolderButton_OnClick(object? sender, RoutedEventArgs e)
+    {
+        var topLevel = TopLevel.GetTopLevel(this);
+        var folder = await topLevel!.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
+        {
+            Title = "Select LocalModsMap Folder",
+            AllowMultiple = false
+        });
+        (DataContext as SettingsPageViewModel)!.ModDir = folder[0].Path.LocalPath;
     }
 }

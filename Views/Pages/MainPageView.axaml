@@ -1,17 +1,17 @@
 ﻿<UserControl
-    d:DesignHeight="450"
-    d:DesignWidth="800"
-    mc:Ignorable="d"
     x:Class="StarModsManager.Views.Pages.MainPageView"
-    x:DataType="vm:MainPageViewModel"
     xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:vm="using:StarModsManager.ViewModels"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    xmlns:pages="clr-namespace:StarModsManager.ViewModels.Pages"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    x:DataType="pages:MainPageViewModel"
+    mc:Ignorable="d">
 
     <Design.DataContext>
-        <vm:MainPageViewModel />
+        <pages:MainPageViewModel />
     </Design.DataContext>
 
     <Panel Margin="40">
@@ -22,12 +22,6 @@
                 </ItemsPanelTemplate>
             </ListBox.ItemsPanel>
         </ListBox>
-        <Button
-            Command="{Binding BuyMusicCommand}"
-            HorizontalAlignment="Right"
-            VerticalAlignment="Top">
-            <PathIcon Data="{StaticResource StoreMicrosoftRegular}" />
-        </Button>
     </Panel>
 
 </UserControl>

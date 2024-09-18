@@ -1,12 +1,11 @@
-﻿using System;
-using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
+﻿using Avalonia.Controls;
 using FluentAvalonia.Core;
 using FluentAvalonia.UI.Controls;
-using StarModsManager.ViewModels;
-using StarModsManager.Views.Pages;
+using StarModsManager.ViewModels.Pages;
+using DownloadPageViewModel = StarModsManager.ViewModels.Pages.DownloadPageViewModel;
+using SettingsPageViewModel = StarModsManager.ViewModels.Pages.SettingsPageViewModel;
 
-namespace StarModsManager.Views;
+namespace StarModsManager.Views.Pages;
 
 public partial class NavigationPages : UserControl
 {
@@ -29,12 +28,15 @@ public partial class NavigationPages : UserControl
             };
             (sender as NavigationView)!.Content = pg;
         }
-        else if (e.SelectedItem is NavigationViewItem)
+        else if (e.SelectedItem is NavigationViewItem navigationViewItem)
         {
-            var pg = new MainPageView
+            UserControl pg = (navigationViewItem.Tag as string) switch
             {
-                DataContext = new MainPageViewModel()
+                "Main" => new MainPageView { DataContext = new MainPageViewModel() },
+                "Download" => new DownloadPageView { DataContext = new DownloadPageViewModel() },
+                _ => new MainPageView { DataContext = new MainPageViewModel() }
             };
+
             (sender as NavigationView)!.Content = pg;
         }
     }

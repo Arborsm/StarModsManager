@@ -1,29 +1,24 @@
 ﻿<UserControl
-    d:DesignHeight="450"
-    d:DesignWidth="800"
-    mc:Ignorable="d"
-    x:Class="StarModsManager.Views.ModListView"
-    x:DataType="vm:ModListViewModel"
+    x:Class="StarModsManager.Views.Pages.DownloadPageView"
     xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:vm="using:StarModsManager.ViewModels"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    xmlns:pages="clr-namespace:StarModsManager.ViewModels.Pages"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    x:DataType="pages:DownloadPageViewModel"
+    mc:Ignorable="d">
 
-    <DockPanel>
+    <DockPanel Margin="40">
         <StackPanel DockPanel.Dock="Top">
-            <TextBox Text="{Binding SearchText}" Watermark="Search for Mod...." />
+            <TextBox Text="{Binding SearchText}" Watermark="Search for OnlineMod...." />
             <ProgressBar IsIndeterminate="True" IsVisible="{Binding IsBusy}" />
         </StackPanel>
-        <Button
-            Command="{Binding CloseCommand}"
-            Content="Close"
-            DockPanel.Dock="Bottom"
-            HorizontalAlignment="Center" />
         <ListBox
+            Margin="0,15"
             Background="Transparent"
             ItemsSource="{Binding SearchResults}"
-            Margin="0,15"
             SelectedItem="{Binding SelectedAlbum}">
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>

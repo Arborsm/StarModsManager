@@ -1,43 +1,54 @@
 <UserControl
-    d:DesignHeight="200"
-    d:DesignWidth="200"
-    mc:Ignorable="d"
     x:Class="StarModsManager.Views.ModView"
-    x:DataType="vm:ModViewModel"
     xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="using:StarModsManager.ViewModels"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    d:DesignHeight="200"
+    d:DesignWidth="200"
+    x:DataType="vm:ModViewModel"
+    mc:Ignorable="d">
 
     <UserControl.Resources>
         <MenuFlyout x:Key="ContextMenu">
             <MenuItem Command="{Binding OpenUrlCommand}" Header="访问Mod网页" />
+            <MenuItem Command="{Binding AsyncLoadCoverCommand}" Header="刷新Mod" />
             <MenuItem
-                Command="{Binding LoadCoverCommand}"
-                CommandParameter="{StaticResource True}"
-                Header="刷新Mod" />
+                Command="{Binding OpenModFolderCommand}"
+                Header="打开Mod目录"
+                IsVisible="{Binding IsLocal}" />
+            <MenuItem Command="{Binding ChangeCoverCommand}" Header="更改图片" />
         </MenuFlyout>
     </UserControl.Resources>
 
-    <StackPanel Spacing="5" Width="200">
+    <Grid
+        Width="200"
+        Height="200"
+        RowDefinitions="*, Auto">
         <Border ClipToBounds="True" CornerRadius="10">
             <Panel Background="Transparent" ContextFlyout="{StaticResource ContextMenu}">
                 <Image
-                    Height="200"
-                    Source="{Binding Pic}"
-                    Stretch="Uniform"
+                    Width="200"
                     VerticalAlignment="Center"
-                    Width="200" />
-                <Panel Height="200" IsVisible="{Binding Pic, Converter={x:Static ObjectConverters.IsNull}}">
+                    Source="{Binding Pic}"
+                    Stretch="Uniform" />
+                <Panel IsVisible="{Binding Pic, Converter={x:Static ObjectConverters.IsNull}}">
                     <PathIcon
-                        Data="{StaticResource GameRegular}"
+                        Width="75"
                         Height="75"
-                        Width="75" />
+                        Data="{StaticResource GameRegular}" />
                 </Panel>
             </Panel>
         </Border>
-        <TextBlock HorizontalAlignment="Center" Text="{Binding Title}" />
+        <TextBlock
+            Grid.Row="1"
+            Width="200"
+            MinHeight="40"
+            HorizontalAlignment="Stretch"
+            Text="{Binding OnlineMod.Title}"
+            TextAlignment="Center"
+            TextWrapping="Wrap" />
         <!--  TextBlock HorizontalAlignment="Center" Text="{Binding Url}" /  -->
-    </StackPanel>
+    </Grid>
 </UserControl>

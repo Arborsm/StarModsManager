@@ -1,0 +1,53 @@
+﻿<UserControl
+    x:Class="StarModsManager.Views.Pages.NavigationPages"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:pages="clr-namespace:StarModsManager.ViewModels.Pages"
+    xmlns:ui="using:FluentAvalonia.UI.Controls"
+    d:DesignHeight="450"
+    d:DesignWidth="900"
+    x:DataType="pages:NavigationPagesModel"
+    mc:Ignorable="d">
+
+    <ui:NavigationView
+        x:Name="MainNav"
+        AlwaysShowHeader="False"
+        OpenPaneLength="250"
+        PaneDisplayMode="Left">
+        <ui:NavigationView.IsPaneOpen>False</ui:NavigationView.IsPaneOpen>
+        <!--<ui:NavigationView.PaneHeader>
+            <Viewbox
+                Height="30"
+                HorizontalAlignment="Left"
+                Margin="10,0,0,0"
+                Width="60">
+                <view:FancyDayNightButton />
+            </Viewbox>
+        </ui:NavigationView.PaneHeader>-->
+        <ui:NavigationView.MenuItems>
+            <ui:NavigationViewItem
+                Content="主页"
+                IconSource="Home"
+                Tag="Main" />
+            <ui:NavigationViewItem
+                Content="下载"
+                IconSource="Download"
+                Tag="Download" />
+            <ui:NavigationViewItem
+                Content="更新"
+                IconSource="Sync"
+                Tag="Update" />
+            <ui:NavigationViewItem
+                Content="翻译"
+                IconSource="Character"
+                Tag="Trans" />
+            <ui:NavigationViewItem
+                Content="校对"
+                IconSource="Edit"
+                Tag="Check" />
+        </ui:NavigationView.MenuItems>
+    </ui:NavigationView>
+
+</UserControl>
