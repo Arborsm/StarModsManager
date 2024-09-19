@@ -12,24 +12,29 @@ using StarModsManager.Common.Main;
 
 namespace StarModsManager.ViewModels.Pages;
 
-public partial class SettingsPageViewModel : ViewModelBase
+public partial class SettingsPageViewModel : ViewModelBase, IViewModel
 {
     private const string System = "System";
     private const string Dark = "Dark";
     private const string Light = "Light";
     private readonly FluentAvaloniaTheme _faTheme;
 
-    [ObservableProperty] [NotifyPropertyChangedFor(nameof(CustomAccentColor))]
+    [ObservableProperty] 
+    [NotifyPropertyChangedFor(nameof(CustomAccentColor))]
     private string _currentAppTheme = System;
 
-    [ObservableProperty] private FlowDirection _currentFlowDirection;
+    [ObservableProperty] 
+    private FlowDirection _currentFlowDirection;
 
-    [ObservableProperty] [NotifyPropertyChangedFor(nameof(ListBoxColor))]
+    [ObservableProperty] 
+    [NotifyPropertyChangedFor(nameof(ListBoxColor))]
     private Color _customAccentColor = Colors.SlateBlue;
 
-    [ObservableProperty] private Color? _listBoxColor;
+    [ObservableProperty] 
+    private Color? _listBoxColor;
 
-    [ObservableProperty] private string _modDir;
+    [ObservableProperty] 
+    private string _modDir;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CustomAccentColor))]

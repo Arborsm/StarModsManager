@@ -10,6 +10,5 @@ public partial class MainWindow : Window
     {
         Instance = this;
         InitializeComponent();
-        // this.WhenActivated(action => action(ViewModel!.ShowDialog.RegisterHandler(DoShowDialogAsync)));
     }
 }

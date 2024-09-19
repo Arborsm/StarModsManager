@@ -4,8 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:pages="clr-namespace:StarModsManager.Views.Pages"
-    xmlns:viewModels="clr-namespace:StarModsManager.ViewModels"
+    xmlns:views="clr-namespace:StarModsManager.Views"
     xmlns:windowing="clr-namespace:FluentAvalonia.UI.Windowing;assembly=FluentAvalonia"
     Title="StarModsManager"
     d:DesignHeight="800"
@@ -16,10 +15,6 @@
     TransparencyLevelHint="AcrylicBlur"
     WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
-
-    <Design.DataContext>
-        <viewModels:MainWindowViewModel />
-    </Design.DataContext>
 
     <Panel>
         <ExperimentalAcrylicBorder IsHitTestVisible="False">
@@ -34,7 +29,7 @@
 
         <Grid RowDefinitions="Auto, *">
             <Panel Height="30" />
-            <pages:NavigationPages Grid.Row="1" />
+            <views:MainNavigation Grid.Row="1" />
         </Grid>
     </Panel>
 

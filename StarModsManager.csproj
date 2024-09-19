@@ -39,9 +39,25 @@
             <DependentUpon>MainWindow.axaml</DependentUpon>
             <SubType>Code</SubType>
         </Compile>
-        <Compile Update="Views\Pages\NavigationPages.axaml.cs">
-            <DependentUpon>NavigationPages.axaml</DependentUpon>
-            <SubType>Code</SubType>
+        <Compile Update="Views\Items\BitmapView.axaml.cs">
+          <DependentUpon>BitmapView.axaml</DependentUpon>
+          <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Views\Items\ModView.axaml.cs">
+          <DependentUpon>ModView.axaml</DependentUpon>
+          <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Views\MainNavigation.axaml.cs">
+          <DependentUpon>NavigationPages.axaml</DependentUpon>
+          <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Views\Customs\PicsSelectView.axaml.cs">
+          <DependentUpon>PicsSelectView.axaml</DependentUpon>
+          <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Views\FancyViews\FancyDayNightButton.axaml.cs">
+          <DependentUpon>FancyDayNightButton.axaml</DependentUpon>
+          <SubType>Code</SubType>
         </Compile>
     </ItemGroup>
 

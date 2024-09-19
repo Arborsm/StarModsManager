@@ -1,19 +1,24 @@
 ﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using StarModsManager.Api;
 using StarModsManager.Common.Mods;
+using StarModsManager.ViewModels.Items;
 
 namespace StarModsManager.ViewModels.Pages;
 
-public partial class DownloadPageViewModel : ViewModelBase
+public partial class DownloadPageViewModel : ViewModelBase, IViewModel
 {
     private CancellationTokenSource? _cts;
 
-    [ObservableProperty] private bool _isBusy;
+    [ObservableProperty] 
+    private bool _isBusy;
 
-    [ObservableProperty] private string _searchText = string.Empty;
+    [ObservableProperty] 
+    private string _searchText = string.Empty;
 
-    [ObservableProperty] private ModViewModel? _selectedAlbum;
+    [ObservableProperty] 
+    private ModViewModel? _selectedAlbum;
 
     public DownloadPageViewModel()
     {
@@ -42,7 +47,20 @@ public partial class DownloadPageViewModel : ViewModelBase
         }
     }
 
-    private async void LoadMods()
+    [RelayCommand]
+    private async Task Refresh()
+    {
+        if (string.IsNullOrEmpty(SearchText))
+        {
+            await DoSearch(SearchText);
+        }
+        else
+        {
+            await LoadMods();
+        }
+    }
+
+    private async Task LoadMods()
     {
         IsBusy = true;
         _cts?.CancelAsync().ConfigureAwait(false);
@@ -83,7 +101,7 @@ public partial class DownloadPageViewModel : ViewModelBase
         {
             foreach (var mod in mods)
             {
-                var vm = new ModViewModel(mod);
+                var vm = new Items.ModViewModel(mod);
                 SearchResults.Add(vm);
             }
 
@@ -99,7 +117,7 @@ public partial class DownloadPageViewModel : ViewModelBase
         var modList = mods.ToList();
         do
         {
-            foreach (var vm in modList.Select(mod => new ModViewModel(mod))) SearchResults.Add(vm);
+            foreach (var vm in modList.Select(mod => new Items.ModViewModel(mod))) SearchResults.Add(vm);
 
             if (!cancellationToken.IsCancellationRequested) LoadCovers(cancellationToken);
             await Task.Delay(1000, cancellationToken);

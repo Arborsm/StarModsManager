@@ -8,6 +8,8 @@ namespace StarModsManager.Common.Mods;
 
 public sealed class LocalMod
 {
+    public string InfoPicturePath => Path.Combine(PathS, "Info.bmp");
+        
     public LocalMod(string path)
     {
         var manifestPath = Path.GetFullPath(path);

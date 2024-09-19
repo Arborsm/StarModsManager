@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO.Compression;
 using System.Text;
@@ -11,6 +12,16 @@ namespace StarModsManager.Api;
 
 internal static class Tools
 {
+    public static void ForEach<TSource>(
+        this IEnumerable<TSource> source,
+        Action<TSource> action)
+    {
+        foreach (var item in source)
+        {
+            action(item);
+        }
+    }
+    
     /// <summary>
     /// 根据参考字典的键顺序对字典进行排序。
     /// </summary>

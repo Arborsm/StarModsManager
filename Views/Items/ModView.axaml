@@ -1,23 +1,20 @@
 <UserControl
-    x:Class="StarModsManager.Views.ModView"
+    x:Class="StarModsManager.Views.Items.ModView"
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:items="clr-namespace:StarModsManager.ViewModels.Items"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:vm="using:StarModsManager.ViewModels"
     d:DesignHeight="200"
     d:DesignWidth="200"
-    x:DataType="vm:ModViewModel"
+    x:DataType="items:ModViewModel"
     mc:Ignorable="d">
 
     <UserControl.Resources>
         <MenuFlyout x:Key="ContextMenu">
             <MenuItem Command="{Binding OpenUrlCommand}" Header="访问Mod网页" />
             <MenuItem Command="{Binding AsyncLoadCoverCommand}" Header="刷新Mod" />
-            <MenuItem
-                Command="{Binding OpenModFolderCommand}"
-                Header="打开Mod目录"
-                IsVisible="{Binding IsLocal}" />
+            <MenuItem Command="{Binding OpenModFolderCommand}" Header="打开Mod目录" />
             <MenuItem Command="{Binding ChangeCoverCommand}" Header="更改图片" />
         </MenuFlyout>
     </UserControl.Resources>

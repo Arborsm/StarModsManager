@@ -6,12 +6,14 @@ using FluentAvalonia.UI.Controls;
 using StarModsManager.Common.Main;
 using StarModsManager.Common.Mods;
 using StarModsManager.Views;
+using PicsSelectView = StarModsManager.Views.Customs.PicsSelectView;
 
-namespace StarModsManager.ViewModels;
+namespace StarModsManager.ViewModels.Items;
 
 public partial class ModViewModel : ViewModelBase
 {
-    [ObservableProperty] private Bitmap? _pic;
+    [ObservableProperty] 
+    private Bitmap? _pic;
 
     public ModViewModel(OnlineMod onlineMod, LocalMod? localMod = default)
     {
@@ -22,28 +24,28 @@ public partial class ModViewModel : ViewModelBase
 
     public OnlineMod OnlineMod { get; }
 
-    private LocalMod? LocalMod { get; }
+    public LocalMod? LocalMod { get; }
 
     private bool IsLocal => LocalMod is not null;
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(IsLocal))]
     private async Task ChangeCover()
     {
         if (LocalMod is not null)
         {
+            var content = new Customs.PicsSelectViewModel(this);
             var dialog = new ContentDialog
             {
                 Title = "Change Cover",
                 PrimaryButtonText = "Select",
                 SecondaryButtonText = "Custom",
-                CloseButtonText = "Close"
-            };
-
-            var picsSelectViewModel = new PicsSelectViewModel(OnlineMod);
-            await Task.Run(picsSelectViewModel.LoadPicsAsync);
-            dialog.Content = new PicsSelectView
-            {
-                Content = picsSelectViewModel
+                CloseButtonText = "Close",
+                Content = new PicsSelectView
+                {
+                    Content = content
+                },
+                PrimaryButtonCommand = content.SelectPicCommand,
+                SecondaryButtonCommand = content.CustomPicCommand
             };
 
             await dialog.ShowAsync();
@@ -51,17 +53,17 @@ public partial class ModViewModel : ViewModelBase
     }
 
     [RelayCommand(CanExecute = nameof(IsLocal))]
-    private void OpenUrl()
-    {
-        if (OnlineMod.Url is not null) Process.Start("explorer.exe", OnlineMod.Url);
-    }
-
-    [RelayCommand]
     private void OpenModFolder()
     {
         if (LocalMod is not null) Process.Start("explorer.exe", LocalMod.PathS);
     }
-
+    
+    [RelayCommand]
+    private void OpenUrl()
+    {
+        if (OnlineMod.Url is not null) Process.Start("explorer.exe", OnlineMod.Url);
+    }
+    
     [RelayCommand]
     private async Task AsyncLoadCover()
     {
@@ -71,6 +73,11 @@ public partial class ModViewModel : ViewModelBase
     public async Task LoadCover(TimeSpan delay,
         CancellationToken cancellationToken, bool refresh = false)
     {
+        if (LocalMod is not null && File.Exists(LocalMod.InfoPicturePath))
+        {
+            Pic = await Task.Run(() => new Bitmap(LocalMod.InfoPicturePath), cancellationToken);
+            return;
+        }
         if (refresh) StarDebug.Debug(@"Refreshing Cover");
         try
         {

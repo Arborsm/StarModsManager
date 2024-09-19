@@ -4,13 +4,19 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:pages="clr-namespace:StarModsManager.ViewModels.Pages"
+    xmlns:pages="using:StarModsManager.ViewModels.Pages"
     d:DesignHeight="450"
     d:DesignWidth="800"
     x:DataType="pages:DownloadPageViewModel"
     mc:Ignorable="d">
 
-    <DockPanel Margin="40">
+    <UserControl.Resources>
+        <MenuFlyout x:Key="ContextMenu">
+            <MenuItem Command="{Binding RefreshCommand}" Header="刷新" />
+        </MenuFlyout>
+    </UserControl.Resources>
+
+    <DockPanel Margin="40" ContextFlyout="{StaticResource ContextMenu}">
         <StackPanel DockPanel.Dock="Top">
             <TextBox Text="{Binding SearchText}" Watermark="Search for OnlineMod...." />
             <ProgressBar IsIndeterminate="True" IsVisible="{Binding IsBusy}" />

@@ -1,14 +1,12 @@
 ﻿<UserControl
-    x:Class="StarModsManager.Views.Pages.NavigationPages"
+    x:Class="StarModsManager.Views.MainNavigation"
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:pages="clr-namespace:StarModsManager.ViewModels.Pages"
     xmlns:ui="using:FluentAvalonia.UI.Controls"
     d:DesignHeight="450"
     d:DesignWidth="900"
-    x:DataType="pages:NavigationPagesModel"
     mc:Ignorable="d">
 
     <ui:NavigationView
@@ -17,15 +15,6 @@
         OpenPaneLength="250"
         PaneDisplayMode="Left">
         <ui:NavigationView.IsPaneOpen>False</ui:NavigationView.IsPaneOpen>
-        <!--<ui:NavigationView.PaneHeader>
-            <Viewbox
-                Height="30"
-                HorizontalAlignment="Left"
-                Margin="10,0,0,0"
-                Width="60">
-                <view:FancyDayNightButton />
-            </Viewbox>
-        </ui:NavigationView.PaneHeader>-->
         <ui:NavigationView.MenuItems>
             <ui:NavigationViewItem
                 Content="主页"

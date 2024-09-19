@@ -53,8 +53,7 @@ public class HttpBatchExecutor
                 (outcome, timespan, retryAttempt, _) =>
                 {
                     var message = outcome.Result is not null
-                        ? $"HTTP Status Code: {outcome.Result.StatusCode}"
-                        : "Exception";
+                        ? $"HTTP Status Code: {outcome.Result.StatusCode}" : outcome.Exception?.Message;
                     StarDebug.Trace(
                         $"Retry {retryAttempt} after {timespan.TotalSeconds:0.00}s delay due to: {message}");
                 }

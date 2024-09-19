@@ -1,12 +1,13 @@
 using System.Net.Http;
 using HtmlAgilityPack;
 using StarModsManager.Api;
+using StarModsManager.Common.Main;
 
 namespace StarModsManager.Common.Mods;
 
 public class ModLinks
 {
-    private static readonly Lazy<ModLinks> LazyInstance = new(() => new ModLinks());
+    private static readonly Lazy<ModLinks> LazyInstance = new(() => Create());
     
     public const string Header = "//div[@class='img-wrapper header-img']/img";
 
@@ -53,8 +54,9 @@ public class ModLinks
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
-            throw;
+            StarDebug.Error($"请求失败，异常信息: {e.Message}");
+            
+            return new HttpResponseMessage();
         }
     }
 
@@ -62,12 +64,12 @@ public class ModLinks
         CancellationToken cancellationToken = default)
     {
         var response = await GetModsPage(searchText, cancellationToken);
-
+        
         var responseData = string.Empty;
         if (response.IsSuccessStatusCode)
             responseData = await response.Content.ReadAsStringAsync(cancellationToken);
         else
-            Console.WriteLine($"请求失败，状态码: {response.StatusCode}");
+            StarDebug.Error($"请求失败，状态码: {response.StatusCode}");
 
         var document = new HtmlDocument();
         document.LoadHtml(responseData);
@@ -84,7 +86,7 @@ public class ModLinks
                 where !string.IsNullOrEmpty(modPicLink)
                 select new OnlineMod(modLink, modName!, modPicLink);
 
-        Console.WriteLine("未找到 mod 信息");
+        StarDebug.Error("未找到 mod 信息");
         return [];
     }
 
@@ -102,8 +104,8 @@ public class ModLinks
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error in GetModPicUrl: {ex.Message}");
-            Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+            StarDebug.Error($"Error in GetModPicUrl: {ex.Message}");
+            StarDebug.Error($"Stack Trace: {ex.StackTrace}");
             return string.Empty;
         }
     }
@@ -123,8 +125,8 @@ public class ModLinks
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error in GetModPicsUrl: {ex.Message}");
-            Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+            StarDebug.Error($"Error in GetModPicsUrl: {ex.Message}");
+            StarDebug.Error($"Stack Trace: {ex.StackTrace}");
             return [];
         }
     }
@@ -160,18 +162,20 @@ public class ModLinks
 
     public static ModLinks Create()
     {
-        var links = Instance;
-        links._nav = true;
-        links._home = false;
-        links._type = 0;
-        links._userId = 0;
-        links._gameId = 1303;
-        links._advfilt = true;
-        links._includeAdult = false;
-        links._showGameFilter = false;
-        links._pageSize = 20;
-        links._page = 1;
-        links._sortBy = SortType.Date;
+        var links = new ModLinks
+        {
+            _nav = true,
+            _home = false,
+            _type = 0,
+            _userId = 0,
+            _gameId = 1303,
+            _advfilt = true,
+            _includeAdult = false,
+            _showGameFilter = false,
+            _pageSize = 20,
+            _page = 1,
+            _sortBy = SortType.Date
+        };
         return links;
     }
 

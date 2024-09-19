@@ -1,6 +1,6 @@
 using Avalonia.Controls;
 
-namespace StarModsManager.Views;
+namespace StarModsManager.Views.Items;
 
 public partial class ModView : UserControl
 {
