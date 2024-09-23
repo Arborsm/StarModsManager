@@ -10,23 +10,41 @@
     x:DataType="items:ModViewModel"
     mc:Ignorable="d">
 
+    <Design.DataContext>
+        <items:ModViewModel />
+    </Design.DataContext>
+
     <UserControl.Resources>
         <MenuFlyout x:Key="ContextMenu">
-            <MenuItem Command="{Binding OpenUrlCommand}" Header="访问Mod网页" />
-            <MenuItem Command="{Binding AsyncLoadCoverCommand}" Header="刷新Mod" />
+            <MenuItem Classes.EnabledMod="{Binding IsDisabled}" Command="{Binding SwitchModCommand}" />
             <MenuItem Command="{Binding OpenModFolderCommand}" Header="打开Mod目录" />
             <MenuItem Command="{Binding ChangeCoverCommand}" Header="更改图片" />
+            <MenuItem Command="{Binding OpenUrlCommand}" Header="访问Mod网页" />
+            <MenuItem Command="{Binding AsyncLoadCoverCommand}" Header="刷新Mod" />
         </MenuFlyout>
     </UserControl.Resources>
+    <UserControl.Styles>
+        <Style Selector="Border.Disabled">
+            <Setter Property="BorderThickness" Value="2" />
+        </Style>
+        <Style Selector="MenuItem.EnabledMod">
+            <Setter Property="Header" Value="启用Mod" />
+        </Style>
+        <Style Selector="MenuItem">
+            <Setter Property="Header" Value="禁用Mod" />
+        </Style>
+    </UserControl.Styles>
 
     <Grid
         Width="200"
         Height="200"
         RowDefinitions="*, Auto">
-        <Border ClipToBounds="True" CornerRadius="10">
+        <Border
+            BorderBrush="Red"
+            Classes.Disabled="{Binding IsDisabled}"
+            ClipToBounds="True">
             <Panel Background="Transparent" ContextFlyout="{StaticResource ContextMenu}">
                 <Image
-                    Width="200"
                     VerticalAlignment="Center"
                     Source="{Binding Pic}"
                     Stretch="Uniform" />
@@ -36,6 +54,15 @@
                         Height="75"
                         Data="{StaticResource GameRegular}" />
                 </Panel>
+                <Rectangle Fill="#80000000" IsVisible="{Binding IsDisabled}" />
+                <TextBlock
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    FontSize="20"
+                    FontWeight="Bold"
+                    Foreground="White"
+                    IsVisible="{Binding IsDisabled}"
+                    Text="已禁用" />
             </Panel>
         </Border>
         <TextBlock

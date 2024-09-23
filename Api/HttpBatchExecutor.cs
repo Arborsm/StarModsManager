@@ -53,7 +53,8 @@ public class HttpBatchExecutor
                 (outcome, timespan, retryAttempt, _) =>
                 {
                     var message = outcome.Result is not null
-                        ? $"HTTP Status Code: {outcome.Result.StatusCode}" : outcome.Exception?.Message;
+                        ? $"HTTP Status Code: {outcome.Result.StatusCode}"
+                        : outcome.Exception?.Message;
                     StarDebug.Trace(
                         $"Retry {retryAttempt} after {timespan.TotalSeconds:0.00}s delay due to: {message}");
                 }
@@ -126,16 +127,14 @@ public class HttpBatchExecutor
                 // StarDebug.Debug($"Task {x.index} start after {initialDelay.TotalSeconds:0.00}s.");
                 return await executeTask(x.task, initialDelay, cancellationToken);
             });
-            
+
             var stopwatch = Stopwatch.StartNew();
             results.AddRange(await Task.WhenAll(groupTasks).WithDebugElapsedTime($"TaskGroup{group.Key}"));
             stopwatch.Stop();
-            
+
             if (!(stopwatch.ElapsedMilliseconds <= 3000))
-            {
                 await Task.Delay(TimeSpan.FromSeconds(Jitter.NextDouble() * 3), cancellationToken);
-            }
-            
+
             StarDebug.Debug($"Group {group.Key} finished.");
         }
 

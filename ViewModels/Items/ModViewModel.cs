@@ -5,21 +5,39 @@ using CommunityToolkit.Mvvm.Input;
 using FluentAvalonia.UI.Controls;
 using StarModsManager.Common.Main;
 using StarModsManager.Common.Mods;
-using StarModsManager.Views;
+using StarModsManager.ViewModels.Customs;
 using PicsSelectView = StarModsManager.Views.Customs.PicsSelectView;
 
 namespace StarModsManager.ViewModels.Items;
 
 public partial class ModViewModel : ViewModelBase
 {
-    [ObservableProperty] 
+    [ObservableProperty]
     private Bitmap? _pic;
+    [ObservableProperty]
+    private bool _isDisabled;
 
     public ModViewModel(OnlineMod onlineMod, LocalMod? localMod = default)
     {
         OnlineMod = onlineMod;
         LocalMod = localMod;
-        if (string.IsNullOrEmpty(onlineMod.ModId) && localMod == null) Task.Run(OnlineMod.SaveAsync);
+        if (string.IsNullOrEmpty(onlineMod.ModId) && localMod == null)
+        {
+            Task.Run(OnlineMod.SaveAsync);
+        }
+        else if (localMod is not null)
+        {
+            IsDisabled = Path.GetFileName(localMod.PathS).StartsWith('.');
+            _localModPath = localMod.PathS;
+        }
+    }
+
+    // Test
+    public ModViewModel() : this(
+        new OnlineMod())
+    {
+        Pic = new Bitmap("D:\\Users\\26537\\AppData\\Roaming\\StarModsManager\\Cache\\14070\\14070-1665488527-1800567611.bmp");
+        IsDisabled = true;
     }
 
     public OnlineMod OnlineMod { get; }
@@ -27,13 +45,14 @@ public partial class ModViewModel : ViewModelBase
     public LocalMod? LocalMod { get; }
 
     private bool IsLocal => LocalMod is not null;
+    private string? _localModPath;
 
     [RelayCommand(CanExecute = nameof(IsLocal))]
     private async Task ChangeCover()
     {
         if (LocalMod is not null)
         {
-            var content = new Customs.PicsSelectViewModel(this);
+            var content = new PicsSelectViewModel(this);
             var dialog = new ContentDialog
             {
                 Title = "Change Cover",
@@ -57,17 +76,34 @@ public partial class ModViewModel : ViewModelBase
     {
         if (LocalMod is not null) Process.Start("explorer.exe", LocalMod.PathS);
     }
-    
+
     [RelayCommand]
     private void OpenUrl()
     {
         if (OnlineMod.Url is not null) Process.Start("explorer.exe", OnlineMod.Url);
     }
-    
+
     [RelayCommand]
     private async Task AsyncLoadCover()
     {
         await LoadCover(TimeSpan.Zero, CancellationToken.None, true);
+    }
+    
+    [RelayCommand(CanExecute = nameof(IsLocal))]
+    private void SwitchMod() => IsDisabled = ToggleDotPrefix();
+    
+    private bool ToggleDotPrefix()
+    {
+        if (!Directory.Exists(_localModPath)) return IsDisabled;
+
+        var directoryName = Path.GetFileName(_localModPath);
+        var parentDirectory = Path.GetDirectoryName(_localModPath)!;
+        var newDirectoryName = directoryName.StartsWith('.') ? directoryName[1..] : '.' + directoryName;
+        var newPath = Path.Combine(parentDirectory, newDirectoryName);
+
+        Directory.Move(_localModPath, newPath);
+        _localModPath = newPath;
+        return !IsDisabled;
     }
 
     public async Task LoadCover(TimeSpan delay,
@@ -78,6 +114,7 @@ public partial class ModViewModel : ViewModelBase
             Pic = await Task.Run(() => new Bitmap(LocalMod.InfoPicturePath), cancellationToken);
             return;
         }
+
         if (refresh) StarDebug.Debug(@"Refreshing Cover");
         try
         {

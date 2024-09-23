@@ -7,7 +7,6 @@ using Avalonia.Styling;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FluentAvalonia.Styling;
-using StarModsManager.Common.Config;
 using StarModsManager.Common.Main;
 
 namespace StarModsManager.ViewModels.Pages;
@@ -19,21 +18,21 @@ public partial class SettingsPageViewModel : ViewModelBase, IViewModel
     private const string Light = "Light";
     private readonly FluentAvaloniaTheme _faTheme;
 
-    [ObservableProperty] 
+    [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CustomAccentColor))]
     private string _currentAppTheme = System;
 
-    [ObservableProperty] 
+    [ObservableProperty]
     private FlowDirection _currentFlowDirection;
 
-    [ObservableProperty] 
+    [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ListBoxColor))]
     private Color _customAccentColor = Colors.SlateBlue;
 
-    [ObservableProperty] 
+    [ObservableProperty]
     private Color? _listBoxColor;
 
-    [ObservableProperty] 
+    [ObservableProperty]
     private string _modDir;
 
     [ObservableProperty]
@@ -45,7 +44,7 @@ public partial class SettingsPageViewModel : ViewModelBase, IViewModel
     {
         GetPredefColors();
         _faTheme = (FluentAvaloniaTheme)Application.Current!.Styles.First(it => it is FluentAvaloniaTheme);
-        _modDir = Program.MainConfig.DirectoryPath;
+        _modDir = Services.MainConfig.DirectoryPath;
 #if DEBUG
         _modDir = "E:\\SteamLibrary\\steamapps\\common\\Stardew Valley\\mods";
 #endif
@@ -194,8 +193,7 @@ public partial class SettingsPageViewModel : ViewModelBase, IViewModel
 
     partial void OnModDirChanged(string value)
     {
-        Program.MainConfig.DirectoryPath = value;
-        ConfigManager<MainConfig>.Save(Program.MainConfig);
+        Services.MainConfig.DirectoryPath = value;
     }
 
     [RelayCommand]

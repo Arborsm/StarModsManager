@@ -29,6 +29,7 @@ public partial class MainNavigation : UserControl
             {
                 "Main" => new MainPageView { DataContext = Services.GetViewModel<MainPageViewModel>() },
                 "Download" => new DownloadPageView { DataContext = Services.GetViewModel<DownloadPageViewModel>() },
+                "Check" => new ProofreadPageView { DataContext = Services.GetViewModel<ProofreadPageViewModel>() },
                 _ => new UserControl()
             };
 

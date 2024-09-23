@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO.Compression;
 using System.Text;
@@ -16,14 +15,11 @@ internal static class Tools
         this IEnumerable<TSource> source,
         Action<TSource> action)
     {
-        foreach (var item in source)
-        {
-            action(item);
-        }
+        foreach (var item in source) action(item);
     }
-    
+
     /// <summary>
-    /// 根据参考字典的键顺序对字典进行排序。
+    ///     根据参考字典的键顺序对字典进行排序。
     /// </summary>
     /// <typeparam name="TKey">字典键的类型。</typeparam>
     /// <typeparam name="TValue">字典值的类型。</typeparam>
@@ -43,13 +39,13 @@ internal static class Tools
     }
 
     /// <summary>
-    /// 读取本地化文件。
+    ///     读取本地化文件。
     /// </summary>
     /// <param name="localMod">本地化模块。</param>
     /// <param name="lang">语言代码。</param>
     /// <returns>默认语言和目标语言的字典。</returns>
     public static (Dictionary<string, string> defaultLang, Dictionary<string, string> targetLang) ReadMap(
-        this LocalMod localMod, 
+        this LocalMod localMod,
         string lang)
     {
         var files = Directory.GetFiles(localMod.PathS + "\\i18n", "*.json");
@@ -64,7 +60,7 @@ internal static class Tools
     }
 
     /// <summary>
-    /// 将double值转换为整数字符串。
+    ///     将double值转换为整数字符串。
     /// </summary>
     /// <param name="value">要转换的double值。</param>
     /// <returns>整数字符串。</returns>
@@ -74,7 +70,7 @@ internal static class Tools
     }
 
     /// <summary>
-    /// 创建备份文件夹。
+    ///     创建备份文件夹。
     /// </summary>
     /// <param name="directoryPath">备份文件夹路径。</param>
     /// <param name="zipFileName">备份文件名。</param>
@@ -88,7 +84,7 @@ internal static class Tools
     }
 
     /// <summary>
-    /// 压缩文件夹。
+    ///     压缩文件夹。
     /// </summary>
     /// <param name="directoryPath">文件夹路径。</param>
     /// <param name="archive">压缩文件夹。</param>
@@ -130,7 +126,7 @@ internal static class Tools
 
     public static Dictionary<string, string> GetTargetLang(this string path)
     {
-        return GetTargetLang(path, Program.TransConfig.Language + ".json");
+        return GetTargetLang(path, Services.TransConfig.Language + ".json");
     }
 
     public static Dictionary<string, string> GetDefaultLang(this string path)
@@ -140,14 +136,15 @@ internal static class Tools
     }
 
     /// <summary>
-    /// 扩展方法，用于测量异步任务的耗时并返回耗时和任务的结果。
+    ///     扩展方法，用于测量异步任务的耗时并返回耗时和任务的结果。
     /// </summary>
     /// <typeparam name="T">任务结果的类型。</typeparam>
     /// <param name="task">需要测量的异步任务。</param>
     /// <param name="arg">可选输出文本</param>
     /// <param name="level">日志级别</param>
     /// <returns>任务的结果。</returns>
-    public static async Task<T> WithDebugElapsedTime<T>(this Task<T> task, string? arg = default, LogLevel? level = default)
+    public static async Task<T> WithDebugElapsedTime<T>(this Task<T> task, string? arg = default,
+        LogLevel? level = default)
     {
         if (level == null) level = LogLevel.Debug;
         var stopwatch = Stopwatch.StartNew();
@@ -158,11 +155,12 @@ internal static class Tools
     }
 
     /// <summary>
-    /// 扩展方法，用于测量无返回值异步任务的耗时。
+    ///     扩展方法，用于测量无返回值异步任务的耗时。
     /// </summary>
     /// <param name="task">需要测量的异步任务。</param>
     /// <param name="arg">可选输出文本</param>
-    /// /// <param name="level">日志级别</param>
+    /// ///
+    /// <param name="level">日志级别</param>
     /// <returns>任务。</returns>
     public static async Task WithDebugElapsedTime(this Task task, string? arg = default, LogLevel? level = default)
     {

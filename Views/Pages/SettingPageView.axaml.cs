@@ -20,6 +20,9 @@ public partial class SettingsPageView : UserControl
             Title = "Select LocalModsMap Folder",
             AllowMultiple = false
         });
-        (DataContext as SettingsPageViewModel)!.ModDir = folder[0].Path.LocalPath;
+        if (folder.Count > 0)
+        {
+            (DataContext as SettingsPageViewModel)!.ModDir = folder[0].Path.LocalPath;
+        }
     }
 }

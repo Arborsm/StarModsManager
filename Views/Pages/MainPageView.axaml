@@ -15,7 +15,10 @@
     </Design.DataContext>
 
     <Panel Margin="40">
-        <ListBox Background="Transparent" ItemsSource="{Binding Mods}">
+        <ListBox
+            AutoScrollToSelectedItem="False"
+            Background="Transparent"
+            ItemsSource="{Binding Mods}">
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
                     <WrapPanel />

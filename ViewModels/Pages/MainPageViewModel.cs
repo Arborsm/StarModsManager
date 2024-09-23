@@ -2,6 +2,7 @@
 using StarModsManager.Api;
 using StarModsManager.Common.Main;
 using StarModsManager.Common.Mods;
+using StarModsManager.ViewModels.Items;
 
 namespace StarModsManager.ViewModels.Pages;
 
@@ -12,21 +13,20 @@ public class MainPageViewModel : ViewModelBase, IViewModel
         Task.Run(LoadMods);
     }
 
-    public ObservableCollection<Items.ModViewModel> Mods { get; } = [];
-
-    private async void LoadMods()
+    public ObservableCollection<ModViewModel> Mods { get; } = [];
+    
+    public async void LoadMods()
     {
-        await ModData.Instance.FindModsAsync(Program.MainConfig.DirectoryPath);
-        var mods = ModData.Instance.LocalModsMap.Values
+        await ModData.Instance.FindModsAsync(Services.MainConfig.DirectoryPath);
+        ModData.Instance.LocalModsMap.Values
             .AsParallel()
-            .Select(it => new Items.ModViewModel(it.OnlineMod, it))
-            .OrderBy(it => it.OnlineMod.Title);
+            .Select(it => new ModViewModel(it.OnlineMod, it))
+            .OrderBy(it => it.OnlineMod.Title)
+            .Where(it => !string.IsNullOrEmpty(it.OnlineMod.ModId))
+            .ForEach(it => Mods.Add(it));
 
-        foreach (var mod in mods.Where(it => !string.IsNullOrEmpty(it.OnlineMod.ModId))) Mods.Add(mod);
-
-        var tasks = Mods.Select(mod => (Func<TimeSpan, CancellationToken, Task>)(async (delay, ct) =>
-            await mod.LoadCover(delay, ct)));
-
+        var tasks = Mods.Select(mod => (Func<TimeSpan, CancellationToken, Task>)
+            (async (delay, ct) => await mod.LoadCover(delay, ct)));
         await HttpBatchExecutor.Instance.ExecuteBatchAsync(tasks, cancellationToken: CancellationToken.None);
     }
 }

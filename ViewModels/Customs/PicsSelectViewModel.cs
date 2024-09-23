@@ -14,18 +14,18 @@ namespace StarModsManager.ViewModels.Customs;
 
 public partial class PicsSelectViewModel : ViewModelBase
 {
-    public ObservableCollection<BitmapViewModel> Pics { get; } = [];
-
-    [ObservableProperty] private bool _isLoading;
-    [ObservableProperty] private BitmapViewModel? _selectedPic;
-
     private readonly ModViewModel _mod;
+
+    [ObservableProperty]
+    private bool _isLoading;
+
+    [ObservableProperty]
+    private BitmapViewModel? _selectedPic;
 
     // Test
     public PicsSelectViewModel()
     {
-        _mod = new ModViewModel(new OnlineMod("", "", ""),
-            new LocalMod("E:\\SteamLibrary\\steamapps\\common\\Stardew Valley\\mods\\[CP] H&W Bathroom Furniture"));
+        _mod = new ModViewModel();
         Task.Run(LoadPicsAsync);
     }
 
@@ -34,6 +34,9 @@ public partial class PicsSelectViewModel : ViewModelBase
         _mod = mod;
         Task.Run(LoadPicsAsync);
     }
+
+    public ObservableCollection<BitmapViewModel> Pics { get; } = [];
+    public bool IsListEmpty => Pics.Count < 1;
 
     private async Task LoadPicsAsync()
     {
@@ -53,10 +56,10 @@ public partial class PicsSelectViewModel : ViewModelBase
         IsLoading = true;
         List<BitmapViewModel> pics = [];
         var modLinks = await ModLinks.Instance.GetModPicsUrl(modUrl, ModLinks.Pics);
-        
+
         await Task.WhenAll(modLinks.Select(async it =>
         {
-            var cachePath = Path.Combine(Program.MainConfig.CachePath, _mod.OnlineMod.ModId);
+            var cachePath = Path.Combine(Services.MainConfig.CachePath, _mod.OnlineMod.ModId);
             if (!Path.Exists(cachePath)) Directory.CreateDirectory(cachePath);
             var picFilePath = Path.Combine(cachePath, Path.GetFileNameWithoutExtension(it) + ".bmp");
             var picStream = await _mod.OnlineMod.LoadPicBitmapAsync(it, picFilePath);
@@ -66,15 +69,12 @@ public partial class PicsSelectViewModel : ViewModelBase
                 pics.Add(new BitmapViewModel(pic, picFilePath));
             }
         }));
-        
+
         await Dispatcher.UIThread.InvokeAsync(() =>
         {
-            foreach (var pic in pics)
-            {
-                Pics.Add(pic);
-            }
+            foreach (var pic in pics) Pics.Add(pic);
         });
-        
+
         IsLoading = false;
     }
 
@@ -115,7 +115,7 @@ public partial class PicsSelectViewModel : ViewModelBase
                     AllowMultiple = false,
                     FileTypeFilter = fileTypes
                 });
-            
+
             var picPath = _mod.LocalMod!.InfoPicturePath;
             if (customPicPath.Count > 0)
             {
@@ -130,9 +130,11 @@ public partial class PicsSelectViewModel : ViewModelBase
                             bitmap.Save(destinationStream);
                         }
                     }
+
                     StarDebug.Error("Image converted and saved successfully.");
                 }
             }
+
             await _mod.LoadCover(TimeSpan.Zero, CancellationToken.None);
         }
         catch (Exception ex)

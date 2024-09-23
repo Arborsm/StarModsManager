@@ -21,8 +21,7 @@ public class Translator
 
     public ITranslator UpdateConfig()
     {
-        Program.TransConfig.TransApiConf = ConfigManager<TransApiConfig>.Load(Program.TransConfig.ApiSelected);
-        return Apis.First(it => it.Name == Program.TransConfig.ApiSelected);
+        return Apis.First(it => it.Name == Services.TransConfig.ApiSelected);
     }
 
     private void FindAllApis()
@@ -43,13 +42,13 @@ public class Translator
 
     internal async Task<string?> TranslateText(string text)
     {
-        return ContainsChinese(text) ? text : await TranslateText(text, Program.TransConfig.EnToCn);
+        return ContainsChinese(text) ? text : await TranslateText(text, Services.TransConfig.EnToCn);
     }
 
     internal async Task<string> TranslateText(string text, string role)
     {
         var token = new CancellationToken(); // Form is not null ? Form.Tsl.Token : 
-        return await CurrentTranslator.StreamCallWithMessage(text, role, Program.TransConfig, token);
+        return await CurrentTranslator.StreamCallWithMessage(text, role, Services.TransApiConfig, token);
     }
 
     internal async Task<Dictionary<string, string>> ProcessText(
@@ -97,13 +96,13 @@ public class Translator
 
     private async Task ProcessDirectory(string directoryPath)
     {
-        var target = Program.TransConfig.Language + ".json";
+        var target = Services.TransConfig.Language + ".json";
         var defaultLang = directoryPath.GetDefaultLang();
         var targetLang = directoryPath.GetTargetLang();
         targetLang = targetLang.Sort(defaultLang);
         var path = Path.Combine(directoryPath, "i18n");
 
-        var tran = await ProcessText(defaultLang, targetLang, Program.TransConfig.EnToCn);
+        var tran = await ProcessText(defaultLang, targetLang, Services.TransConfig.EnToCn);
 
         if (defaultLang.IsMismatchedTokens(tran)) ModData.Instance.IsMismatchedTokens = true;
 

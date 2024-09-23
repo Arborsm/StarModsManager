@@ -7,12 +7,12 @@ namespace StarModsManager.Common.Mods;
 
 public class ModLinks
 {
-    private static readonly Lazy<ModLinks> LazyInstance = new(() => Create());
-    
     public const string Header = "//div[@class='img-wrapper header-img']/img";
 
     public const string Pics =
         "//ul[@id='mod_images_list_1']//li[contains(@class, 'image-tile')]//a[@class='mod-image']";
+
+    private static readonly Lazy<ModLinks> LazyInstance = new(() => Create());
 
     private bool _advfilt;
     private int _gameId;
@@ -26,7 +26,7 @@ public class ModLinks
     private string _sortBy = null!;
     private int _type;
     private int _userId;
-    
+
     public static ModLinks Instance => LazyInstance.Value;
 
     private async Task<HttpResponseMessage> GetModsPage(string? searchText = null,
@@ -55,7 +55,7 @@ public class ModLinks
         catch (Exception e)
         {
             StarDebug.Error($"请求失败，异常信息: {e.Message}");
-            
+
             return new HttpResponseMessage();
         }
     }
@@ -64,7 +64,7 @@ public class ModLinks
         CancellationToken cancellationToken = default)
     {
         var response = await GetModsPage(searchText, cancellationToken);
-        
+
         var responseData = string.Empty;
         if (response.IsSuccessStatusCode)
             responseData = await response.Content.ReadAsStringAsync(cancellationToken);

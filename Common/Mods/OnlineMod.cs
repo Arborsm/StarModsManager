@@ -8,10 +8,13 @@ public class OnlineMod
 {
     private readonly string _cachePath;
 
+    public OnlineMod() : this("https://www.nexusmods.com/stardewvalley/mods/14070",
+        "Fancy Crops and Foraging Retexture", "") { }
+
     public OnlineMod(string? url, string title, string picUrl)
     {
         var modId = url?.Split('/').Last() ?? string.Empty;
-        _cachePath = Path.Combine(Program.MainConfig.CachePath, modId);
+        _cachePath = Path.Combine(Services.MainConfig.CachePath, modId);
         ModId = modId;
         Url = url;
         Title = title;
@@ -26,7 +29,7 @@ public class OnlineMod
     public async void SaveAsync()
     {
         if (string.IsNullOrEmpty(ModId)) return;
-        if (!Directory.Exists(Program.MainConfig.CachePath)) Directory.CreateDirectory(Program.MainConfig.CachePath);
+        if (!Directory.Exists(Services.MainConfig.CachePath)) Directory.CreateDirectory(Services.MainConfig.CachePath);
 
         await using var fs = File.OpenWrite(_cachePath);
         await SaveToStreamAsync(this, fs);
@@ -52,8 +55,9 @@ public class OnlineMod
         await Task.Delay(delay, cancellationToken);
         return await LoadPicBitmapAsync(PicUrl, _cachePath + ".bmp", CancellationToken.None);
     }
-    
-    public async Task<Stream?> LoadPicBitmapAsync(string picUrl, string cachePath, CancellationToken cancellationToken = default)
+
+    public async Task<Stream?> LoadPicBitmapAsync(string picUrl, string cachePath,
+        CancellationToken cancellationToken = default)
     {
         if (File.Exists(cachePath)) return File.OpenRead(cachePath);
 

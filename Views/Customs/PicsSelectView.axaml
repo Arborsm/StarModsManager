@@ -5,7 +5,6 @@
     xmlns:customs="clr-namespace:StarModsManager.ViewModels.Customs"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:viewModels="clr-namespace:StarModsManager.ViewModels"
     Width="500"
     Height="450"
     x:DataType="customs:PicsSelectViewModel"
@@ -22,6 +21,7 @@
         <Panel>
             <ListBox
                 Background="Transparent"
+                IsVisible="{Binding !IsListEmpty}"
                 ItemsSource="{Binding Pics}"
                 SelectedItem="{Binding SelectedPic}">
                 <ListBox.ItemsPanel>
@@ -30,8 +30,10 @@
                     </ItemsPanelTemplate>
                 </ListBox.ItemsPanel>
             </ListBox>
-            <TextBlock IsVisible="False" Text="Cannot find any pictures in the mod page" />
-            <!--  IsVisible="{Binding Pics.Count, Converter={x:Static DefaultValueConverter.Instance}}" TODO have to sleep...  -->
+            <TextBlock
+                IsEnabled="{Binding IsListEmpty}"
+                IsVisible="False"
+                Text="Cannot find any pictures in the mod page" />
         </Panel>
     </DockPanel>
 </UserControl>

@@ -70,7 +70,6 @@ internal class ModData
         I18LocalMods = LocalModsMap.Values
             .AsParallel()
             .Where(mod => mod.Lang.Count > 0 && Directory.Exists(mod.PathS))
-            .Where(it => it.DefaultLang.Keys.Any(key => !it.TargetLang.ContainsKey(key)))
             .ToArray();
     }
 

@@ -1,5 +1,4 @@
 ﻿using Avalonia.Controls;
-using StarModsManager.ViewModels.Pages;
 
 namespace StarModsManager.Views.Pages;
 

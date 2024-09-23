@@ -1,9 +1,15 @@
-﻿namespace StarModsManager.Common.Config;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 
-public class TransApiConfig
+namespace StarModsManager.Common.Config;
+
+public partial class TransApiConfig : ConfigBase
 {
-    public string Api { get; set; } = "your-api-key";
-    public string Url { get; set; } = "https://api.openai.com";
-    public string Model { get; set; } = "gpt-3.5-turbo";
-    public List<string> Models { get; set; } = [];
+    [ObservableProperty]
+    private string _api = "your-api-key";
+    [ObservableProperty]
+    private string _url = "https://api.openai.com";
+    [ObservableProperty]
+    private string _model = "gpt-3.5-turbo";
+    [ObservableProperty]
+    private string[] _models = [];
 }

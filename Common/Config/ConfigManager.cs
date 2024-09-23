@@ -1,17 +1,41 @@
-﻿using Newtonsoft.Json;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Newtonsoft.Json;
 using StarModsManager.Common.Main;
 
 namespace StarModsManager.Common.Config;
 
-public static class ConfigManager<T> where T : new()
+
+public abstract class ConfigBase : ObservableObject;
+
+public class ConfigManager<T> : ObservableObject where T : ConfigBase, new()
 {
-    public static T Load(string? additionName = null)
+    private readonly T _config = null!;
+    private readonly string _additionName;
+
+    public T Config
     {
-        additionName = additionName == null ? string.Empty : "_" + additionName;
-        var configFilePath = Path.Combine(Program.AppSavingPath, typeof(T).Name + additionName + ".json");
+        get => _config;
+        private init => SetProperty(ref _config, value);
+    }
+
+    private ConfigManager(string? additionName = null)
+    {
+        _additionName = additionName == null ? string.Empty : "_" + additionName;
+        Config = Load();
+        Config.PropertyChanged += (_, _) => Save();
+    }
+
+    public static ConfigManager<T> GetInstance(string? additionName = null)
+    {
+        return new ConfigManager<T>(additionName);
+    }
+
+    private T Load()
+    {
+        var configFilePath = GetConfigFilePath();
         if (!File.Exists(configFilePath))
         {
-            Directory.CreateDirectory(Program.AppSavingPath);
+            Directory.CreateDirectory(Services.AppSavingPath);
             return new T();
         }
 
@@ -19,11 +43,15 @@ public static class ConfigManager<T> where T : new()
         return JsonConvert.DeserializeObject<T>(json)!;
     }
 
-    public static void Save(T config, string? additionName = null)
+    private void Save()
     {
-        additionName = additionName == null ? string.Empty : "_" + additionName;
-        var configFilePath = Path.Combine(Program.AppSavingPath, typeof(T).Name + additionName + ".json");
-        var json = JsonConvert.SerializeObject(config, Formatting.Indented);
+        var configFilePath = GetConfigFilePath();
+        var json = JsonConvert.SerializeObject(Config, Formatting.Indented);
         File.WriteAllText(configFilePath, json);
+    }
+
+    private string GetConfigFilePath()
+    {
+        return Path.Combine(Services.AppSavingPath, typeof(T).Name + _additionName + ".json");
     }
 }

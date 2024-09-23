@@ -11,13 +11,13 @@ public partial class DownloadPageViewModel : ViewModelBase, IViewModel
 {
     private CancellationTokenSource? _cts;
 
-    [ObservableProperty] 
+    [ObservableProperty]
     private bool _isBusy;
 
-    [ObservableProperty] 
+    [ObservableProperty]
     private string _searchText = string.Empty;
 
-    [ObservableProperty] 
+    [ObservableProperty]
     private ModViewModel? _selectedAlbum;
 
     public DownloadPageViewModel()
@@ -51,13 +51,9 @@ public partial class DownloadPageViewModel : ViewModelBase, IViewModel
     private async Task Refresh()
     {
         if (string.IsNullOrEmpty(SearchText))
-        {
             await DoSearch(SearchText);
-        }
         else
-        {
             await LoadMods();
-        }
     }
 
     private async Task LoadMods()
@@ -101,7 +97,7 @@ public partial class DownloadPageViewModel : ViewModelBase, IViewModel
         {
             foreach (var mod in mods)
             {
-                var vm = new Items.ModViewModel(mod);
+                var vm = new ModViewModel(mod);
                 SearchResults.Add(vm);
             }
 
@@ -117,7 +113,7 @@ public partial class DownloadPageViewModel : ViewModelBase, IViewModel
         var modList = mods.ToList();
         do
         {
-            foreach (var vm in modList.Select(mod => new Items.ModViewModel(mod))) SearchResults.Add(vm);
+            foreach (var vm in modList.Select(mod => new ModViewModel(mod))) SearchResults.Add(vm);
 
             if (!cancellationToken.IsCancellationRequested) LoadCovers(cancellationToken);
             await Task.Delay(1000, cancellationToken);
@@ -126,7 +122,7 @@ public partial class DownloadPageViewModel : ViewModelBase, IViewModel
 
     private async void LoadCovers(CancellationToken cancellationToken = default)
     {
-        var tasks = SearchResults.Select(uri => 
+        var tasks = SearchResults.Select(uri =>
             (Func<TimeSpan, CancellationToken, Task>)(async (delay, ct) => await uri.LoadCover(delay, ct)));
 
         await HttpBatchExecutor.Instance.ExecuteBatchAsync(tasks, cancellationToken: cancellationToken);
