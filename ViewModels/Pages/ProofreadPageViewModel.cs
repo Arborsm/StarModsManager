@@ -44,6 +44,7 @@ public partial class ProofreadPageViewModel : ViewModelBase, IViewModel
     {
         _langEditedCache[item.Key] = (item.SourceLang, item.TargetLang);
         IsNotSave = _langEditedCache.Count != 0;
+        if (IsNotSave) SaveCommand.NotifyCanExecuteChanged();
     }
 
     partial void OnShowLinesChanged(bool value)
@@ -153,7 +154,7 @@ public partial class ProofreadPageViewModel : ViewModelBase, IViewModel
         {
             return
             [
-                new ModLang("key", "sodddddddddssssssssssssssssssssssssddurce", "target", true),
+                new ModLang("key", "sodddddddddssssssssssssssssssssssssddurce", "target"),
                 new ModLang("key2", "sourcedgywiagydgwayugduywagdyugawyugduyawgdyugawyugdyuawgdyuwadugauywgd2",
                     "的女娃把电脑架空挖宝多看几遍科技部不断加快把我看不懂就看我把大家可别挖掘被大家挖宝角度看八戒悟空不断加快瓦伯爵挖矿机不断加快挖不到就看不挖基坑底部我到北京网卡绑定控件被挖", false),
                 new ModLang("key3", "souaaaaaaaaaaaaaaaaaaaaaaaaaaaarce3",
