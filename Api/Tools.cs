@@ -46,8 +46,9 @@ internal static class Tools
     /// <returns>默认语言和目标语言的字典。</returns>
     public static (Dictionary<string, string> defaultLang, Dictionary<string, string> targetLang) ReadMap(
         this LocalMod localMod,
-        string lang)
+        string? lang = null)
     {
+        lang ??= Services.TransConfig.Language;
         var files = Directory.GetFiles(localMod.PathS + "\\i18n", "*.json");
         var defaultLangFile = files.First(x => x.Contains("default"));
         var targetLangFile = files.FirstOrDefault(x => x.Contains(lang));
@@ -57,6 +58,12 @@ internal static class Tools
             : new Dictionary<string, string>();
         var targetLang = targetLangTemp.Sort(defaultLang);
         return (defaultLang, targetLang);
+    }
+
+    public static Dictionary<string, string> GetUntranslatedMap(this LocalMod localMod)
+    {
+        var (defaultLang, targetLang) = localMod.ReadMap();
+        return defaultLang.Where(x => !targetLang.ContainsKey(x.Key)).ToDictionary(x => x.Key, x => x.Value);
     }
 
     /// <summary>
@@ -146,7 +153,7 @@ internal static class Tools
     public static async Task<T> WithDebugElapsedTime<T>(this Task<T> task, string? arg = default,
         LogLevel? level = default)
     {
-        if (level == null) level = LogLevel.Debug;
+        if (level == null) level = LogLevel.Trace;
         var stopwatch = Stopwatch.StartNew();
         var result = await task;
         stopwatch.Stop();

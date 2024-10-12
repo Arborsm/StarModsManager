@@ -23,5 +23,8 @@
         <FluentTheme />
         <styling:FluentAvaloniaTheme PreferSystemTheme="True" PreferUserAccentColor="True" />
         <StyleInclude Source="avares://StarModsManager/Assets/Icons.axaml" />
+        <Style Selector="Window">
+            <Setter Property="FontFamily" Value="Microsoft YaHei UI,Simsun,苹方-简,宋体-简" />
+        </Style>
     </Application.Styles>
 </Application>

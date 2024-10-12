@@ -3,6 +3,7 @@ using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FluentAvalonia.UI.Controls;
+using StarModsManager.Api;
 using StarModsManager.Common.Main;
 using StarModsManager.Common.Mods;
 using StarModsManager.ViewModels.Customs;
@@ -41,8 +42,8 @@ public partial class ModViewModel : ViewModelBase
     }
 
     public OnlineMod OnlineMod { get; }
-
     public LocalMod? LocalMod { get; }
+    public bool LocalModIsNotNull => LocalMod is not null;
 
     private bool IsLocal => LocalMod is not null;
     private string? _localModPath;
@@ -106,8 +107,7 @@ public partial class ModViewModel : ViewModelBase
         return !IsDisabled;
     }
 
-    public async Task LoadCover(TimeSpan delay,
-        CancellationToken cancellationToken, bool refresh = false)
+    public async Task LoadCover(TimeSpan delay, CancellationToken cancellationToken, bool refresh = false)
     {
         if (LocalMod is not null && File.Exists(LocalMod.InfoPicturePath))
         {

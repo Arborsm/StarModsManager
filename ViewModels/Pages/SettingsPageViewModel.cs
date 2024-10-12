@@ -11,7 +11,7 @@ using StarModsManager.Common.Main;
 
 namespace StarModsManager.ViewModels.Pages;
 
-public partial class SettingsPageViewModel : ViewModelBase, IViewModel
+public partial class SettingsPageViewModel : ViewModelBase
 {
     private const string System = "System";
     private const string Dark = "Dark";
@@ -58,7 +58,7 @@ public partial class SettingsPageViewModel : ViewModelBase, IViewModel
 
     public List<Color> PredefinedColors { get; private set; } = [];
 
-    private ThemeVariant GetThemeVariant(string value)
+    private static ThemeVariant GetThemeVariant(string value)
     {
         return value switch
         {

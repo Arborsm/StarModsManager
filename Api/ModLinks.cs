@@ -12,7 +12,7 @@ public class ModLinks
     public const string Pics =
         "//ul[@id='mod_images_list_1']//li[contains(@class, 'image-tile')]//a[@class='mod-image']";
 
-    private static readonly Lazy<ModLinks> LazyInstance = new(() => Create());
+    private static readonly Lazy<ModLinks> LazyInstance = new(Create);
 
     private bool _advfilt;
     private int _gameId;
@@ -131,7 +131,7 @@ public class ModLinks
         }
     }
 
-    private async Task<HtmlDocument> FetchHtmlDocument(string modUrl, string picCode,
+    private static async Task<HtmlDocument> FetchHtmlDocument(string modUrl, string picCode,
         CancellationToken cancellationToken)
     {
         if (picCode == Pics) modUrl += "?tab=images";
@@ -143,7 +143,7 @@ public class ModLinks
         return htmlDoc;
     }
 
-    private string GetAttributeName(string picCode)
+    private static string GetAttributeName(string picCode)
     {
         return picCode switch
         {

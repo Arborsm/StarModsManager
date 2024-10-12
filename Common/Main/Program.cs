@@ -1,5 +1,4 @@
 ﻿using Avalonia;
-using StarModsManager.Common.Config;
 
 namespace StarModsManager.Common.Main;
 

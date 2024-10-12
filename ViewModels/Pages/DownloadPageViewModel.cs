@@ -7,7 +7,7 @@ using StarModsManager.ViewModels.Items;
 
 namespace StarModsManager.ViewModels.Pages;
 
-public partial class DownloadPageViewModel : ViewModelBase, IViewModel
+public partial class DownloadPageViewModel : ViewModelBase
 {
     private CancellationTokenSource? _cts;
 

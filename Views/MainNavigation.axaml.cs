@@ -1,4 +1,5 @@
 ﻿using Avalonia.Controls;
+using CommunityToolkit.Mvvm.DependencyInjection;
 using FluentAvalonia.UI.Controls;
 using StarModsManager.Common.Main;
 using StarModsManager.ViewModels.Pages;
@@ -20,16 +21,17 @@ public partial class MainNavigation : UserControl
     {
         if (e.IsSettingsSelected)
         {
-            var pg = new SettingsPageView { DataContext = Services.GetViewModel<SettingsPageViewModel>() };
+            var pg = new SettingsPageView { DataContext = Ioc.Default.GetRequiredService<SettingsPageViewModel>() };
             (sender as NavigationView)!.Content = pg;
         }
         else if (e.SelectedItem is NavigationViewItem navigationViewItem)
         {
             var pg = (navigationViewItem.Tag as string) switch
             {
-                "Main" => new MainPageView { DataContext = Services.GetViewModel<MainPageViewModel>() },
-                "Download" => new DownloadPageView { DataContext = Services.GetViewModel<DownloadPageViewModel>() },
-                "Check" => new ProofreadPageView { DataContext = Services.GetViewModel<ProofreadPageViewModel>() },
+                "Main" => new MainPageView { DataContext = Ioc.Default.GetRequiredService<MainPageViewModel>() },
+                "Download" => new DownloadPageView { DataContext = Ioc.Default.GetRequiredService<DownloadPageViewModel>() },
+                "Trans" => new TransPageView { DataContext = Ioc.Default.GetRequiredService<TransPageViewModel>() },
+                "Check" => new ProofreadPageView { DataContext = Ioc.Default.GetRequiredService<ProofreadPageViewModel>() },
                 _ => new UserControl()
             };
 

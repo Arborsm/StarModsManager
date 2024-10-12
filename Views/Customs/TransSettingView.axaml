@@ -1,0 +1,60 @@
+<UserControl
+    x:Class="StarModsManager.Views.Customs.TransSettingView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:customs="clr-namespace:StarModsManager.ViewModels.Customs"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    x:DataType="customs:TransSettingViewModel"
+    mc:Ignorable="d">
+    <StackPanel
+        Width="300"
+        Margin="10"
+        HorizontalAlignment="Left"
+        Orientation="Vertical">
+        <Grid ColumnDefinitions="Auto,*" RowDefinitions="*,*">
+            <Label
+                Grid.Row="0"
+                Grid.Column="0"
+                Margin="10,0,0,10"
+                VerticalAlignment="Center"
+                Content="API" />
+            <ComboBox
+                Grid.Row="0"
+                Grid.Column="1"
+                Margin="10,0,0,10"
+                HorizontalAlignment="Right"
+                ItemsSource="{Binding Apis}" />
+            <Label
+                Grid.Row="1"
+                Grid.Column="0"
+                Margin="10,0,0,10"
+                VerticalAlignment="Center"
+                Content="Language" />
+            <ComboBox
+                Grid.Row="1"
+                Grid.Column="1"
+                Margin="10,0,0,10"
+                HorizontalAlignment="Right"
+                ItemsSource="{Binding Langs}" />
+        </Grid>
+        <Label Margin="10,0,0,10" Content="Prompt Text:" />
+        <TextBox
+            Height="100"
+            Margin="10,0,0,0"
+            Text="{Binding PromptText}"
+            TextWrapping="Wrap" />
+        <StackPanel Orientation="Horizontal">
+            <Label
+                Margin="10,0"
+                VerticalAlignment="Center"
+                Content="Auto Backup" />
+            <ToggleSwitch
+                IsChecked="{Binding IsBackup}"
+                OffContent=""
+                OnContent="" />
+        </StackPanel>
+    </StackPanel>
+</UserControl>

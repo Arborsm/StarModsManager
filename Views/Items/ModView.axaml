@@ -16,9 +16,18 @@
 
     <UserControl.Resources>
         <MenuFlyout x:Key="ContextMenu">
-            <MenuItem Classes.EnabledMod="{Binding IsDisabled}" Command="{Binding SwitchModCommand}" />
-            <MenuItem Command="{Binding OpenModFolderCommand}" Header="打开Mod目录" />
-            <MenuItem Command="{Binding ChangeCoverCommand}" Header="更改图片" />
+            <MenuItem
+                Classes.EnabledMod="{Binding IsDisabled}"
+                Command="{Binding SwitchModCommand}"
+                IsVisible="{Binding LocalModIsNotNull}" />
+            <MenuItem
+                Command="{Binding OpenModFolderCommand}"
+                Header="打开Mod目录"
+                IsVisible="{Binding LocalModIsNotNull}" />
+            <MenuItem
+                Command="{Binding ChangeCoverCommand}"
+                Header="更改图片"
+                IsVisible="{Binding LocalModIsNotNull}" />
             <MenuItem Command="{Binding OpenUrlCommand}" Header="访问Mod网页" />
             <MenuItem Command="{Binding AsyncLoadCoverCommand}" Header="刷新Mod" />
         </MenuFlyout>

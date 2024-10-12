@@ -43,13 +43,12 @@ public class OnlineMod
     public async Task<Stream?> LoadPicBitmapAsync(TimeSpan delay, bool refresh = false,
         CancellationToken cancellationToken = default)
     {
+        if (refresh && File.Exists(_cachePath + ".bmp")) File.Delete(_cachePath + ".bmp");
+        if (File.Exists(_cachePath + ".bmp")) return File.OpenRead(_cachePath + ".bmp");
+        
         if (string.IsNullOrEmpty(PicUrl) || (refresh && !PicUrl.Contains("http")))
             if (Url is not null)
                 PicUrl = await ModLinks.Instance.GetModPicUrl(Url, ModLinks.Pics, cancellationToken);
-
-        if (refresh && File.Exists(_cachePath + ".bmp")) File.Delete(_cachePath + ".bmp");
-
-        if (File.Exists(_cachePath + ".bmp")) return File.OpenRead(_cachePath + ".bmp");
 
         if (string.IsNullOrEmpty(PicUrl)) return null;
         await Task.Delay(delay, cancellationToken);

@@ -12,28 +12,26 @@ using StarModsManager.Common.Mods;
 
 namespace StarModsManager.ViewModels.Pages;
 
-public partial class ProofreadPageViewModel : ViewModelBase, IViewModel
+public partial class ProofreadPageViewModel : ViewModelBase
 {
     private static Dictionary<string, (string?, string?)> _langMap = null!;
     private readonly Dictionary<string, (string?, string?)> _langEditedCache = [];
 
     [ObservableProperty]
     private LocalMod _currentMod = null!;
-
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(SaveCommand))]
     private bool _isNotSave;
-
-    [ObservableProperty]
-    private bool _isFinish;
-
     [ObservableProperty]
     private bool _isFilter = Services.ProofreadConfig.IsFilter;
-
     [ObservableProperty]
     private bool _showLines = Services.ProofreadConfig.HasBorder;
-
     [ObservableProperty]
     private bool _isVisibleHeader = Services.ProofreadConfig.IsVisibleHeader;
+    [ObservableProperty]
+    private bool _canSort = Services.ProofreadConfig.CanSort;
+    [ObservableProperty]
+    private bool _canResize = Services.ProofreadConfig.EnableHeaderResizing;
 
     public required DataGridCollectionView ModLangsView { get; set; }
 
@@ -42,9 +40,9 @@ public partial class ProofreadPageViewModel : ViewModelBase, IViewModel
 
     public void AddEditedLang(ModLang item)
     {
+        if (item.TargetLang == _langMap[item.Key].Item2) return;
         _langEditedCache[item.Key] = (item.SourceLang, item.TargetLang);
         IsNotSave = _langEditedCache.Count != 0;
-        if (IsNotSave) SaveCommand.NotifyCanExecuteChanged();
     }
 
     partial void OnShowLinesChanged(bool value)
@@ -72,9 +70,15 @@ public partial class ProofreadPageViewModel : ViewModelBase, IViewModel
             ModLangsView.Filter = _ => true;
         }
     }
+    
+    public void Clear()
+    {
+        _langEditedCache.Clear();
+        IsNotSave = false;
+    }
 
     [RelayCommand(CanExecute = nameof(IsNotSave))]
-    private async Task Save()
+    public async Task Save()
     {
         var (_, targetLang) = CurrentMod.ReadMap(Services.TransConfig.Language);
         foreach (var kv in _langEditedCache)
@@ -96,6 +100,8 @@ public partial class ProofreadPageViewModel : ViewModelBase, IViewModel
             IsNotSave = false;
         }
     }
+    
+    
 
     public ProofreadPageViewModel()
     {

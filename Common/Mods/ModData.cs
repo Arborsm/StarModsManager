@@ -1,19 +1,22 @@
 ﻿using System.Text.Json;
+using CommunityToolkit.Mvvm.Input;
 using StarModsManager.Assets.Lang;
+using StarModsManager.Common.Main;
 
 namespace StarModsManager.Common.Mods;
 
 internal class ModData
 {
-    public static readonly ModData Instance = new();
-    public LocalMod[] I18LocalMods = null!;
     public bool IsMismatchedTokens = false;
-    public Dictionary<string, LocalMod> LocalModsMap = null!; // Id/UniqueId -> mod
-    public OnlineMod[] OnlineMods = null!;
-    public Dictionary<string, OnlineMod> OnlineModsMap = null!; // UniqueId -> mod
-
-    public async Task FindModsAsync(string path)
+    public static readonly ModData Instance = new();
+    public readonly List<LocalMod> I18LocalMods = [];
+    public readonly List<OnlineMod> OnlineMods = [];
+    public Dictionary<string, LocalMod> LocalModsMap = []; // Id/UniqueId -> mod
+    public Dictionary<string, OnlineMod> OnlineModsMap = []; // UniqueId -> mod
+    
+    public async Task FindModsAsync()
     {
+        var path = Services.MainConfig.DirectoryPath;
         if (Directory.Exists(path))
         {
             OnlineModsMap = (await LoadCachedAsync()).ToDictionary(mod => mod.ModId, mod => mod);
@@ -67,10 +70,11 @@ internal class ModData
 
     public void InitProcessMods()
     {
-        I18LocalMods = LocalModsMap.Values
+        I18LocalMods.Clear();
+        var i18LocalMods = LocalModsMap.Values
             .AsParallel()
-            .Where(mod => mod.Lang.Count > 0 && Directory.Exists(mod.PathS))
-            .ToArray();
+            .Where(mod => mod.Lang.Count > 0 && Directory.Exists(mod.PathS));
+        I18LocalMods.AddRange(i18LocalMods);
     }
 
     private static async Task FindManifestFilesAsync(string path, List<string> manifestFiles)

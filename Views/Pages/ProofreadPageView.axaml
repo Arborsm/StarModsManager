@@ -14,14 +14,27 @@
 
     <Control.Resources>
         <api:NullableBoolToColorConverter x:Key="NullableBoolToColorConverter" />
+        <api:ModLangIsMatchComparer x:Key="ModLangIsMatchComparer" />
     </Control.Resources>
 
     <Grid RowDefinitions="Auto, *">
         <Grid Margin="20,10" ColumnDefinitions="Auto, *">
-            <ui:CommandBar>
+            <ui:CommandBar OverflowButtonVisibility="Visible">
                 <ui:CommandBar.PrimaryCommands>
+                    <ui:CommandBarButton
+                        HorizontalAlignment="Right"
+                        Command="{Binding SaveCommand}"
+                        IconSource="Save"
+                        Label="Save" />
+                    <ui:CommandBarButton IconSource="Find" Label="Search" />
                     <ui:CommandBarToggleButton
-                        IconSource="Navigation"
+                        IconSource="Filter"
+                        IsChecked="{Binding IsFilter}"
+                        Label="Filter" />
+                </ui:CommandBar.PrimaryCommands>
+                <ui:CommandBar.SecondaryCommands>
+                    <ui:CommandBarToggleButton
+                        IconSource="Stop"
                         IsChecked="{Binding ShowLines}"
                         Label="Lines" />
                     <ui:CommandBarToggleButton
@@ -29,16 +42,14 @@
                         IsChecked="{Binding IsVisibleHeader}"
                         Label="Header" />
                     <ui:CommandBarToggleButton
-                        IconSource="Filter"
-                        IsChecked="{Binding IsFilter}"
-                        Label="Filter" />
-                    <ui:CommandBarButton
-                        HorizontalAlignment="Right"
-                        Command="{Binding SaveCommand}"
-                        IconSource="Save"
-                        Label="Save" />
-                </ui:CommandBar.PrimaryCommands>
-                <ui:CommandBar.SecondaryCommands />
+                        IconSource="Sort"
+                        IsChecked="{Binding CanSort}"
+                        Label="Sort" />
+                    <ui:CommandBarToggleButton
+                        IconSource="Switch"
+                        IsChecked="{Binding CanResize}"
+                        Label="Resize" />
+                </ui:CommandBar.SecondaryCommands>
             </ui:CommandBar>
 
             <ComboBox
@@ -61,9 +72,12 @@
         <Panel Grid.Row="1">
             <DataGrid
                 Name="ProofreadDataGrid"
+                CanUserResizeColumns="{Binding CanResize}"
+                CanUserSortColumns="{Binding CanSort}"
                 CellEditEnded="ProofreadDataGrid_OnCellEditEnded"
                 Classes.IsInvisibleHeader="{Binding !IsVisibleHeader}"
-                Classes.ShowLines="{Binding ShowLines}">
+                Classes.ShowLines="{Binding ShowLines}"
+                ItemsSource="{Binding ModLangsView}">
                 <DataGrid.Styles>
                     <Style Selector="TextBlock">
                         <Setter Property="TextWrapping" Value="WrapWithOverflow" />
@@ -93,7 +107,10 @@
                         Header="目标语言"
                         IsReadOnly="False"
                         Tag="TargetLang" />
-                    <DataGridTemplateColumn Header="符号">
+                    <DataGridTemplateColumn
+                        CanUserSort="True"
+                        CustomSortComparer="{StaticResource ModLangIsMatchComparer}"
+                        Header="符号">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <Ellipse
@@ -105,6 +122,15 @@
                     </DataGridTemplateColumn>
                 </DataGrid.Columns>
             </DataGrid>
+
+            <ui:TeachingTip
+                Name="UnSavedTip"
+                Title="未保存"
+                ActionButtonCommand="{Binding SaveCommand}"
+                ActionButtonContent="保存"
+                CloseButtonContent="关闭"
+                IsOpen="{Binding IsNotSave}"
+                Subtitle="您有未保存的更改。是否要保存更改?" />
         </Panel>
     </Grid>
 </UserControl>

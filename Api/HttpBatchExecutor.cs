@@ -119,25 +119,23 @@ public class HttpBatchExecutor
             .Select((task, index) => new { task, index })
             .GroupBy(x => x.index / groupSize);
 
+        var sw = Stopwatch.StartNew();
         foreach (var group in groups)
         {
             var groupTasks = group.Select(async x =>
             {
                 var initialDelay = TimeSpan.FromSeconds(Jitter.NextDouble() * 2);
-                // StarDebug.Debug($"Task {x.index} start after {initialDelay.TotalSeconds:0.00}s.");
                 return await executeTask(x.task, initialDelay, cancellationToken);
             });
 
-            var stopwatch = Stopwatch.StartNew();
-            results.AddRange(await Task.WhenAll(groupTasks).WithDebugElapsedTime($"TaskGroup{group.Key}"));
-            stopwatch.Stop();
+            sw.Start();
+            results.AddRange(await Task.WhenAll(groupTasks));
+            sw.Stop();
 
-            if (!(stopwatch.ElapsedMilliseconds <= 3000))
+            if (!(sw.ElapsedMilliseconds <= 3000))
                 await Task.Delay(TimeSpan.FromSeconds(Jitter.NextDouble() * 3), cancellationToken);
-
-            StarDebug.Debug($"Group {group.Key} finished.");
         }
-
+        StarDebug.Debug($"All tasks completed in {sw.Elapsed.TotalSeconds:0.00}s.");
         return results;
     }
 
