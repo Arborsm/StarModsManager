@@ -57,6 +57,7 @@ public partial class ProofreadPageViewModel : ViewModelBase
 
     partial void OnIsFilterChanged(bool value)
     {
+        Services.ProofreadConfig.IsFilter = value;
         if (value)
         {
             ModLangsView.Filter = item =>
@@ -70,22 +71,27 @@ public partial class ProofreadPageViewModel : ViewModelBase
             ModLangsView.Filter = _ => true;
         }
     }
-    
-    public void Clear()
+
+    partial void OnCanSortChanged(bool value)
     {
-        _langEditedCache.Clear();
-        IsNotSave = false;
+        Services.ProofreadConfig.CanSort = value;
+    }
+
+    partial void OnCanResizeChanged(bool value)
+    {
+        Services.ProofreadConfig.EnableHeaderResizing = value;
     }
 
     [RelayCommand(CanExecute = nameof(IsNotSave))]
-    public async Task Save()
+    private async Task Save()
     {
         var (_, targetLang) = CurrentMod.ReadMap(Services.TransConfig.Language);
         foreach (var kv in _langEditedCache)
         {
+            _langMap[kv.Key] = kv.Value;
             targetLang[kv.Key] = kv.Value.Item2 ?? string.Empty;
         }
-
+        
         try
         {
             await File.WriteAllTextAsync(CurrentMod.PathS + "\\i18n\\" + $"{Services.TransConfig.Language}.json",
@@ -97,11 +103,10 @@ public partial class ProofreadPageViewModel : ViewModelBase
         }
         finally
         {
+            _langEditedCache.Clear();
             IsNotSave = false;
         }
     }
-    
-    
 
     public ProofreadPageViewModel()
     {

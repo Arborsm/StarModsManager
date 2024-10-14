@@ -2,6 +2,8 @@
 using System.Globalization;
 using System.IO.Compression;
 using System.Text;
+using CommunityToolkit.Mvvm.Messaging;
+using FluentAvalonia.UI.Controls;
 using Newtonsoft.Json;
 using NLog;
 using StarModsManager.Common.Main;
@@ -9,13 +11,104 @@ using StarModsManager.Common.Mods;
 
 namespace StarModsManager.Api;
 
-internal static class Tools
+internal static class SMMTools
 {
+    private static readonly Random Jitter = new();
+    private const int InitialGroupSize = 20;
+    
+    public static void Notification(string message, string title = "Info", InfoBarSeverity severity = InfoBarSeverity.Informational)
+    {
+        WeakReferenceMessenger.Default.Send(new NotificationMessage
+        {
+            Title = title,
+            Message = message,
+            Severity = severity
+        });
+    }
+    
+    public static readonly Dictionary<string, string> LanguageMap = new(StringComparer.OrdinalIgnoreCase)
+    {
+        { "中文", "zh" },
+        { "Français", "fr" },
+        { "Deutsch", "de" },
+        { "Magyar", "hu" },
+        { "Italiano", "it" },
+        { "日本語", "ja" },
+        { "한국어", "ko" },
+        { "Português", "pt" },
+        { "Русский", "ru" },
+        { "Español", "es" },
+        { "Türkçe", "tr" }
+    };
+
+    public static string SwitchLanguage(string input)
+    {
+        if (LanguageMap.TryGetValue(input, out var code))
+        {
+            return code;
+        }
+
+        return LanguageMap.ContainsValue(input)
+            ? LanguageMap.First(x => x.Value.Equals(input, StringComparison.OrdinalIgnoreCase)).Key
+            : string.Empty;
+    }
+
     public static void ForEach<TSource>(
         this IEnumerable<TSource> source,
         Action<TSource> action)
     {
         foreach (var item in source) action(item);
+    }
+    
+    public static async Task ExecuteBatchAsync(IEnumerable<Task> tasks,
+        int groupSize = InitialGroupSize, CancellationToken cancellationToken = default)
+    {
+        await ExecuteInBatches(tasks, async (task, _, _) =>
+        {
+            await task;
+            return Task.CompletedTask;
+        }, groupSize, cancellationToken);
+    }
+    
+    public static async Task ExecuteBatchAsync(IEnumerable<Func<TimeSpan, CancellationToken, Task>> tasks,
+        int groupSize = InitialGroupSize, CancellationToken cancellationToken = default)
+    {
+        await ExecuteInBatches(tasks, async (task, initialDelay, ct) =>
+        {
+            await task(initialDelay, ct);
+            return Task.CompletedTask;
+        }, groupSize, cancellationToken);
+    }
+    
+    private static async Task ExecuteInBatches<TTask, TResult>(IEnumerable<TTask> tasks,
+        Func<TTask, TimeSpan, CancellationToken, Task<TResult>> executeTask,
+        int groupSize,
+        CancellationToken cancellationToken)
+    {
+        var groups = tasks
+            .Select((task, index) => new { task, index })
+            .GroupBy(x => x.index / groupSize);
+
+        var sw = Stopwatch.StartNew();
+        foreach (var group in groups)
+        {
+            var groupTasks = group.Select(async x =>
+            {
+                var initialDelay = TimeSpan.FromSeconds(Jitter.NextDouble() * 2);
+                return await executeTask(x.task, initialDelay, cancellationToken);
+            }).ToList();
+
+            sw.Start();
+            await Task.Run(async () =>
+            {
+                await Task.WhenAll(groupTasks);
+            }, cancellationToken);
+            sw.Stop();
+
+            if (!(sw.ElapsedMilliseconds <= 3000))
+                await Task.Delay(TimeSpan.FromSeconds(Jitter.NextDouble() * 3), cancellationToken);
+        }
+        StarDebug.Debug($"All tasks completed in {sw.Elapsed.TotalSeconds:0.00}s.");
     }
 
     /// <summary>
@@ -199,11 +292,4 @@ public class KeyValuePairComparer<TKey, TValue>(
 
         return (keyHashCode * 397) ^ valueHashCode;
     }
-}
-
-internal enum ProcessResult
-{
-    Success,
-    Fail,
-    Cancel
 }

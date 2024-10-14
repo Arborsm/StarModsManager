@@ -11,12 +11,16 @@
     mc:Ignorable="d">
 
     <Grid Margin="10,0" RowDefinitions="Auto, *, Auto">
-        <StackPanel Margin="10,0,10,10" Orientation="Vertical">
+        <StackPanel Margin="10,10,10,10" Orientation="Vertical">
+            <ProgressBar IsIndeterminate="{Binding IsIndeterminate}" IsVisible="{Binding IsIndeterminate}" />
             <TextBlock
                 Margin="10"
                 HorizontalAlignment="Center"
                 Text="总进度" />
-            <ProgressBar Maximum="{Binding MaxProgress}" Value="{Binding Progress}" />
+            <ProgressBar
+                Height="20"
+                Maximum="{Binding MaxProgress}"
+                Value="{Binding Progress}" />
         </StackPanel>
         <Grid
             Grid.Row="1"
@@ -38,6 +42,7 @@
                 Grid.Row="1"
                 Grid.Column="0"
                 Margin="10"
+                Focusable="False"
                 IsReadOnly="True"
                 Text="{Binding SourceText}"
                 TextWrapping="WrapWithOverflow" />
@@ -45,15 +50,25 @@
                 Grid.Row="1"
                 Grid.Column="1"
                 Margin="10"
+                Focusable="False"
                 IsReadOnly="True"
                 Text="{Binding TargetText}"
                 TextWrapping="WrapWithOverflow" />
         </Grid>
-        <Button
+        <StackPanel
             Grid.Row="2"
-            Margin="0,10,0,20"
             HorizontalAlignment="Center"
-            Click="Button_OnClick"
-            Content="取消" />
+            Orientation="Horizontal">
+            <Button
+                Margin="0,10,0,20"
+                HorizontalAlignment="Center"
+                Click="Button_OnClick"
+                Content="取消" />
+            <Button
+                Margin="20,10,0,20"
+                Click="Button_OnClick"
+                Content="确定"
+                IsEnabled="{Binding IsFinished}" />
+        </StackPanel>
     </Grid>
 </UserControl>

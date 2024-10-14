@@ -1,5 +1,8 @@
 ﻿using System.Runtime.InteropServices;
+using CommunityToolkit.Mvvm.Messaging;
+using FluentAvalonia.UI.Controls;
 using NLog;
+using StarModsManager.Api;
 
 namespace StarModsManager.Common.Main;
 
@@ -20,12 +23,15 @@ public static partial class StarDebug
     /// </remarks>
     internal static void AttachToParentConsole()
     {
-        AttachConsole(AttachParentProcess);
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            AttachConsole(AttachParentProcess);
+        }
     }
     
     static StarDebug()
     {
-        var logDirectory = Path.Combine(Services.AppSavingPath, "Log");
+        var logDirectory = Services.LogDir;
         Directory.CreateDirectory(logDirectory);
         var fileName = Path.Combine(logDirectory, "log_${shortdate}.log");
         if (File.Exists(fileName)) fileName = Rename(fileName);
@@ -87,8 +93,14 @@ public static partial class StarDebug
         Logger.Fatal(e, message);
     }
 
-    public static void Error(Exception e, string msg)
+    public static void Error(Exception e, string? msg = default)
     {
+        WeakReferenceMessenger.Default.Send(new NotificationMessage
+        {
+            Title = "Error",
+            Message = msg ?? e.Message,
+            Severity = InfoBarSeverity.Error
+        });
         Logger.Error(e, msg);
     }
 }

@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Media;
@@ -7,6 +6,8 @@ using Avalonia.Styling;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FluentAvalonia.Styling;
+using FluentAvalonia.UI.Controls;
+using StarModsManager.Api;
 using StarModsManager.Common.Main;
 
 namespace StarModsManager.ViewModels.Pages;
@@ -45,26 +46,17 @@ public partial class SettingsPageViewModel : ViewModelBase
         GetPredefColors();
         _faTheme = (FluentAvaloniaTheme)Application.Current!.Styles.First(it => it is FluentAvaloniaTheme);
         _modDir = Services.MainConfig.DirectoryPath;
-#if DEBUG
-        _modDir = "E:\\SteamLibrary\\steamapps\\common\\Stardew Valley\\mods";
-#endif
     }
 
-    public string[] AppThemes { get; } =
-        [System, Light, Dark /*, FluentAvaloniaTheme.HighContrastTheme*/];
+    public string[] AppThemes { get; } = [System, Light, Dark /*, FluentAvaloniaTheme.HighContrastTheme*/];
 
-    public FlowDirection[] AppFlowDirections { get; } =
-        [FlowDirection.LeftToRight, FlowDirection.RightToLeft];
+    public FlowDirection[] AppFlowDirections { get; } = [FlowDirection.LeftToRight, FlowDirection.RightToLeft];
 
     public List<Color> PredefinedColors { get; private set; } = [];
 
     private static ThemeVariant GetThemeVariant(string value)
     {
-        return value switch
-        {
-            Light => ThemeVariant.Light,
-            _ => ThemeVariant.Dark
-        };
+        return value switch { Light => ThemeVariant.Light, _ => ThemeVariant.Dark };
     }
 
     private void GetPredefColors()
@@ -194,16 +186,12 @@ public partial class SettingsPageViewModel : ViewModelBase
     partial void OnModDirChanged(string value)
     {
         Services.MainConfig.DirectoryPath = value;
-    }
-
-    [RelayCommand]
-    private void AutoDetectModDirectory()
-    {
+        SMMTools.Notification("需要重启使得改动生效", "注意", InfoBarSeverity.Warning);
     }
 
     [RelayCommand]
     private void OpenModDirectory()
     {
-        Process.Start("explorer.exe", ModDir);
+        PlatformTools.OpenFileOrUrl(ModDir);
     }
 }

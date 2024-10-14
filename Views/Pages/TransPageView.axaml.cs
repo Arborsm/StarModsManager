@@ -2,7 +2,6 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using FluentAvalonia.UI.Controls;
-using StarModsManager.Common.Trans;
 using StarModsManager.ViewModels.Customs;
 using StarModsManager.ViewModels.Pages;
 using StarModsManager.Views.Customs;
@@ -28,14 +27,17 @@ public partial class TransPageView : UserControl
 
     private async void SettingButton_OnClick(object? sender, RoutedEventArgs e)
     {
+        var vm = new TransSettingViewModel();
         var dialog = new ContentDialog
         {
             Title = "Translating Settings",
-            PrimaryButtonText = "Save",
             Content = new TransSettingView
             {
-                DataContext = new TransSettingViewModel()
-            }
+                DataContext = vm
+            },
+            PrimaryButtonText = "Save",
+            PrimaryButtonCommand = vm.SaveCommand,
+            CloseButtonText = "Close"
         };
 
         await dialog.ShowAsync();

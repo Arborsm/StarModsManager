@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.DependencyInjection;
 using Newtonsoft.Json;
 using StarModsManager.Api;
+using StarModsManager.Common.Config;
 using StarModsManager.Common.Main;
 using StarModsManager.Common.Mods;
 using StarModsManager.ViewModels.Pages;
@@ -11,43 +12,40 @@ namespace StarModsManager.Common.Trans;
 public class Translator
 {
     public static Translator Instance { get; } = new();
-    public readonly ITranslator CurrentTranslator;
-
-    public Translator()
-    {
-        CurrentTranslator = UpdateConfig();
-    }
-
     public List<ITranslator> Apis { get; } = [new OllamaTrans(), new OpenAITrans()];
 
-    public ITranslator UpdateConfig()
+    private ITranslator? _translator;
+    public ITranslator CurrentTranslator
     {
-        return Apis.First(it => it.Name == Services.TransConfig.ApiSelected);
+        get
+        {
+            if (_translator is null || _translator.Name != Services.TransConfig.ApiSelected)
+            {
+                _translator = Instance.Apis.First(it => it.Name == Services.TransConfig.ApiSelected);
+            }
+
+            return _translator;
+        }
     }
 
-    internal async Task<string?> TranslateText(string text)
-    {
-        return ContainsChinese(text) ? text : await TranslateText(text, Services.TransConfig.PromptText);
-    }
-
-    internal async Task<ProcessResult> ProcessDirectories(LocalMod[] toTansMods,
-        CancellationToken token = default)
+    internal async Task ProcessDirectories(IList<LocalMod> toTansMods, CancellationToken token = default)
     {
         var transPageViewModel = Ioc.Default.GetRequiredService<TransPageViewModel>();
-        var directories = toTansMods.Select(it => it.PathS).ToArray();
-        transPageViewModel.MaxProgress = toTansMods.Length;
-        transPageViewModel.Progress = 0;
-        var tasks = directories.Select(async directory =>
-        {
-            await ProcessDirectory(directory, token);
-            transPageViewModel.Progress++;
-        });
+        var totalItems = toTansMods.Select(it => it.GetUntranslatedMap().Count).Sum();
+        transPageViewModel.MaxProgress = totalItems;
+        transPageViewModel.IsIndeterminate = true;
 
-        await Task.WhenAll(tasks);
-        return ProcessResult.Success;
+        var progress = new Progress<int>(value => transPageViewModel.Progress = value);
+
+        foreach (var mod in toTansMods)
+        {
+            if (token.IsCancellationRequested) break;
+            await ProcessDirectory(mod.PathS, progress, token);
+        }
     }
 
-    private async Task ProcessDirectory(string directoryPath, CancellationToken token)
+    private async Task ProcessDirectory(string directoryPath, IProgress<int> progress,
+        CancellationToken token)
     {
         var target = Services.TransConfig.Language + ".json";
         var defaultLang = directoryPath.GetDefaultLang();
@@ -55,7 +53,8 @@ public class Translator
         targetLang = targetLang.Sort(defaultLang);
         var path = Path.Combine(directoryPath, "i18n");
 
-        var tran = await ProcessText(defaultLang, targetLang, Services.TransConfig.PromptText, token);
+        var tran = 
+            await ProcessText(defaultLang, targetLang, Services.TransConfig, progress, token);
 
         if (defaultLang.IsMismatchedTokens(tran)) ModData.Instance.IsMismatchedTokens = true;
 
@@ -65,33 +64,63 @@ public class Translator
 
         await File.WriteAllTextAsync(Path.Combine(path, target), JsonConvert.SerializeObject(combined), token);
     }
-    
-    private async Task<Dictionary<string, string>> ProcessText(Dictionary<string, string> map,
+
+    private async Task<Dictionary<string, string>> ProcessText(
+        Dictionary<string, string> map,
         Dictionary<string, string>? mapAllCn,
-        string role, CancellationToken token)
+        TransConfig config,
+        IProgress<int> progress,
+        CancellationToken token)
     {
         mapAllCn ??= new Dictionary<string, string>();
         var processedMap = new ConcurrentDictionary<string, string>();
         var keys = map.Keys.Except(mapAllCn.Keys).ToList();
-        var tasks = keys.Select(async key =>
+        var transPageViewModel = Ioc.Default.GetRequiredService<TransPageViewModel>();
+        var processedItems = 0;
+        if (Services.TransConfig.IsTurbo)
         {
-            if (map[key].Length <= 20) await Task.Delay(500, token);
-            var result = await TranslateText(map[key], role, token);
-
-            if (result != string.Empty)
+            var tasks = keys.Select(async key =>
             {
+                if (token.IsCancellationRequested) return;
+                var result = await TranslateText(map[key], config.PromptText, token);
+                if (result == string.Empty) return;
+                transPageViewModel.SourceText += map[key] + Environment.NewLine;
+                transPageViewModel.TargetText += result + Environment.NewLine;
                 Console.WriteLine(result);
                 processedMap[key] = result;
+                Interlocked.Increment(ref processedItems);
+                progress.Report(processedItems);
+            });
+            await Task.WhenAll(tasks);
+        }
+        else
+        {
+            foreach (var key in keys.TakeWhile(_ => !token.IsCancellationRequested))
+            {
+                if (map[key].Length <= 20) await Task.Delay(config.DelayMs, token);
+                var result = await TranslateText(map[key], config.PromptText, token);
+                if (result == string.Empty) break;
+                transPageViewModel.SourceText += map[key] + Environment.NewLine;
+                transPageViewModel.TargetText += result + Environment.NewLine;
+                Console.WriteLine(result);
+                processedMap[key] = result;
+                Interlocked.Increment(ref processedItems);
+                progress.Report(processedItems);
             }
-        });
+        }
 
-        await Task.WhenAll(tasks);
         return processedMap.ToDictionary(k => k.Key, v => v.Value);
     }
-    
+
+    internal async Task<string?> TranslateText(string text)
+    {
+        return ContainsChinese(text) ? text : await TranslateText(text, Services.TransConfig.PromptText);
+    }
+
     private async Task<string> TranslateText(string text, string role, CancellationToken token = default)
     {
-        return await CurrentTranslator.StreamCallWithMessage(text, role, Services.TransApiConfigs[Services.TransConfig.ApiSelected], token);
+        return await CurrentTranslator.StreamCallWithMessage(text, role,
+            Services.TransApiConfigs[Services.TransConfig.ApiSelected], token);
     }
 
     private static bool ContainsChinese(string str)

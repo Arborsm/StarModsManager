@@ -1,14 +1,14 @@
 ﻿using System.Collections.ObjectModel;
-using Avalonia.Controls;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
+using StarModsManager.Api;
 using StarModsManager.Common.Main;
 using StarModsManager.Common.Mods;
 using StarModsManager.ViewModels.Items;
-using StarModsManager.Views;
 
 namespace StarModsManager.ViewModels.Customs;
 
@@ -79,14 +79,14 @@ public partial class PicsSelectViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private async Task SelectPic()
+    private async Task SelectPic(CancellationToken cancellationToken)
     {
         if (SelectedPic is null) return;
         try
         {
             var picPath = _mod.LocalMod!.InfoPicturePath;
-            await Task.Run(() => File.Copy(SelectedPic.FilePath, picPath, true));
-            await _mod.LoadCover(TimeSpan.Zero, CancellationToken.None);
+            await Task.Run(() => File.Copy(SelectedPic.FilePath, picPath, true), cancellationToken);
+            await _mod.LoadCover(TimeSpan.Zero, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -95,7 +95,7 @@ public partial class PicsSelectViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private async Task CustomPic()
+    private async Task CustomPic(CancellationToken cancellationToken)
     {
         try
         {
@@ -108,13 +108,15 @@ public partial class PicsSelectViewModel : ViewModelBase
                 }
             };
 
-            var customPicPath = await TopLevel.GetTopLevel(MainWindow.Instance)!.StorageProvider
-                .OpenFilePickerAsync(new FilePickerOpenOptions
-                {
-                    Title = "Select a custom picture",
-                    AllowMultiple = false,
-                    FileTypeFilter = fileTypes
-                });
+            var dialogMessage = new DialogMessage
+            {
+                Title = "Select a custom picture",
+                FileTypeFilter = fileTypes,
+            };
+
+            WeakReferenceMessenger.Default.Send(dialogMessage);
+
+            var customPicPath = await dialogMessage.CompletionSource.Task;
 
             var picPath = _mod.LocalMod!.InfoPicturePath;
             if (customPicPath.Count > 0)
@@ -135,7 +137,7 @@ public partial class PicsSelectViewModel : ViewModelBase
                 }
             }
 
-            await _mod.LoadCover(TimeSpan.Zero, CancellationToken.None);
+            await _mod.LoadCover(TimeSpan.Zero, cancellationToken);
         }
         catch (Exception ex)
         {

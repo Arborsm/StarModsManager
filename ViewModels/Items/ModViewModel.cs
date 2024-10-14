@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using Avalonia.Media.Imaging;
+﻿using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FluentAvalonia.UI.Controls;
@@ -75,19 +74,19 @@ public partial class ModViewModel : ViewModelBase
     [RelayCommand(CanExecute = nameof(IsLocal))]
     private void OpenModFolder()
     {
-        if (LocalMod is not null) Process.Start("explorer.exe", LocalMod.PathS);
+        if (LocalMod is not null) PlatformTools.OpenFileOrUrl(LocalMod.PathS);
     }
 
     [RelayCommand]
     private void OpenUrl()
     {
-        if (OnlineMod.Url is not null) Process.Start("explorer.exe", OnlineMod.Url);
+        if (OnlineMod.Url is not null) PlatformTools.OpenFileOrUrl(OnlineMod.Url);
     }
 
     [RelayCommand]
-    private async Task AsyncLoadCover()
+    private async Task AsyncLoadCover(CancellationToken cancellationToken)
     {
-        await LoadCover(TimeSpan.Zero, CancellationToken.None, true);
+        await LoadCover(TimeSpan.Zero, cancellationToken, true);
     }
     
     [RelayCommand(CanExecute = nameof(IsLocal))]
@@ -116,15 +115,17 @@ public partial class ModViewModel : ViewModelBase
         }
 
         if (refresh) StarDebug.Debug(@"Refreshing Cover");
-        try
+        await using var imageStream = await OnlineMod.LoadPicBitmapAsync(delay, refresh, cancellationToken);
+        if (imageStream is not null)
         {
-            await using var imageStream = await OnlineMod.LoadPicBitmapAsync(delay, refresh, cancellationToken);
-            if (imageStream is not null)
+            try
+            {
                 Pic = await Task.Run(() => Bitmap.DecodeToWidth(imageStream, 400), cancellationToken);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e.Message);
+            }
+            catch (Exception e)
+            {
+                StarDebug.Error(e.Message);
+            }
         }
     }
 }

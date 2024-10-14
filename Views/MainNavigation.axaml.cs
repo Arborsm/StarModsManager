@@ -1,7 +1,6 @@
 ﻿using Avalonia.Controls;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using FluentAvalonia.UI.Controls;
-using StarModsManager.Common.Main;
 using StarModsManager.ViewModels.Pages;
 using StarModsManager.Views.Pages;
 

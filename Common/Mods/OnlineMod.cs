@@ -14,7 +14,7 @@ public class OnlineMod
     public OnlineMod(string? url, string title, string picUrl)
     {
         var modId = url?.Split('/').Last() ?? string.Empty;
-        _cachePath = Path.Combine(Services.MainConfig.CachePath, modId);
+        _cachePath = Path.Combine(Services.OnlineModsDir, modId);
         ModId = modId;
         Url = url;
         Title = title;
@@ -29,8 +29,6 @@ public class OnlineMod
     public async void SaveAsync()
     {
         if (string.IsNullOrEmpty(ModId)) return;
-        if (!Directory.Exists(Services.MainConfig.CachePath)) Directory.CreateDirectory(Services.MainConfig.CachePath);
-
         await using var fs = File.OpenWrite(_cachePath);
         await SaveToStreamAsync(this, fs);
     }
@@ -52,7 +50,7 @@ public class OnlineMod
 
         if (string.IsNullOrEmpty(PicUrl)) return null;
         await Task.Delay(delay, cancellationToken);
-        return await LoadPicBitmapAsync(PicUrl, _cachePath + ".bmp", CancellationToken.None);
+        return await LoadPicBitmapAsync(PicUrl, _cachePath + ".bmp", cancellationToken);
     }
 
     public async Task<Stream?> LoadPicBitmapAsync(string picUrl, string cachePath,

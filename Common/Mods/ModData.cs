@@ -1,5 +1,4 @@
 ﻿using System.Text.Json;
-using CommunityToolkit.Mvvm.Input;
 using StarModsManager.Assets.Lang;
 using StarModsManager.Common.Main;
 
@@ -40,13 +39,14 @@ internal class ModData
         }
     }
 
-    public static async Task<IEnumerable<OnlineMod>> LoadCachedAsync()
+    private static async Task<IEnumerable<OnlineMod>> LoadCachedAsync()
     {
-        if (!Directory.Exists("./Cache")) Directory.CreateDirectory("./Cache");
+        var cachePath = Services.OnlineModsDir;
+        if (!Directory.Exists(cachePath)) Directory.CreateDirectory(cachePath);
 
         var results = new List<OnlineMod>();
 
-        foreach (var file in Directory.EnumerateFiles("./Cache"))
+        foreach (var file in Directory.EnumerateFiles(cachePath))
             try
             {
                 if (!string.IsNullOrWhiteSpace(new DirectoryInfo(file).Extension) && file.EndsWith("bmp")) continue;
@@ -63,12 +63,12 @@ internal class ModData
         return results;
     }
 
-    public static async Task<OnlineMod?> LoadCachedAsync(Stream stream)
+    private static async Task<OnlineMod?> LoadCachedAsync(Stream stream)
     {
         return await JsonSerializer.DeserializeAsync<OnlineMod>(stream).ConfigureAwait(false);
     }
 
-    public void InitProcessMods()
+    private void InitProcessMods()
     {
         I18LocalMods.Clear();
         var i18LocalMods = LocalModsMap.Values

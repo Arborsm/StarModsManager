@@ -125,6 +125,6 @@ public partial class DownloadPageViewModel : ViewModelBase
         var tasks = SearchResults.Select(uri =>
             (Func<TimeSpan, CancellationToken, Task>)(async (delay, ct) => await uri.LoadCover(delay, ct)));
 
-        await HttpBatchExecutor.Instance.ExecuteBatchAsync(tasks, cancellationToken: cancellationToken);
+        await SMMTools.ExecuteBatchAsync(tasks, cancellationToken: cancellationToken);
     }
 }

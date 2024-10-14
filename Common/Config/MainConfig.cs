@@ -1,6 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using StarModsManager.Common.Main;
-using StarModsManager.Common.Mods;
 
 namespace StarModsManager.Common.Config;
 
