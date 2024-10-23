@@ -5,10 +5,11 @@ using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
-using StarModsManager.Api;
+using StarModsManager.Api.lib;
+using StarModsManager.Api.NexusMods;
 using StarModsManager.Common.Main;
-using StarModsManager.Common.Mods;
 using StarModsManager.ViewModels.Items;
+using StarDebug = StarModsManager.Api.StarDebug;
 
 namespace StarModsManager.ViewModels.Customs;
 
@@ -55,7 +56,7 @@ public partial class PicsSelectViewModel : ViewModelBase
     {
         IsLoading = true;
         List<BitmapViewModel> pics = [];
-        var modLinks = await ModLinks.Instance.GetModPicsUrl(modUrl, ModLinks.Pics);
+        var modLinks = await new NexusPics(modUrl).GetModPicsUrlAsync(NexusPics.Pics);
 
         await Task.WhenAll(modLinks.Select(async it =>
         {
@@ -79,14 +80,14 @@ public partial class PicsSelectViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private async Task SelectPic(CancellationToken cancellationToken)
+    private async Task SelectPicAsync(CancellationToken cancellationToken)
     {
         if (SelectedPic is null) return;
         try
         {
             var picPath = _mod.LocalMod!.InfoPicturePath;
             await Task.Run(() => File.Copy(SelectedPic.FilePath, picPath, true), cancellationToken);
-            await _mod.LoadCover(TimeSpan.Zero, cancellationToken);
+            await _mod.LoadCoverAsync(cancellationToken: cancellationToken);
         }
         catch (Exception ex)
         {
@@ -95,7 +96,7 @@ public partial class PicsSelectViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private async Task CustomPic(CancellationToken cancellationToken)
+    private async Task CustomPicAsync(CancellationToken cancellationToken)
     {
         try
         {
@@ -111,7 +112,7 @@ public partial class PicsSelectViewModel : ViewModelBase
             var dialogMessage = new DialogMessage
             {
                 Title = "Select a custom picture",
-                FileTypeFilter = fileTypes,
+                FileTypeFilter = fileTypes
             };
 
             WeakReferenceMessenger.Default.Send(dialogMessage);
@@ -137,7 +138,7 @@ public partial class PicsSelectViewModel : ViewModelBase
                 }
             }
 
-            await _mod.LoadCover(TimeSpan.Zero, cancellationToken);
+            await _mod.LoadCoverAsync(cancellationToken: cancellationToken);
         }
         catch (Exception ex)
         {

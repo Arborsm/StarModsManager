@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using StarModsManager.Common.Main;
 using StarModsManager.Common.Trans;
+using StarDebug = StarModsManager.Api.StarDebug;
 
 namespace StarModsManager.ViewModels.Customs;
 
@@ -33,17 +34,17 @@ public partial class ApiSettingViewModel(string selectedApi) : ViewModelBase
     }
 
     [RelayCommand]
-    private async Task GetModels()
+    private async Task GetModelsAsync()
     {
         try
         {
             Models.Clear();
             var models =
-                await Translator.Instance.CurrentTranslator.GetSupportModels(Services.TransApiConfigs[selectedApi]);
+                await Translator.Instance.CurrentTranslator.GetSupportModelsAsync(Services.TransApiConfigs[selectedApi]);
             models.ForEach(Models.Add);
             if (Models.Count > 0) Model = Models.First();
         }
-        catch (Exception e)
+        catch (Exception? e)
         {
             StarDebug.Error(e);
         }

@@ -18,13 +18,14 @@ public partial class TranslatingView : UserControl
     private static async void OnInitialized(object? sender, EventArgs e)
     {
         if (Services.IsInDesignMode) return;
-        await Ioc.Default.GetRequiredService<TransPageViewModel>().Translate();
+        await Ioc.Default.GetRequiredService<TransPageViewModel>().TranslateAsync();
     }
 
-    private void Button_OnClick(object? sender, RoutedEventArgs e)
+    private void CancelButton_OnClick(object? sender, RoutedEventArgs e)
     {
         var vm = Ioc.Default.GetRequiredService<TransPageViewModel>();
         vm.CancellationTokenSource.Cancel();
+        vm.Clear();
         this.Content = new TransPageView
         {
             DataContext = vm

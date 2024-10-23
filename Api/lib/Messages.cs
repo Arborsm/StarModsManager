@@ -1,7 +1,7 @@
 ﻿using Avalonia.Platform.Storage;
 using FluentAvalonia.UI.Controls;
 
-namespace StarModsManager.Api;
+namespace StarModsManager.Api.lib;
 
 public class DialogMessage {
     public required string Title { get; init; }

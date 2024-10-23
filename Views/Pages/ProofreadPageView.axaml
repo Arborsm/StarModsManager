@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:api="clr-namespace:StarModsManager.Api"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:lib="clr-namespace:StarModsManager.Api.lib"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:pages="using:StarModsManager.ViewModels.Pages"
     xmlns:ui="using:FluentAvalonia.UI.Controls"
@@ -13,8 +14,11 @@
     mc:Ignorable="d">
 
     <Control.Resources>
-        <api:NullableBoolToColorConverter x:Key="NullableBoolToColorConverter" />
-        <api:ModLangIsMatchComparer x:Key="ModLangIsMatchComparer" />
+        <lib:NullableBoolToColorConverter x:Key="NullableBoolToColorConverter" />
+        <lib:ModLangIsMatchComparer x:Key="ModLangIsMatchComparer" />
+        <MenuFlyout x:Key="ContextMenu">
+            <MenuItem Command="{Binding TranslateCommand}" Header="翻译" />
+        </MenuFlyout>
     </Control.Resources>
 
     <Grid RowDefinitions="Auto, *">
@@ -77,7 +81,10 @@
                 CellEditEnded="ProofreadDataGrid_OnCellEditEnded"
                 Classes.IsInvisibleHeader="{Binding !IsVisibleHeader}"
                 Classes.ShowLines="{Binding ShowLines}"
-                ItemsSource="{Binding ModLangsView}">
+                ContextFlyout="{StaticResource ContextMenu}"
+                ItemsSource="{Binding ModLangsView}"
+                SelectedItem="{Binding SelectedItem}"
+                SelectionChanged="ProofreadDataGrid_OnSelectionChanged">
                 <DataGrid.Styles>
                     <Style Selector="TextBlock">
                         <Setter Property="TextWrapping" Value="WrapWithOverflow" />

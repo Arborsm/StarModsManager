@@ -5,7 +5,6 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Styling;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
-using StarModsManager.Common.Main;
 using StarModsManager.ViewModels.Pages;
 using MainWindow = StarModsManager.Views.MainWindow;
 
@@ -36,9 +35,6 @@ public class App : Application
         
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-#if DEBUG
-            StarDebug.AttachToParentConsole();   
-#endif
             var mainWindow = new MainWindow();
             desktop.MainWindow = mainWindow;
         }

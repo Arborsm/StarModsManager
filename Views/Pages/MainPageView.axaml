@@ -2,6 +2,7 @@
     x:Class="StarModsManager.Views.Pages.MainPageView"
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:pages="using:StarModsManager.ViewModels.Pages"
@@ -25,6 +26,10 @@
                 </ItemsPanelTemplate>
             </ListBox.ItemsPanel>
         </ListBox>
+        <controls:ProgressRing
+            Width="100"
+            Height="100"
+            IsVisible="{Binding IsLoading}" />
     </Panel>
 
 </UserControl>

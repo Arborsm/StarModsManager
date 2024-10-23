@@ -28,8 +28,10 @@
                 Command="{Binding ChangeCoverCommand}"
                 Header="更改图片"
                 IsVisible="{Binding LocalModIsNotNull}" />
+            <MenuItem Command="{Binding GetDetailCommand}" Header="查看详情" />
             <MenuItem Command="{Binding OpenUrlCommand}" Header="访问Mod网页" />
-            <MenuItem Command="{Binding AsyncLoadCoverCommand}" Header="刷新Mod" />
+            <MenuItem Command="{Binding LoadCoverCommand}" Header="刷新Mod" />
+            <MenuItem Command="{Binding DownloadCommand}" Header="下载" />
         </MenuFlyout>
     </UserControl.Resources>
     <UserControl.Styles>

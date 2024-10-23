@@ -7,6 +7,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FluentAvalonia.Styling;
 using FluentAvalonia.UI.Controls;
+using StardewModdingAPI.Toolkit.Framework.GameScanning;
 using StarModsManager.Api;
 using StarModsManager.Common.Main;
 
@@ -18,6 +19,9 @@ public partial class SettingsPageViewModel : ViewModelBase
     private const string Dark = "Dark";
     private const string Light = "Light";
     private readonly FluentAvaloniaTheme _faTheme;
+    
+    [ObservableProperty]
+    private string _nexusApiKey = Services.MainConfig.NexusModsApiKey;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CustomAccentColor))]
@@ -186,12 +190,24 @@ public partial class SettingsPageViewModel : ViewModelBase
     partial void OnModDirChanged(string value)
     {
         Services.MainConfig.DirectoryPath = value;
-        SMMTools.Notification("需要重启使得改动生效", "注意", InfoBarSeverity.Warning);
+        SMMHelper.Notification("需要重启使得改动生效", "注意", InfoBarSeverity.Warning);
+    }
+
+    partial void OnNexusApiKeyChanged(string value)
+    {
+        Services.MainConfig.NexusModsApiKey = value;
     }
 
     [RelayCommand]
+    private void AutoSelect()
+    {
+        var gameScanner = new GameScanner();
+        ModDir = Path.Combine(gameScanner.Scan().First().FullName, "mods");
+    }
+    
+    [RelayCommand]
     private void OpenModDirectory()
     {
-        PlatformTools.OpenFileOrUrl(ModDir);
+        PlatformHelper.OpenFileOrUrl(ModDir);
     }
 }

@@ -7,8 +7,8 @@ public interface ITranslator
     bool NeedApi { get; }
     string Name { get; }
 
-    Task<string> StreamCallWithMessage(string text, string role, TransApiConfig config,
+    Task<string> StreamCallWithMessageAsync(string text, string role, TransApiConfig config,
         CancellationToken cancellationToken);
 
-    Task<List<string>> GetSupportModels(TransApiConfig config);
+    Task<List<string>> GetSupportModelsAsync(TransApiConfig config);
 }

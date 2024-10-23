@@ -1,11 +1,9 @@
 ﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
-using Microsoft.Win32;
-using StarModsManager.Common.Main;
 
 namespace StarModsManager.Api;
 
-public static class PlatformTools
+public static class PlatformHelper
 {
     public static void OpenFileOrUrl(string path)
     {
@@ -15,7 +13,7 @@ public static class PlatformTools
                 (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps)) OpenUrl(path);
             else OpenFolder(path);
         }
-        catch (Exception e)
+        catch (Exception? e)
         {
             StarDebug.Error(e);
         }

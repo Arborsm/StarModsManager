@@ -6,6 +6,7 @@ using StarModsManager.Api;
 using StarModsManager.Common.Main;
 using StarModsManager.Common.Mods;
 using StarModsManager.Common.Trans;
+using StarDebug = StarModsManager.Api.StarDebug;
 
 namespace StarModsManager.ViewModels.Pages;
 
@@ -13,10 +14,10 @@ public partial class TransPageViewModel : ViewModelBase
 {
     public TransPageViewModel()
     {
-        Mods = new ObservableCollection<ToTansMod>(
-            ModData.Instance.I18LocalMods
-                .Where(it => it.GetUntranslatedMap().Count > 0)
-                .Select(it => new ToTansMod(true, it)));
+        var mods = ModData.Instance.I18LocalMods
+            .Where(it => it.GetUntranslatedMap().Count > 0)
+            .Select(it => new ToTansMod(true, it));
+        Mods = new ObservableCollection<ToTansMod>(mods);
     }
 
     [ObservableProperty]
@@ -26,27 +27,23 @@ public partial class TransPageViewModel : ViewModelBase
     [ObservableProperty]
     private bool _isIndeterminate;
     [ObservableProperty]
-    private string _sourceText = string.Empty;
-    [ObservableProperty]
-    private string _targetText = string.Empty;
-    [ObservableProperty]
     private bool _isFinished;
-
     public ObservableCollection<ToTansMod> Mods { get; }
+    public ObservableCollection<TansDoneMod> DoneMods { get; } = [];
     public CancellationTokenSource CancellationTokenSource { get; set; } = null!;
 
     [RelayCommand]
-    private async Task Reload()
+    private async Task ReloadAsync()
     {
         Mods.Clear();
-        await Task.Run(() =>ModData.Instance.I18LocalMods
+        await Task.Run(() => ModData.Instance.I18LocalMods
             .AsQueryable()
             .Where(it => it.GetUntranslatedMap().Count > 0)
             .Select(it => new ToTansMod(true, it))
             .ForEach(mod => Dispatcher.UIThread.Invoke(() => Mods.Add(mod))));
     }
 
-    public async Task Translate()
+    public async Task TranslateAsync()
     {
         if (Services.TransConfig.IsBackup)
         {
@@ -54,26 +51,37 @@ public partial class TransPageViewModel : ViewModelBase
         }
         try
         {
+            ModData.Instance.IsMismatchedTokens = false;
             IsFinished = false;
-            await Translator.Instance.ProcessDirectories(
-                Mods.Where(it => it.IsChecked).Select(it => it.LocalMod).ToArray(), CancellationTokenSource.Token);
+            var mods = Mods.Where(it => it.IsChecked).Select(it => it.LocalMod).ToArray();
+            await Translator.Instance.ProcessDirectoriesAsync(mods, CancellationTokenSource.Token);
         }
         catch (OperationCanceledException)
         {
-            SMMTools.Notification("操作已取消");
+            SMMHelper.Notification("操作已取消");
         }
-        catch (Exception e)
+        catch (Exception? e)
         {
             StarDebug.Error(e);
         }
         finally
         {
             IsIndeterminate = false;
-            IsFinished = true; SourceText = string.Empty;
-            TargetText = string.Empty;
+            IsFinished = true; 
             Progress = 0;
         }
+
+        if (ModData.Instance.IsMismatchedTokens)
+        {
+            SMMHelper.Notification("发现符号匹配错误，建议到校对页面修复");
+        }
     }
+
+    public void Clear()
+    {
+        DoneMods.Clear();
+    }
+    
     private static void CreateBackup()
     {
         var tempPath = Services.BackupTempDir;
@@ -108,4 +116,10 @@ public class ToTansMod(bool isChecked, LocalMod localMod)
     public bool IsChecked { get; set; } = isChecked;
     public string Name { get; } = localMod.Name;
     public string Keys { get; } = localMod.GetUntranslatedMap().Count.ToString();
+}
+
+public class TansDoneMod(string sourceText, string targetText)
+{
+    public string SourceText { get; } = sourceText;
+    public string TargetText { get; } = targetText;
 }

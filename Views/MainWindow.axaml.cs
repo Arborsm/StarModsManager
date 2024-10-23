@@ -5,7 +5,7 @@ using Avalonia.Platform.Storage;
 using Avalonia.Styling;
 using CommunityToolkit.Mvvm.Messaging;
 using FluentAvalonia.UI.Controls;
-using StarModsManager.Api;
+using StarModsManager.Api.lib;
 
 namespace StarModsManager.Views;
 
@@ -14,7 +14,7 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-        WeakReferenceMessenger.Default.Register<DialogMessage>(this, ShowDialog);
+        WeakReferenceMessenger.Default.Register<DialogMessage>(this, ShowDialogAsync);
         WeakReferenceMessenger.Default.Register<NotificationMessage>(this, ShowNotification);
     }
 
@@ -34,7 +34,7 @@ public partial class MainWindow : Window
         infoBar.IsOpen = true;
     }
 
-    private async void ShowDialog(object recipient, DialogMessage message)
+    private async void ShowDialogAsync(object recipient, DialogMessage message)
     {
         var files = await GetTopLevel(this)!.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
         {

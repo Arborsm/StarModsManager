@@ -6,6 +6,8 @@ using Newtonsoft.Json;
 using StarModsManager.Api;
 using StarModsManager.Common.Main;
 using StarModsManager.Common.Mods;
+using StarModsManager.Common.Trans;
+using StarDebug = StarModsManager.Api.StarDebug;
 
 // ReSharper disable UnusedParameterInPartialMethod
 // ReSharper disable ClassNeverInstantiated.Global
@@ -16,7 +18,8 @@ public partial class ProofreadPageViewModel : ViewModelBase
 {
     private static Dictionary<string, (string?, string?)> _langMap = null!;
     private readonly Dictionary<string, (string?, string?)> _langEditedCache = [];
-
+    [ObservableProperty]
+    private ModLang? _selectedItem;
     [ObservableProperty]
     private LocalMod _currentMod = null!;
     [ObservableProperty]
@@ -34,8 +37,8 @@ public partial class ProofreadPageViewModel : ViewModelBase
     private bool _canResize = Services.ProofreadConfig.EnableHeaderResizing;
 
     public required DataGridCollectionView ModLangsView { get; set; }
-
-    public static ObservableCollection<LocalMod> I18NMods { get; } =
+    
+    public static ObservableCollection<LocalMod> I18NMods { get; } = 
         [..ModData.Instance.I18LocalMods.OrderBy(it => it.Name)];
 
     public void AddEditedLang(ModLang item)
@@ -82,8 +85,19 @@ public partial class ProofreadPageViewModel : ViewModelBase
         Services.ProofreadConfig.EnableHeaderResizing = value;
     }
 
+    [RelayCommand]
+    private async Task TranslateAsync()
+    {
+        if (SelectedItem?.SourceLang is not null)
+        {
+            SelectedItem.TargetLang = await Translator.Instance.TranslateTextAsync(SelectedItem.SourceLang);
+            SelectedItem.IsMatch = IsMatch(SelectedItem);
+            AddEditedLang(SelectedItem);
+        }
+    }
+
     [RelayCommand(CanExecute = nameof(IsNotSave))]
-    private async Task Save()
+    private async Task SaveAsync()
     {
         var (_, targetLang) = CurrentMod.ReadMap(Services.TransConfig.Language);
         foreach (var kv in _langEditedCache)
@@ -97,7 +111,7 @@ public partial class ProofreadPageViewModel : ViewModelBase
             await File.WriteAllTextAsync(CurrentMod.PathS + "\\i18n\\" + $"{Services.TransConfig.Language}.json",
                 JsonConvert.SerializeObject(targetLang, Formatting.Indented));
         }
-        catch (Exception e)
+        catch (Exception? e)
         {
             StarDebug.Error(e, "保存翻译失败");
         }
@@ -141,22 +155,34 @@ public partial class ProofreadPageViewModel : ViewModelBase
             {
                 var sourceText = x.Value.Item1;
                 var targetText = x.Value.Item2;
-                bool? isMatch;
-                if (sourceText is null || targetText is null)
-                {
-                    isMatch = false;
-                }
-                else if (sourceText.IsMismatchedTokens(targetText, false))
-                {
-                    isMatch = null;
-                }
-                else
-                {
-                    isMatch = true;
-                }
+                var isMatch = IsMatch(sourceText, targetText);
 
                 return new ModLang(x.Key, sourceText, targetText, isMatch);
             }));
+    }
+
+    private static bool? IsMatch(ModLang selectedItem)
+    {
+        return IsMatch(selectedItem.SourceLang, selectedItem.TargetLang);
+    }
+    
+    private static bool? IsMatch(string? sourceText, string? targetText)
+    {
+        bool? isMatch;
+        if (sourceText is null || targetText is null)
+        {
+            isMatch = false;
+        }
+        else if (sourceText.IsMismatchedTokens(targetText, false))
+        {
+            isMatch = null;
+        }
+        else
+        {
+            isMatch = true;
+        }
+
+        return isMatch;
     }
 
     private static class ExampleData
@@ -179,10 +205,13 @@ public partial class ProofreadPageViewModel : ViewModelBase
     }
 }
 
-public class ModLang(string key, string? sourceLang, string? targetLang, bool? isMatch = true)
+public partial class ModLang(string key, string? sourceLang, string? targetLang, bool? isMatch = true) : ObservableObject
 {
     public string Key { get; } = key;
-    public string? SourceLang { get; set; } = sourceLang;
-    public string? TargetLang { get; set; } = targetLang;
-    public bool? IsMatch { get; } = isMatch;
+    public string? SourceLang { get; } = sourceLang;
+    
+    [ObservableProperty]
+    private bool? _isMatch = isMatch;
+    [ObservableProperty]
+    private string? _targetLang = targetLang;
 }

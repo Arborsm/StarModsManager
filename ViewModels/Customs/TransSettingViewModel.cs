@@ -10,9 +10,9 @@ public partial class TransSettingViewModel : ViewModelBase
 {
     private const string OpenAI = "OpenAI";
     public List<string> Apis { get; } = Translator.Instance.Apis.Select(it => it.Name).ToList();
-    public List<string> Langs { get; } = SMMTools.LanguageMap.Keys.ToList();
+    public List<string> Langs { get; } = SMMHelper.LanguageMap.Keys.ToList();
     [ObservableProperty]
-    private string _showLang = SMMTools.SwitchLanguage(Services.TransConfig.Language);
+    private string _showLang = SMMHelper.SwitchLanguage(Services.TransConfig.Language);
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CanTurboEnabled))]
     private string _selectedApi = Services.TransConfig.ApiSelected;
@@ -28,7 +28,7 @@ public partial class TransSettingViewModel : ViewModelBase
 
     partial void OnShowLangChanged(string? oldValue, string newValue)
     {
-        var lang = SMMTools.SwitchLanguage(newValue);
+        var lang = SMMHelper.SwitchLanguage(newValue);
         if (string.IsNullOrEmpty(PromptText) && lang == "zh")
         {
             PromptText = "你是一位专业的游戏本地化翻译专家,擅长将《星露谷物语》及其模组的英文文本翻译成地道的简体中文。请遵循以下指引:\n" +

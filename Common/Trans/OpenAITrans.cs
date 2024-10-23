@@ -11,7 +11,7 @@ internal class OpenAITrans : ITranslator
     public bool NeedApi => true;
     public string Name => "OpenAI";
 
-    public async Task<string> StreamCallWithMessage(string text, string role, TransApiConfig config,
+    public async Task<string> StreamCallWithMessageAsync(string text, string role, TransApiConfig config,
         CancellationToken cancellationToken)
     {
         using var httpClient = new HttpClient();
@@ -31,7 +31,7 @@ internal class OpenAITrans : ITranslator
         return response.FirstChoice;
     }
 
-    public async Task<List<string>> GetSupportModels(TransApiConfig config)
+    public async Task<List<string>> GetSupportModelsAsync(TransApiConfig config)
     {
         using var httpClient = new HttpClient();
         var api = new OpenAIAuthentication(config.Api);

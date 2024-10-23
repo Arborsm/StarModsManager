@@ -24,7 +24,7 @@
                     <DataGridTextColumn
                         Width="*"
                         Binding="{Binding Name}"
-                        Header="Mod 名称" />
+                        Header="ModInfo 名称" />
                     <DataGridTextColumn Binding="{Binding Keys}" Header="未翻译条目" />
                 </DataGrid.Columns>
             </DataGrid>

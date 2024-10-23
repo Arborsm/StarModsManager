@@ -1,5 +1,6 @@
 using System.Text.Json;
 using StarModsManager.Api;
+using StarModsManager.Api.NexusMods;
 using StarModsManager.Common.Main;
 
 namespace StarModsManager.Common.Mods;
@@ -19,8 +20,20 @@ public class OnlineMod
         Url = url;
         Title = title;
         PicUrl = picUrl;
+        UpdateUrlType = GetUpdateUrlType(url);
     }
 
+    private static string GetUpdateUrlType(string? url) => url?.ToLower() switch
+    {
+        { } s when s.Contains("nexusmods") => "NexusMods",
+        { } s when s.Contains("github") => "Github",
+        { } s when s.Contains("playstarbound") => "Forums",
+        { } s when s.Contains("stardewvalleywiki") => "Unofficial",
+        { } s when s.Contains("spacechase0") => "Spacechase",
+        _ => "???"
+    };
+
+    public string UpdateUrlType { get; init; }
     public string ModId { get; init; }
     public string? Url { get; init; }
     public string Title { get; init; }
@@ -38,18 +51,17 @@ public class OnlineMod
         await JsonSerializer.SerializeAsync(stream, data).ConfigureAwait(false);
     }
 
-    public async Task<Stream?> LoadPicBitmapAsync(TimeSpan delay, bool refresh = false,
+    public async Task<Stream?> LoadPicBitmapAsync(bool refresh = false,
         CancellationToken cancellationToken = default)
     {
         if (refresh && File.Exists(_cachePath + ".bmp")) File.Delete(_cachePath + ".bmp");
         if (File.Exists(_cachePath + ".bmp")) return File.OpenRead(_cachePath + ".bmp");
         
         if (string.IsNullOrEmpty(PicUrl) || (refresh && !PicUrl.Contains("http")))
-            if (Url is not null)
-                PicUrl = await ModLinks.Instance.GetModPicUrl(Url, ModLinks.Pics, cancellationToken);
+            if (Url is not null && !Url.Contains("???"))
+                PicUrl = await new NexusPics(Url).GetModPicUrlAsync(NexusPics.Pics, cancellationToken);
 
         if (string.IsNullOrEmpty(PicUrl)) return null;
-        await Task.Delay(delay, cancellationToken);
         return await LoadPicBitmapAsync(PicUrl, _cachePath + ".bmp", cancellationToken);
     }
 
@@ -58,7 +70,7 @@ public class OnlineMod
     {
         if (File.Exists(cachePath)) return File.OpenRead(cachePath);
 
-        var response = await HttpBatchExecutor.Instance.GetAsync(picUrl, cancellationToken);
+        var response = await HttpHelper.Instance.GetAsync(picUrl, cancellationToken);
 
         if (!response.IsSuccessStatusCode) return null;
         await using (var contentStream = await response.Content.ReadAsStreamAsync(cancellationToken))
@@ -72,14 +84,15 @@ public class OnlineMod
 
         return File.OpenRead(cachePath);
     }
-
-    public static async Task<IEnumerable<OnlineMod>> SearchAsync(string searchTerm, CancellationToken ct = default)
+    
+    public override bool Equals(object? obj)
     {
-        return await ModLinks.Instance.GetModsAsync(searchTerm, ct);
+        if (obj is not OnlineMod other) return false;
+        return other.ModId == ModId && other.Url == Url && other.Title == Title;
     }
 
-    public static async Task<IEnumerable<OnlineMod>> GetModsAsync(CancellationToken ct = default)
+    public override int GetHashCode()
     {
-        return await ModLinks.Instance.GetModsAsync(cancellationToken: ct);
+        return HashCode.Combine(ModId, Url, Title);
     }
 }

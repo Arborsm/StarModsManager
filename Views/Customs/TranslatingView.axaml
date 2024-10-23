@@ -2,7 +2,9 @@
     x:Class="StarModsManager.Views.Customs.TranslatingView"
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:api="clr-namespace:StarModsManager.Api"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:lib="clr-namespace:StarModsManager.Api.lib"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:pages="using:StarModsManager.ViewModels.Pages"
     d:DesignHeight="450"
@@ -22,39 +24,29 @@
                 Maximum="{Binding MaxProgress}"
                 Value="{Binding Progress}" />
         </StackPanel>
-        <Grid
+        <Border
             Grid.Row="1"
-            ColumnDefinitions="*,*"
-            RowDefinitions="Auto, *">
-            <TextBlock
-                Grid.Row="0"
-                Grid.Column="0"
-                Margin="10"
-                HorizontalAlignment="Center"
-                Text="原文" />
-            <TextBlock
-                Grid.Row="0"
-                Grid.Column="1"
-                Margin="10"
-                HorizontalAlignment="Center"
-                Text="译文" />
-            <TextBox
-                Grid.Row="1"
-                Grid.Column="0"
-                Margin="10"
-                Focusable="False"
-                IsReadOnly="True"
-                Text="{Binding SourceText}"
-                TextWrapping="WrapWithOverflow" />
-            <TextBox
-                Grid.Row="1"
-                Grid.Column="1"
-                Margin="10"
-                Focusable="False"
-                IsReadOnly="True"
-                Text="{Binding TargetText}"
-                TextWrapping="WrapWithOverflow" />
-        </Grid>
+            BorderBrush="Gray"
+            BorderThickness="1">
+            <DataGrid
+                Name="TansDataGrid"
+                lib:DataGridBehavior.AutoScrollToLastRow="True"
+                GridLinesVisibility="All"
+                ItemsSource="{Binding DoneMods}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn
+                        Width="*"
+                        Binding="{Binding SourceText}"
+                        Header="原文"
+                        IsReadOnly="True" />
+                    <DataGridTextColumn
+                        Width="*"
+                        Binding="{Binding TargetText}"
+                        Header="译文"
+                        IsReadOnly="True" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
         <StackPanel
             Grid.Row="2"
             HorizontalAlignment="Center"
@@ -62,11 +54,11 @@
             <Button
                 Margin="0,10,0,20"
                 HorizontalAlignment="Center"
-                Click="Button_OnClick"
+                Click="CancelButton_OnClick"
                 Content="取消" />
             <Button
                 Margin="20,10,0,20"
-                Click="Button_OnClick"
+                Click="CancelButton_OnClick"
                 Content="确定"
                 IsEnabled="{Binding IsFinished}" />
         </StackPanel>

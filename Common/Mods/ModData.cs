@@ -1,6 +1,8 @@
 ﻿using System.Text.Json;
+using CommunityToolkit.Mvvm.DependencyInjection;
 using StarModsManager.Assets.Lang;
 using StarModsManager.Common.Main;
+using StarModsManager.ViewModels.Pages;
 
 namespace StarModsManager.Common.Mods;
 
@@ -9,7 +11,6 @@ internal class ModData
     public bool IsMismatchedTokens = false;
     public static readonly ModData Instance = new();
     public readonly List<LocalMod> I18LocalMods = [];
-    public readonly List<OnlineMod> OnlineMods = [];
     public Dictionary<string, LocalMod> LocalModsMap = []; // Id/UniqueId -> mod
     public Dictionary<string, OnlineMod> OnlineModsMap = []; // UniqueId -> mod
     
@@ -22,15 +23,11 @@ internal class ModData
             LocalModsMap = new Dictionary<string, LocalMod>();
             var manifestFiles = new List<string>();
             await FindManifestFilesAsync(path, manifestFiles);
-            LocalModsMap = manifestFiles
-                .AsParallel()
-                .Select(manifestFile => new LocalMod(manifestFile))
+            LocalModsMap = manifestFiles.AsParallel()
+                .Select(manifestFilePath => new LocalMod(manifestFilePath))
                 .GroupBy(mod => mod.UniqueID)
-                .ToDictionary(
-                    group => group.Key,
-                    group => group.LastOrDefault()
-                )!;
-
+                .ToDictionary(grouping => grouping.Key, grouping => grouping.LastOrDefault())!;
+            await Ioc.Default.GetRequiredService<MainPageViewModel>().LoadModsAsync();
             InitProcessMods();
         }
         else

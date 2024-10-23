@@ -3,9 +3,10 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FluentAvalonia.UI.Controls;
 using StarModsManager.Api;
-using StarModsManager.Common.Main;
+using StarModsManager.Api.NexusMods;
 using StarModsManager.Common.Mods;
 using StarModsManager.ViewModels.Customs;
+using StarModsManager.Views.Customs;
 using PicsSelectView = StarModsManager.Views.Customs.PicsSelectView;
 
 namespace StarModsManager.ViewModels.Items;
@@ -47,8 +48,34 @@ public partial class ModViewModel : ViewModelBase
     private bool IsLocal => LocalMod is not null;
     private string? _localModPath;
 
+    [RelayCommand]
+    private async Task DownloadAsync()
+    {
+        if (OnlineMod.Url != null) await new NexusDownload(OnlineMod.Url).GetModDownloadUrlAsync();
+    }
+
+    [RelayCommand]
+    private async Task GetDetailAsync()
+    {
+        if (LocalMod is not null)
+        {
+            var content = new ModDetailViewModel(await File.ReadAllTextAsync(Path.Combine(LocalMod.PathS, "manifest.json")));
+            var dialog = new ContentDialog
+            {
+                Title = "Detail",
+                CloseButtonText = "Close",
+                Content = new ModDetailView
+                {
+                    Content = content
+                }
+            };
+
+            await dialog.ShowAsync();
+        }
+    }
+
     [RelayCommand(CanExecute = nameof(IsLocal))]
-    private async Task ChangeCover()
+    private async Task ChangeCoverAsync()
     {
         if (LocalMod is not null)
         {
@@ -74,19 +101,19 @@ public partial class ModViewModel : ViewModelBase
     [RelayCommand(CanExecute = nameof(IsLocal))]
     private void OpenModFolder()
     {
-        if (LocalMod is not null) PlatformTools.OpenFileOrUrl(LocalMod.PathS);
+        if (LocalMod is not null) PlatformHelper.OpenFileOrUrl(LocalMod.PathS);
     }
 
     [RelayCommand]
     private void OpenUrl()
     {
-        if (OnlineMod.Url is not null) PlatformTools.OpenFileOrUrl(OnlineMod.Url);
+        if (OnlineMod.Url is not null) PlatformHelper.OpenFileOrUrl(OnlineMod.Url);
     }
 
     [RelayCommand]
-    private async Task AsyncLoadCover(CancellationToken cancellationToken)
+    private async Task LoadCoverAsync(CancellationToken cancellationToken)
     {
-        await LoadCover(TimeSpan.Zero, cancellationToken, true);
+        await LoadCoverAsync(true, cancellationToken);
     }
     
     [RelayCommand(CanExecute = nameof(IsLocal))]
@@ -106,26 +133,48 @@ public partial class ModViewModel : ViewModelBase
         return !IsDisabled;
     }
 
-    public async Task LoadCover(TimeSpan delay, CancellationToken cancellationToken, bool refresh = false)
+    public async Task LoadCoverAsync(bool refresh = false, CancellationToken cancellationToken = default)
     {
         if (LocalMod is not null && File.Exists(LocalMod.InfoPicturePath))
         {
             Pic = await Task.Run(() => new Bitmap(LocalMod.InfoPicturePath), cancellationToken);
             return;
         }
-
-        if (refresh) StarDebug.Debug(@"Refreshing Cover");
-        await using var imageStream = await OnlineMod.LoadPicBitmapAsync(delay, refresh, cancellationToken);
-        if (imageStream is not null)
+        await using var imageStream = await OnlineMod.LoadPicBitmapAsync(refresh, cancellationToken);
+        if (imageStream is not null && await IsValidImageFileAsync(imageStream))
+        {
+            Pic = await Task.Run(() => Bitmap.DecodeToWidth(imageStream, 400), cancellationToken);
+        }
+    }
+    
+    private static async Task<bool> IsValidImageFileAsync(Stream stream)
+    {
+        return await Task.Run(() =>
         {
             try
             {
-                Pic = await Task.Run(() => Bitmap.DecodeToWidth(imageStream, 400), cancellationToken);
+                using var bitmap = new Bitmap(stream);
+                return true;
             }
-            catch (Exception e)
+            catch (ArgumentException)
             {
-                StarDebug.Error(e.Message);
+                return false;
             }
-        }
+            finally
+            {
+                stream.Position = 0;
+            }
+        });
+    }
+
+    public override bool Equals(object? obj)
+    {
+        if (obj is not ModViewModel vm) return false;
+        return LocalMod == vm.LocalMod && OnlineMod == vm.OnlineMod;
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(OnlineMod, LocalMod);
     }
 }

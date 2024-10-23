@@ -1,20 +1,24 @@
 ﻿using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using HtmlAgilityPack;
 using Polly;
 using Polly.Retry;
-using StarModsManager.Common.Main;
 
 namespace StarModsManager.Api;
 
-public class HttpBatchExecutor
+public class HttpHelper
 {
     private static readonly Random Jitter = new();
-    private static readonly Lazy<HttpBatchExecutor> LazyInstance = new(() => new HttpBatchExecutor());
+    private static readonly Lazy<HttpHelper> LazyInstance = new(() => new HttpHelper());
     private readonly HttpClient _httpClient;
     private readonly AsyncRetryPolicy<HttpResponseMessage> _policy;
+    private readonly SemaphoreSlim _semaphore;
+    private const int MaxConcurrentRequests = 10; // 设置最大并发请求数
 
-    public HttpBatchExecutor()
+    public static HttpHelper Instance => LazyInstance.Value;
+
+    public HttpHelper(string referer = "https://www.nexusmods.com/stardewvalley/mods/")
     {
         var client = new HttpClient
         {
@@ -28,7 +32,7 @@ public class HttpBatchExecutor
         client.DefaultRequestHeaders.Add("Sec-Fetch-Dest", "empty");
         client.DefaultRequestHeaders.Add("Sec-Fetch-Mode", "cors");
         client.DefaultRequestHeaders.Add("Sec-Fetch-Site", "same-origin");
-        client.DefaultRequestHeaders.Add("Referer", "https://www.nexusmods.com/stardewvalley/mods/?BH=3");
+        client.DefaultRequestHeaders.Add("Referer", referer);
 
         _httpClient = client;
 
@@ -54,13 +58,29 @@ public class HttpBatchExecutor
                         $"Retry {retryAttempt} after {timespan.TotalSeconds:0.00}s delay due to: {message}");
                 }
             );
+        _semaphore = new SemaphoreSlim(MaxConcurrentRequests, MaxConcurrentRequests);
     }
-    
-    public static HttpBatchExecutor Instance => LazyInstance.Value;
-    
+
     public async Task<HttpResponseMessage> GetAsync(string uri, CancellationToken cancellationToken)
     {
-        return await _policy.ExecuteAsync(async ct =>
-            await _httpClient.GetAsync(uri, HttpCompletionOption.ResponseHeadersRead, ct), cancellationToken);
+        await _semaphore.WaitAsync(cancellationToken);
+        try
+        {
+            return await _policy.ExecuteAsync(async ct =>
+                await _httpClient.GetAsync(uri, HttpCompletionOption.ResponseHeadersRead, ct), cancellationToken);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
+
+    public async Task<HtmlDocument> FetchHtmlDocumentAsync(string url, CancellationToken cancellationToken = default)
+    {
+        var response = await GetAsync(url, cancellationToken);
+        var html = await response.Content.ReadAsStringAsync(cancellationToken);
+        var htmlDoc = new HtmlDocument();
+        htmlDoc.LoadHtml(html);
+        return htmlDoc;
     }
 }

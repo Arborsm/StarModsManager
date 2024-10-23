@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using StardewModdingAPI.Toolkit.Serialization;
+using StardewModdingAPI.Toolkit.Serialization.Models;
+using StarModsManager.Api;
 using StarModsManager.Common.Main;
 
 // ReSharper disable InconsistentNaming
@@ -25,47 +27,43 @@ public sealed class LocalMod
             // ignored
         }
 
-        dynamic modData = JsonConvert.DeserializeObject(manifest)!;
-        Name = modData.Name;
-        Description = modData.Description;
-        Version = modData.Version;
-        UniqueID = modData.UniqueID;
+        var mod = new JsonHelper().Deserialize<Manifest>(manifest)!;
+        Name = mod.Name;
+        Description = mod.Description;
+        Version = mod.Version.ToString();
+        UniqueID = mod.UniqueID;
         Lang = i18n;
         PathS = parentDirectory;
-        var UpdateKeys = modData.UpdateKeys;
-        string? modUrl = null;
+        var UpdateKeys = mod.UpdateKeys;
         var numberPart = string.Empty;
-        try
-        {
-            if (UpdateKeys is not null)
-            {
-                string updateKey = UpdateKeys[0];
-                var parts = updateKey.Split(':');
-                if (parts.Length > 1 && int.TryParse(parts[1], out var id)) numberPart = id.ToString();
-                modUrl = "https://www.nexusmods.com/stardewvalley/mods/" + numberPart;
-            }
-        }
-        catch (Exception)
-        {
-            // ignored
-        }
+        var modUrl = UpdateKeys.Select(SMMHelper.Toolkit.GetUpdateUrl).FirstOrDefault(p => p != null) ?? "";
 
         var picUrl = string.Empty;
         if (File.Exists(Path.Combine(Services.MainConfig.CachePath, numberPart + ".bmp")))
             picUrl = Path.Combine(Services.MainConfig.CachePath, numberPart + ".bmp");
 
         OnlineMod = ModData.Instance.OnlineModsMap.TryGetValue(numberPart, out var onlineMod)
-            ? onlineMod
-            : new OnlineMod(modUrl, Name, picUrl);
+            ? onlineMod : new OnlineMod(modUrl, Name, picUrl);
     }
 
     public string InfoPicturePath => Path.Combine(PathS, "Info.bmp");
 
-    public OnlineMod OnlineMod { get; set; }
+    public OnlineMod OnlineMod { get; }
     public string Name { get; }
     public string Description { get; }
     public string Version { get; }
     public string UniqueID { get; }
     public string PathS { get; }
     public List<string> Lang { get; }
+    
+    public override bool Equals(object? obj)
+    {
+        if (obj is not LocalMod other) return false;
+        return other.Name == Name && other.Description == Description && other.Version == Version && other.UniqueID == UniqueID;
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Name, Description, Version, UniqueID);
+    }
 }

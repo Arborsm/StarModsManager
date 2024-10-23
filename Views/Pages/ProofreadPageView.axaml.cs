@@ -61,4 +61,10 @@ public partial class ProofreadPageView : UserControl
 
         proofreadDataGrid.RaiseEvent(keyEventArgs);
     }
+
+    private void ProofreadDataGrid_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        e.Handled = true;
+        ((DataGrid)sender!).InvalidateVisual();
+    }
 }

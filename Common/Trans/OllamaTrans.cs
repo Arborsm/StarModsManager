@@ -10,7 +10,7 @@ internal class OllamaTrans : ITranslator
     public bool NeedApi => false;
     public string Name => "Ollama";
 
-    public async Task<string> StreamCallWithMessage(string text, string role, TransApiConfig config,
+    public async Task<string> StreamCallWithMessageAsync(string text, string role, TransApiConfig config,
         CancellationToken cancellationToken)
     {
         var ollama = new OllamaApiClient(config.Url);
@@ -28,7 +28,7 @@ internal class OllamaTrans : ITranslator
         return response?.Message.Content ?? string.Empty;
     }
 
-    public async Task<List<string>> GetSupportModels(TransApiConfig config)
+    public async Task<List<string>> GetSupportModelsAsync(TransApiConfig config)
     {
         var ollama = new OllamaApiClient(config.Url);
         var models = await ollama.ListLocalModels();

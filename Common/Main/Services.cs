@@ -1,3 +1,4 @@
+using System.Reflection;
 using Avalonia.Controls;
 using StarModsManager.Common.Config;
 using StarModsManager.Common.Trans;
@@ -6,6 +7,7 @@ namespace StarModsManager.Common.Main;
 
 public static class Services
 {
+    public static readonly string AppVersion = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "Unknown";
     public static readonly string AppSavingPath = 
         CombineNCheckDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "StarModsManager");
     private static readonly string TempDir = CombineNCheckDirectory(Path.GetTempPath(), "StarModsManager");

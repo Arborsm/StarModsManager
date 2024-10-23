@@ -2,7 +2,10 @@
     x:Class="StarModsManager.Views.Pages.DownloadPageView"
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:api="clr-namespace:StarModsManager.Api"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:ic="using:FluentIcons.Avalonia.Fluent"
+    xmlns:lib="clr-namespace:StarModsManager.Api.lib"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:pages="using:StarModsManager.ViewModels.Pages"
     d:DesignHeight="450"
@@ -20,16 +23,49 @@
         </MenuFlyout>
     </UserControl.Resources>
 
+    <UserControl.Styles>
+        <Style Selector="ToggleButton ic|SymbolIcon.Asc">
+            <Setter Property="IsVisible" Value="False" />
+        </Style>
+        <Style Selector="ToggleButton:checked ic|SymbolIcon.Asc">
+            <Setter Property="IsVisible" Value="True" />
+        </Style>
+        <Style Selector="ToggleButton ic|SymbolIcon.Desc">
+            <Setter Property="IsVisible" Value="True" />
+        </Style>
+        <Style Selector="ToggleButton:checked ic|SymbolIcon.Desc">
+            <Setter Property="IsVisible" Value="False" />
+        </Style>
+    </UserControl.Styles>
+
     <DockPanel Margin="20" ContextFlyout="{StaticResource ContextMenu}">
         <StackPanel DockPanel.Dock="Top">
-            <TextBox Text="{Binding SearchText}" Watermark="Search for OnlineMod...." />
+            <Grid ColumnDefinitions="*, Auto, Auto">
+                <TextBox Text="{Binding SearchText}" Watermark="Search for OnlineMod...." />
+                <ComboBox
+                    Grid.Column="1"
+                    Width="160"
+                    Margin="10,0,0,0"
+                    ItemsSource="{Binding SortByList}"
+                    SelectedValue="{Binding SortBy}" />
+                <ToggleButton
+                    Grid.Column="2"
+                    Margin="10,0,0,0"
+                    IsChecked="{Binding Asc}">
+                    <Panel>
+                        <ic:SymbolIcon Classes="Desc" Symbol="TextSortDescending" />
+                        <ic:SymbolIcon Classes="Asc" Symbol="TextSortAscending" />
+                    </Panel>
+                </ToggleButton>
+            </Grid>
             <ProgressBar IsIndeterminate="True" IsVisible="{Binding IsBusy}" />
         </StackPanel>
         <ListBox
             Margin="0,15"
+            lib:ListBoxBehavior.LoadMoreCommand="{Binding LoadMoreModsCommand}"
             Background="Transparent"
             ItemsSource="{Binding SearchResults}"
-            SelectedItem="{Binding SelectedAlbum}">
+            SelectedItem="{Binding SelectedMod}">
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
                     <WrapPanel />

@@ -1,21 +1,19 @@
-﻿using System.Diagnostics;
-using System.Globalization;
-using System.IO.Compression;
+﻿using System.IO.Compression;
 using System.Text;
 using CommunityToolkit.Mvvm.Messaging;
 using FluentAvalonia.UI.Controls;
 using Newtonsoft.Json;
-using NLog;
+using StardewModdingAPI.Toolkit;
+using StarModsManager.Api.lib;
 using StarModsManager.Common.Main;
 using StarModsManager.Common.Mods;
 
 namespace StarModsManager.Api;
 
-internal static class SMMTools
+internal static class SMMHelper
 {
-    private static readonly Random Jitter = new();
-    private const int InitialGroupSize = 20;
-    
+    public static readonly ModToolkit Toolkit = new();
+
     public static void Notification(string message, string title = "Info", InfoBarSeverity severity = InfoBarSeverity.Informational)
     {
         WeakReferenceMessenger.Default.Send(new NotificationMessage
@@ -28,17 +26,17 @@ internal static class SMMTools
     
     public static readonly Dictionary<string, string> LanguageMap = new(StringComparer.OrdinalIgnoreCase)
     {
-        { "中文", "zh" },
-        { "Français", "fr" },
-        { "Deutsch", "de" },
-        { "Magyar", "hu" },
-        { "Italiano", "it" },
-        { "日本語", "ja" },
-        { "한국어", "ko" },
-        { "Português", "pt" },
-        { "Русский", "ru" },
-        { "Español", "es" },
-        { "Türkçe", "tr" }
+        ["中文"] = "zh",
+        ["Français"] = "fr",
+        ["Deutsch"] = "de",
+        ["Magyar"] = "hu",
+        ["Italiano"] = "it",
+        ["日本語"] = "ja",
+        ["한국어"] = "ko",
+        ["Português"] = "pt",
+        ["Русский"] = "ru",
+        ["Español"] = "es",
+        ["Türkçe"] = "tr"
     };
 
     public static string SwitchLanguage(string input)
@@ -53,62 +51,14 @@ internal static class SMMTools
             : string.Empty;
     }
 
-    public static void ForEach<TSource>(
-        this IEnumerable<TSource> source,
-        Action<TSource> action)
+    public static void ForEach<TSource>(this IEnumerable<TSource> source,
+        Action<TSource> action, CancellationToken cancellationToken = default)
     {
-        foreach (var item in source) action(item);
-    }
-    
-    public static async Task ExecuteBatchAsync(IEnumerable<Task> tasks,
-        int groupSize = InitialGroupSize, CancellationToken cancellationToken = default)
-    {
-        await ExecuteInBatches(tasks, async (task, _, _) =>
+        foreach (var item in source)
         {
-            await task;
-            return Task.CompletedTask;
-        }, groupSize, cancellationToken);
-    }
-    
-    public static async Task ExecuteBatchAsync(IEnumerable<Func<TimeSpan, CancellationToken, Task>> tasks,
-        int groupSize = InitialGroupSize, CancellationToken cancellationToken = default)
-    {
-        await ExecuteInBatches(tasks, async (task, initialDelay, ct) =>
-        {
-            await task(initialDelay, ct);
-            return Task.CompletedTask;
-        }, groupSize, cancellationToken);
-    }
-    
-    private static async Task ExecuteInBatches<TTask, TResult>(IEnumerable<TTask> tasks,
-        Func<TTask, TimeSpan, CancellationToken, Task<TResult>> executeTask,
-        int groupSize,
-        CancellationToken cancellationToken)
-    {
-        var groups = tasks
-            .Select((task, index) => new { task, index })
-            .GroupBy(x => x.index / groupSize);
-
-        var sw = Stopwatch.StartNew();
-        foreach (var group in groups)
-        {
-            var groupTasks = group.Select(async x =>
-            {
-                var initialDelay = TimeSpan.FromSeconds(Jitter.NextDouble() * 2);
-                return await executeTask(x.task, initialDelay, cancellationToken);
-            }).ToList();
-
-            sw.Start();
-            await Task.Run(async () =>
-            {
-                await Task.WhenAll(groupTasks);
-            }, cancellationToken);
-            sw.Stop();
-
-            if (!(sw.ElapsedMilliseconds <= 3000))
-                await Task.Delay(TimeSpan.FromSeconds(Jitter.NextDouble() * 3), cancellationToken);
+            if (cancellationToken.IsCancellationRequested) break;
+            action(item);
         }
-        StarDebug.Debug($"All tasks completed in {sw.Elapsed.TotalSeconds:0.00}s.");
     }
 
     /// <summary>
@@ -157,16 +107,6 @@ internal static class SMMTools
     {
         var (defaultLang, targetLang) = localMod.ReadMap();
         return defaultLang.Where(x => !targetLang.ContainsKey(x.Key)).ToDictionary(x => x.Key, x => x.Value);
-    }
-
-    /// <summary>
-    ///     将double值转换为整数字符串。
-    /// </summary>
-    /// <param name="value">要转换的double值。</param>
-    /// <returns>整数字符串。</returns>
-    public static string ToStringI(this double value)
-    {
-        return ((int)value).ToString(CultureInfo.InvariantCulture);
     }
 
     /// <summary>
@@ -233,42 +173,6 @@ internal static class SMMTools
     {
         var en = path.GetJsonString("default.json");
         return JsonConvert.DeserializeObject<Dictionary<string, string>>(en)!;
-    }
-
-    /// <summary>
-    ///     扩展方法，用于测量异步任务的耗时并返回耗时和任务的结果。
-    /// </summary>
-    /// <typeparam name="T">任务结果的类型。</typeparam>
-    /// <param name="task">需要测量的异步任务。</param>
-    /// <param name="arg">可选输出文本</param>
-    /// <param name="level">日志级别</param>
-    /// <returns>任务的结果。</returns>
-    public static async Task<T> WithDebugElapsedTime<T>(this Task<T> task, string? arg = default,
-        LogLevel? level = default)
-    {
-        if (level == null) level = LogLevel.Trace;
-        var stopwatch = Stopwatch.StartNew();
-        var result = await task;
-        stopwatch.Stop();
-        StarDebug.Log($"{arg} completed in {stopwatch.ElapsedMilliseconds} ms", level);
-        return result;
-    }
-
-    /// <summary>
-    ///     扩展方法，用于测量无返回值异步任务的耗时。
-    /// </summary>
-    /// <param name="task">需要测量的异步任务。</param>
-    /// <param name="arg">可选输出文本</param>
-    /// ///
-    /// <param name="level">日志级别</param>
-    /// <returns>任务。</returns>
-    public static async Task WithDebugElapsedTime(this Task task, string? arg = default, LogLevel? level = default)
-    {
-        if (level == null) level = LogLevel.Debug;
-        var stopwatch = Stopwatch.StartNew();
-        await task;
-        stopwatch.Stop();
-        StarDebug.Log($"{arg} completed in {stopwatch.ElapsedMilliseconds} ms", level);
     }
 }
 

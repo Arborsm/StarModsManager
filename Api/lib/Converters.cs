@@ -4,7 +4,7 @@ using Avalonia.Data.Converters;
 using Avalonia.Media;
 using StarModsManager.ViewModels.Pages;
 
-namespace StarModsManager.Api;
+namespace StarModsManager.Api.lib;
 
 public class NullableBoolToColorConverter : IValueConverter
 {

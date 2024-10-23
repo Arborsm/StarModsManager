@@ -2,9 +2,10 @@
 using CommunityToolkit.Mvvm.Messaging;
 using FluentAvalonia.UI.Controls;
 using NLog;
-using StarModsManager.Api;
+using StarModsManager.Api.lib;
+using StarModsManager.Common.Main;
 
-namespace StarModsManager.Common.Main;
+namespace StarModsManager.Api;
 
 public static partial class StarDebug
 {
@@ -23,33 +24,22 @@ public static partial class StarDebug
     /// </remarks>
     internal static void AttachToParentConsole()
     {
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            AttachConsole(AttachParentProcess);
-        }
-    }
-    
-    static StarDebug()
-    {
-        var logDirectory = Services.LogDir;
-        Directory.CreateDirectory(logDirectory);
-        var fileName = Path.Combine(logDirectory, "log_${shortdate}.log");
-        if (File.Exists(fileName)) fileName = Rename(fileName);
-        LogManager.Setup().LoadConfiguration(builder =>
-        {
-            builder.ForLogger().FilterMinLevel(LogLevel.Trace).WriteToConsole();
-            builder.ForLogger().FilterMinLevel(LogLevel.Info).WriteToFile(fileName);
-        });
+        AttachConsole(AttachParentProcess);
     }
 
-    private static string Rename(string fileName)
+    static StarDebug()
     {
-        var i = 0;
-        do 
+        var debugFileName = Path.Combine(Services.LogDir, "debug_${shortdate}.log");
+        var logFileName = Path.Combine(Services.LogDir, "log_${shortdate}.log");
+
+        LogManager.Setup().LoadConfiguration(builder =>
         {
-            fileName = Path.Combine(Path.GetDirectoryName(fileName)!, $"log_{i++}.log");
-        } while (File.Exists(fileName));
-        return fileName;
+            builder.ForLogger().FilterMinLevel(LogLevel.Trace).WriteToConsole("${longdate}|${level:uppercase=true}|${message}");
+            builder.ForLogger().FilterMinLevel(LogLevel.Trace).WriteToFile(debugFileName, 
+                "${longdate}|${level:uppercase=true}|${message}", maxArchiveDays: 10);
+            builder.ForLogger().FilterMinLevel(LogLevel.Info)
+                .WriteToFile(logFileName, "${longdate}|${level:uppercase=true}|${message}");
+        });
     }
 
     public static void Trace(string message, params object[] args)
@@ -59,9 +49,7 @@ public static partial class StarDebug
 
     public static void Debug(string message, params object[] args)
     {
-#if DEBUG
         Logger.Debug(message, args);
-#endif
     }
 
     public static void Info(string message, params object[] args)
