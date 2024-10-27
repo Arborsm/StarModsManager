@@ -1,6 +1,7 @@
 ﻿using System.Net.Http;
 using RestEase;
 using StarModsManager.Api.NexusMods.Responses;
+using ModFile = StarModsManager.ViewModels.Customs.ModFile;
 
 namespace StarModsManager.Api.NexusMods.Interface;
 
@@ -14,7 +15,8 @@ public class NexusApiClient
         _gameDomainName = gameDomainName ?? "stardewvalley";
         var httpClient = new HttpClient
         {
-            BaseAddress = new Uri("https://api.nexusmods.com/")
+            BaseAddress = new Uri("https://api.nexusmods.com/"),
+            Timeout = TimeSpan.FromSeconds(30)
         };
         var restClient = new RestClient(httpClient)
         {

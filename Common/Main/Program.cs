@@ -1,10 +1,8 @@
 ﻿using Avalonia;
 using Avalonia.Media;
-using Avalonia.Threading;
 using FluentIcons.Avalonia.Fluent;
 using StarModsManager.Api;
 using StarModsManager.Api.lib;
-using StarModsManager.Common.Mods;
 
 namespace StarModsManager.Common.Main;
 
@@ -22,23 +20,21 @@ internal static class Program
 
     private static AppBuilder InitializeDataBackground(this AppBuilder builder)
     {
-        StarDebug.AttachToParentConsole();
-        StarDebug.Info("Starting StarModsManager...");
-        _ = Task.Run(async () => await ModData.Instance.FindModsAsync());
-        StarDebug.Info($"Welcome to StarModsManager v{Services.AppVersion}");
+        SMMDebug.AttachToParentConsole();
+        SMMDebug.Info("Starting StarModsManager...");
+        _ = Task.Run(async () => await ModsHelper.Instance.FindModsAsync());
+        SMMDebug.Info($"Welcome to StarModsManager v{Services.AppVersion}");
         var startTime = DateTime.Now;
-        StarDebug.Info($"Starting at: {startTime:yyyy-MM-dd HH:mm:ss}");
+        SMMDebug.Info($"Starting at: {startTime:yyyy-MM-dd HH:mm:ss}");
         return builder;
     }
 
-    private static AppBuilder BuildAvaloniaApp()
-    {
-        return AppBuilder.Configure<App>()
+    private static AppBuilder BuildAvaloniaApp() =>
+        AppBuilder.Configure<App>()
             .UsePlatformDetect()
             .WithInterFont()
             .UseSegoeMetrics()
             .LogToTrace();
-    }
 
     private static FontManagerOptions CreateFontManagerOptions()
     {

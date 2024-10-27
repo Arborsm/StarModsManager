@@ -6,14 +6,13 @@ using Avalonia.Styling;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FluentAvalonia.Styling;
-using FluentAvalonia.UI.Controls;
 using StardewModdingAPI.Toolkit.Framework.GameScanning;
 using StarModsManager.Api;
 using StarModsManager.Common.Main;
 
 namespace StarModsManager.ViewModels.Pages;
 
-public partial class SettingsPageViewModel : ViewModelBase
+public partial class SettingsPageViewModel : MainPageViewModelBase
 {
     private const string System = "System";
     private const string Dark = "Dark";
@@ -190,7 +189,7 @@ public partial class SettingsPageViewModel : ViewModelBase
     partial void OnModDirChanged(string value)
     {
         Services.MainConfig.DirectoryPath = value;
-        SMMHelper.Notification("需要重启使得改动生效", "注意", InfoBarSeverity.Warning);
+        ServiceLocator.Clear();
     }
 
     partial void OnNexusApiKeyChanged(string value)

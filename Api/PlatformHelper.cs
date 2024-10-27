@@ -15,7 +15,7 @@ public static class PlatformHelper
         }
         catch (Exception? e)
         {
-            StarDebug.Error(e);
+            SMMDebug.Error(e);
         }
     }
 

@@ -3,34 +3,36 @@ using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using StarModsManager.Api.NexusMods;
+using StarModsManager.Api.NexusMods.Limit;
 using StarModsManager.Common.Mods;
 using StarModsManager.ViewModels.Items;
 
 namespace StarModsManager.ViewModels.Pages;
 
-public partial class DownloadPageViewModel : ViewModelBase
+public partial class DownloadPageViewModel : MainPageViewModelBase
 {
     private int _currentPage = 1;
     private CancellationTokenSource? _cts;
-    private readonly SemaphoreSlim _semaphore = new(1, 1);
+    private readonly Throttle _throttle = new(1, TimeSpan.FromSeconds(1));
+    
+    [ObservableProperty]
+    private bool _isBusy;
+    [ObservableProperty]
+    private string _searchText = string.Empty;
+    [ObservableProperty]
+    private string? _sortBy = NexusPage.Types.Keys.First();
+    [ObservableProperty]
+    private ModViewModel? _selectedMod;
+    [ObservableProperty]
+    private bool _asc;
+    
     private NexusPage NexusPage => new()
     {
         Page = _currentPage,
         SortBy = GetSort,
         AscOrder = Asc
     };
-    private string GetSort => NexusPage.Types[SortBy];
-
-    [ObservableProperty]
-    private bool _isBusy;
-    [ObservableProperty]
-    private string _searchText = string.Empty;
-    [ObservableProperty]
-    private string _sortBy = NexusPage.Types.Keys.First();
-    [ObservableProperty]
-    private ModViewModel? _selectedMod;
-    [ObservableProperty]
-    private bool _asc;
+    private string GetSort => NexusPage.Types[SortBy ?? "Date"];
 
     public ObservableCollection<string> SortByList { get; } = [..NexusPage.Types.Keys];
     
@@ -38,12 +40,14 @@ public partial class DownloadPageViewModel : ViewModelBase
 
     partial void OnSearchTextChanged(string value)
     {
+        if (string.IsNullOrWhiteSpace(value)) return;
         _ = DebounceSearchAsync(value);
         _currentPage = 1;
     }
 
-    partial void OnSortByChanged(string? oldValue, string newValue)
+    partial void OnSortByChanged(string? oldValue, string? newValue)
     {
+        if (oldValue == null) return;
         if (oldValue == newValue) return;
         Init();
     }
@@ -58,31 +62,33 @@ public partial class DownloadPageViewModel : ViewModelBase
     {
         _currentPage = 1;
         SearchResults.Clear();
-        Task.Run(() => LoadModsAsync(true));
+        RunTask(LoadModsAsync(true));
     }
 
     private async Task DebounceSearchAsync(string searchText)
     {
-        _cts?.CancelAsync().ConfigureAwait(false);
+        _cts?.CancelAsync();
         _cts = new CancellationTokenSource();
 
         try
         {
             await Task.Delay(500, _cts.Token);
-            await DoSearchAsync(searchText);
+            RunTask(DoSearchAsync(searchText));
         }
         catch (TaskCanceledException)
         {
         }
     }
 
-    [RelayCommand]
-    private async Task RefreshAsync()
+    private void RunTask(Task task)
     {
-        if (string.IsNullOrEmpty(SearchText))
-            await DoSearchAsync(SearchText);
-        else
-            await LoadModsAsync(true);
+        _ = _throttle.Run(async () => await task);
+    }
+
+    [RelayCommand]
+    private void Refresh()
+    {
+        RunTask(string.IsNullOrEmpty(SearchText) ? DoSearchAsync(SearchText) : LoadModsAsync(true));
     }
 
     private bool CanLoadMoreMods => SearchResults.Count > 0;
@@ -90,26 +96,17 @@ public partial class DownloadPageViewModel : ViewModelBase
     [RelayCommand(CanExecute = nameof(CanLoadMoreMods))]
     private async Task LoadMoreModsAsync()
     {
-        if (!await _semaphore.WaitAsync(0)) return;
-
-        try
+        await Task.Run(() => _throttle.Queue(async () =>
         {
-            await Task.Run(async () =>
-            {
-                _currentPage++;
-                await LoadModsAsync(false).ConfigureAwait(false);
-            });
-        }
-        finally
-        {
-            _semaphore.Release();
-        }
+            _currentPage++;
+            await LoadModsAsync(false);
+        }));
     }
 
     private async Task LoadModsAsync(bool clearSearch)
     {
         IsBusy = true;
-        _cts?.CancelAsync().ConfigureAwait(false);
+        _cts?.CancelAsync();
         _cts = new CancellationTokenSource();
         var cancellationToken = _cts.Token;
 
@@ -127,7 +124,7 @@ public partial class DownloadPageViewModel : ViewModelBase
     {
         if (string.IsNullOrWhiteSpace(s)) return;
         IsBusy = true;
-        _cts?.CancelAsync().ConfigureAwait(false);
+        _cts?.CancelAsync();
         _cts = new CancellationTokenSource();
         var cancellationToken = _cts.Token;
 
@@ -162,7 +159,7 @@ public partial class DownloadPageViewModel : ViewModelBase
     private async Task LoadCoversAsync(CancellationToken cancellationToken = default)
     {
         var tasks = SearchResults.AsParallel()
-            .Select(async uri => await uri.LoadCoverAsync(cancellationToken: cancellationToken));
+            .Select(async model => await model.LoadCoverAsync(cancellationToken: cancellationToken));
 
         await Task.WhenAll(tasks);
     }

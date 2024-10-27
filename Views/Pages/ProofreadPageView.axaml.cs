@@ -4,7 +4,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
-using CommunityToolkit.Mvvm.DependencyInjection;
+using StarModsManager.Common.Main;
 using StarModsManager.ViewModels.Pages;
 
 namespace StarModsManager.Views.Pages;
@@ -20,7 +20,7 @@ public partial class ProofreadPageView : UserControl
     
     private void ComboBox_SelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
-        var viewModel = Ioc.Default.GetRequiredService<ProofreadPageViewModel>();
+        var viewModel = ServiceLocator.Resolve<ProofreadPageViewModel>();
         ProofreadDataGrid.ItemsSource = viewModel.ModLangsView;
     }
 
@@ -29,7 +29,7 @@ public partial class ProofreadPageView : UserControl
         if (e.EditAction != DataGridEditAction.Commit) return;
         var dataGrid = (DataGrid) sender!;
         var item = (ModLang) dataGrid.SelectedItem!;
-        Ioc.Default.GetRequiredService<ProofreadPageViewModel>().AddEditedLang(item);
+        ServiceLocator.Resolve<ProofreadPageViewModel>().AddEditedLang(item);
     }
     
     private static void DisableDefaultScrolling(DataGrid dataGrid)

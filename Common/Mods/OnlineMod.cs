@@ -48,7 +48,7 @@ public class OnlineMod
 
     private static async Task SaveToStreamAsync(OnlineMod data, Stream stream)
     {
-        await JsonSerializer.SerializeAsync(stream, data).ConfigureAwait(false);
+        await JsonSerializer.SerializeAsync(stream, data);
     }
 
     public async Task<Stream?> LoadPicBitmapAsync(bool refresh = false,
@@ -57,9 +57,15 @@ public class OnlineMod
         if (refresh && File.Exists(_cachePath + ".bmp")) File.Delete(_cachePath + ".bmp");
         if (File.Exists(_cachePath + ".bmp")) return File.OpenRead(_cachePath + ".bmp");
         
-        if (string.IsNullOrEmpty(PicUrl) || (refresh && !PicUrl.Contains("http")))
+        if (string.IsNullOrEmpty(PicUrl) || (refresh && !PicUrl.Contains("http")) 
+                                         || PicUrl == "https://www.nexusmods.com/assets/images/default/noimage.svg")
+        {
             if (Url is not null && !Url.Contains("???"))
-                PicUrl = await new NexusPics(Url).GetModPicUrlAsync(NexusPics.Pics, cancellationToken);
+            {
+                var nexusMod = await NexusMod.Create(Url, cancellationToken);
+                PicUrl = await nexusMod.GetModPicUrlAsync(NexusMod.Pics);
+            }
+        }
 
         if (string.IsNullOrEmpty(PicUrl)) return null;
         return await LoadPicBitmapAsync(PicUrl, _cachePath + ".bmp", cancellationToken);

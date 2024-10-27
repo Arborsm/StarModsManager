@@ -20,10 +20,8 @@ public class HttpHelper
 
     public HttpHelper(string referer = "https://www.nexusmods.com/stardewvalley/mods/")
     {
-        var client = new HttpClient
-        {
-            Timeout = TimeSpan.FromSeconds(30)
-        };
+        var client = new HttpClient();
+        client.Timeout = TimeSpan.FromSeconds(30);
         client.DefaultRequestHeaders.Accept.Clear();
         client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("*/*"));
         client.DefaultRequestHeaders.UserAgent.ParseAdd(
@@ -35,9 +33,9 @@ public class HttpHelper
         client.DefaultRequestHeaders.Add("Referer", referer);
 
         _httpClient = client;
-
         _policy = Policy<HttpResponseMessage>
-            .Handle<HttpRequestException>()
+            .Handle<HttpRequestException>(ex => 
+                !ex.Message.Contains("The SSL connection could not be established", StringComparison.OrdinalIgnoreCase))
             .OrResult(msg =>
                 msg.StatusCode is HttpStatusCode.TooManyRequests or HttpStatusCode.InternalServerError
                     or HttpStatusCode.RequestTimeout)
@@ -54,7 +52,7 @@ public class HttpHelper
                     var message = outcome.Result is not null
                         ? $"HTTP Status Code: {outcome.Result.StatusCode}"
                         : outcome.Exception?.Message;
-                    StarDebug.Trace(
+                    SMMDebug.Trace(
                         $"Retry {retryAttempt} after {timespan.TotalSeconds:0.00}s delay due to: {message}");
                 }
             );
@@ -68,6 +66,11 @@ public class HttpHelper
         {
             return await _policy.ExecuteAsync(async ct =>
                 await _httpClient.GetAsync(uri, HttpCompletionOption.ResponseHeadersRead, ct), cancellationToken);
+        }
+        catch (HttpRequestException ex) when (ex.Message.Contains("The SSL connection could not be established", StringComparison.OrdinalIgnoreCase))
+        {
+            SMMHelper.Notification("网络链接错误, 请检查网络设置");
+            return new HttpResponseMessage();
         }
         finally
         {

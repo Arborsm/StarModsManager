@@ -7,7 +7,12 @@
         <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
         <ApplicationManifest>app.manifest</ApplicationManifest>
         <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
-        <LangVersion>default</LangVersion>
+        <LangVersion>preview</LangVersion>
+        <Authors>Arborsm</Authors>
+        <Description>A Mod Manager for StardewValley</Description>
+        <Copyright>GPL-3.0 license</Copyright>
+        <RepositoryUrl>https://github.com/Arborsm/StarModsManager</RepositoryUrl>
+        <RepositoryType>GitHub</RepositoryType>
     </PropertyGroup>
 
     <ItemGroup>
@@ -17,16 +22,17 @@
 
     <ItemGroup>
         <PackageReference Include="Avalonia" Version="11.1.4"/>
+        <PackageReference Include="Avalonia.Controls.TreeDataGrid" Version="11.0.10" />
         <PackageReference Include="Avalonia.Desktop" Version="11.1.4"/>
         <PackageReference Include="Avalonia.Fonts.Inter" Version="11.1.4"/>
         <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
         <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.1.4" />
         <PackageReference Include="Avalonia.Themes.Fluent" Version="11.1.4"/>
+        <PackageReference Include="Avalonia.Xaml.Behaviors" Version="11.1.0.5" />
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2"/>
         <PackageReference Include="FluentAvaloniaUI" Version="2.1.0"/>
         <PackageReference Include="FluentIcons.Avalonia.Fluent" Version="1.1.261" />
         <PackageReference Include="HtmlAgilityPack" Version="1.11.67"/>
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1"/>
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
         <PackageReference Include="NLog" Version="5.3.4"/>
         <PackageReference Include="OllamaSharp" Version="3.0.15" />
@@ -34,6 +40,7 @@
         <PackageReference Include="Pathoschild.Http.FluentClient" Version="4.4.1"/>
         <PackageReference Include="Polly" Version="8.4.2"/>
         <PackageReference Include="RestEase" Version="1.6.4" />
+        <PackageReference Include="VdfConverter" Version="1.0.3" />
     </ItemGroup>
 
     <ItemGroup>
@@ -52,10 +59,6 @@
         </Compile>
         <Compile Update="Views\Items\ModView.axaml.cs">
             <DependentUpon>ModView.axaml</DependentUpon>
-            <SubType>Code</SubType>
-        </Compile>
-        <Compile Update="Views\MainNavigation.axaml.cs">
-            <DependentUpon>NavigationPages.axaml</DependentUpon>
             <SubType>Code</SubType>
         </Compile>
         <Compile Update="Views\Customs\PicsSelectView.axaml.cs">

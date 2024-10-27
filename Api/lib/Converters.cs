@@ -33,6 +33,24 @@ public class NullableBoolToColorConverter : IValueConverter
     }
 }
 
+public class HeightMultiplierConverter : IValueConverter
+{
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is not double height || parameter is not string multiplierString) return value;
+        if (double.TryParse(multiplierString, out var multiplier))
+        {
+            return height * multiplier;
+        }
+        return value;
+    }
+
+    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+}
+
 public class ModLangIsMatchComparer : IComparer
 {
     private static int Compare(ModLang? x, ModLang? y)

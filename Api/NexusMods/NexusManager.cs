@@ -1,4 +1,5 @@
-﻿using StarModsManager.Api.NexusMods.Interface;
+﻿using Polly;
+using StarModsManager.Api.NexusMods.Interface;
 using StarModsManager.Api.NexusMods.Limit;
 using StarModsManager.Api.NexusMods.Responses;
 
@@ -13,7 +14,22 @@ public static class NexusManager
     {
         _api = new NexusApiClient(apiKey, userAgent);
         _throttle = new Throttle(30, TimeSpan.FromSeconds(1));
-        Task.Run(async () => await _api.ValidateUser());
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                var retryPolicy = Policy
+                    .Handle<Exception>()
+                    .WaitAndRetryAsync(3, retryAttempt => 
+                        TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
+                return await retryPolicy.ExecuteAsync(() => _api.ValidateUser());
+            }
+            catch (Exception)
+            {
+                // ignore
+            }
+            return null;
+        });
     }
     
     public static async Task<ModInfo> GetModAsync(int modId)
@@ -29,6 +45,12 @@ public static class NexusManager
     public static async Task<ModFileDownloadLink> GetModFileDownloadLinkAsync(int modId, int fileId)
     {
         return await ExecuteThrottledRequestAsync(() => _api.GetModFileDownloadLink(modId, fileId));
+    }
+    
+    public static async Task<Uri?> GetPicsAsync(int modId)
+    {
+        var mod = await GetModAsync(modId);
+        return mod.PictureUrl;
     }
 
     private static async Task<T> ExecuteThrottledRequestAsync<T>(Func<Task<T>> apiCall)

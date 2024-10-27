@@ -94,7 +94,7 @@ public class ListBoxBehavior : AvaloniaObject
         AvaloniaProperty.RegisterAttached<ListBoxBehavior, ListBox, ICommand>("LoadMoreCommand");
 
     public static readonly AttachedProperty<double> LoadMoreThresholdProperty =
-        AvaloniaProperty.RegisterAttached<ListBoxBehavior, ListBox, double>("LoadMoreThreshold", defaultValue: 0.9);
+        AvaloniaProperty.RegisterAttached<ListBoxBehavior, ListBox, double>("LoadMoreThreshold", defaultValue: 300);
 
     public static void SetLoadMoreCommand(ListBox element, ICommand value)
     {
@@ -124,13 +124,9 @@ public class ListBoxBehavior : AvaloniaObject
     private static void OnLoadMoreCommandChanged(ListBox listBox, AvaloniaPropertyChangedEventArgs e)
     {
         if (e.NewValue is ICommand)
-        {
             listBox.AddHandler(ScrollViewer.ScrollChangedEvent, OnScrollChanged);
-        }
         else
-        {
             listBox.RemoveHandler(ScrollViewer.ScrollChangedEvent, OnScrollChanged);
-        }
     }
 
     private static void OnScrollChanged(object? sender, ScrollChangedEventArgs e)
@@ -142,12 +138,8 @@ public class ListBoxBehavior : AvaloniaObject
         var verticalOffset = scrollViewer.Offset.Y;
         var viewportHeight = scrollViewer.Viewport.Height;
         var extentHeight = scrollViewer.Extent.Height;
-
-        if (!((verticalOffset + viewportHeight) / extentHeight > threshold)) return;
+        if (extentHeight - (verticalOffset + viewportHeight) > threshold) return;
         var command = GetLoadMoreCommand(listBox);
-        if (command.CanExecute(null))
-        {
-            command.Execute(null);
-        }
+        if (command.CanExecute(null)) command.Execute(null);
     }
 }

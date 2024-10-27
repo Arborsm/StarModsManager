@@ -1,12 +1,9 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
 using Avalonia.Styling;
-using CommunityToolkit.Mvvm.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection;
-using StarModsManager.ViewModels.Pages;
-using MainWindow = StarModsManager.Views.MainWindow;
+using StarModsManager.Common.Main;
+using StarModsManager.Views;
 
 namespace StarModsManager;
 
@@ -22,16 +19,7 @@ public class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
-        BindingPlugins.DataValidators.RemoveAt(0);
-        var collection = new ServiceCollection()
-            .AddSingleton<MainPageViewModel>()
-            .AddSingleton<DownloadPageViewModel>()
-            .AddSingleton<TransPageViewModel>()
-            .AddSingleton<ProofreadPageViewModel>()
-            .AddSingleton<SettingsPageViewModel>()
-            .BuildServiceProvider();
-        
-        Ioc.Default.ConfigureServices(collection);
+        ServiceLocator.RegisterAllViewModels();
         
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {

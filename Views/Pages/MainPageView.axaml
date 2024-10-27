@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:lib="clr-namespace:StarModsManager.Api.lib"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:pages="using:StarModsManager.ViewModels.Pages"
     d:DesignHeight="450"
@@ -15,21 +16,121 @@
         <pages:MainPageViewModel />
     </Design.DataContext>
 
-    <Panel Margin="40">
-        <ListBox
-            AutoScrollToSelectedItem="False"
-            Background="Transparent"
-            ItemsSource="{Binding Mods}">
-            <ListBox.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <WrapPanel />
-                </ItemsPanelTemplate>
-            </ListBox.ItemsPanel>
-        </ListBox>
-        <controls:ProgressRing
-            Width="100"
-            Height="100"
-            IsVisible="{Binding IsLoading}" />
-    </Panel>
+    <UserControl.Resources>
+        <lib:HeightMultiplierConverter x:Key="HeightMultiplierConverter" />
+        <MenuFlyout x:Key="CategoryContextMenu">
+            <MenuItem Command="{Binding RemoveLabelCommand}" Header="Remove" />
+            <MenuItem Command="{Binding AddLabelCommand}" Header="Add" />
+        </MenuFlyout>
+    </UserControl.Resources>
+
+    <Grid
+        Name="MainGrid"
+        Margin="20,40,20,20"
+        RowDefinitions="Auto, Auto, *">
+        <Expander Grid.Row="1" MaxHeight="{Binding #MainGrid.Bounds.Height, Converter={StaticResource HeightMultiplierConverter}, ConverterParameter=0.8}">
+            <Expander.Styles>
+                <Style Selector="ListBoxItem">
+                    <Setter Property="Padding" Value="0" />
+                    <Setter Property="MinWidth" Value="0" />
+                </Style>
+                <Style Selector="ToggleButton">
+                    <Setter Property="Padding" Value="0" />
+                </Style>
+                <Style Selector="ListBoxItem">
+                    <Setter Property="ZIndex" Value="0" />
+                    <Setter Property="(Interaction.Behaviors)">
+                        <BehaviorCollectionTemplate>
+                            <BehaviorCollection>
+                                <ItemDragBehavior Orientation="Horizontal" />
+                            </BehaviorCollection>
+                        </BehaviorCollectionTemplate>
+                    </Setter>
+                </Style>
+                <Style Selector="ListBoxItem:pressed">
+                    <Setter Property="ZIndex" Value="1" />
+                </Style>
+                <Style Selector="ListBoxItem:not(:dragging)">
+                    <Setter Property="Transitions">
+                        <Setter.Value>
+                            <Transitions>
+                                <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.2" />
+                            </Transitions>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </Expander.Styles>
+            <Expander.Header>
+                <Grid ColumnDefinitions="*, Auto">
+                    <ScrollViewer HorizontalScrollBarVisibility="Hidden">
+                        <Interaction.Behaviors>
+                            <HorizontalScrollViewerBehavior />
+                        </Interaction.Behaviors>
+                        <ListBox ItemsSource="{Binding ModCategories}" SelectedItem="{Binding SelectedCategory}">
+                            <ListBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel ContextFlyout="{StaticResource CategoryContextMenu}" Orientation="Horizontal" />
+                                </ItemsPanelTemplate>
+                            </ListBox.ItemsPanel>
+                        </ListBox>
+                    </ScrollViewer>
+                </Grid>
+            </Expander.Header>
+            <ListBox
+                AutoScrollToSelectedItem="False"
+                Background="Transparent"
+                ItemsSource="{Binding ExpanderListMods}">
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel />
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+            </ListBox>
+        </Expander>
+        <Panel Grid.Row="2">
+            <ListBox
+                AutoScrollToSelectedItem="False"
+                Background="Transparent"
+                ItemsSource="{Binding Mods}"
+                SelectedItems="{Binding SelectedMods}"
+                SelectionMode="Multiple">
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel />
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+            </ListBox>
+            <controls:ProgressRing
+                Width="100"
+                Height="100"
+                IsVisible="{Binding IsLoading}" />
+            <Button
+                Name="AddBtn"
+                Width="40"
+                Height="40"
+                Margin="0,0,30,0"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Bottom"
+                HorizontalContentAlignment="Center"
+                VerticalContentAlignment="Center"
+                Command="{Binding AddModCommand}"
+                CornerRadius="20">
+                <Button.Styles>
+                    <Style Selector="Button">
+                        <Setter Property="Background" Value="#3498db" />
+                    </Style>
+                    <Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                        <Setter Property="Background" Value="#2980b9" />
+                    </Style>
+                </Button.Styles>
+                <Path
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Data="M0,6 H12 M6,0 V12"
+                    Stroke="White"
+                    StrokeThickness="2" />
+            </Button>
+        </Panel>
+    </Grid>
 
 </UserControl>

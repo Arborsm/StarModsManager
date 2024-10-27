@@ -34,6 +34,7 @@ public sealed class LocalMod
         UniqueID = mod.UniqueID;
         Lang = i18n;
         PathS = parentDirectory;
+        _isHidden = File.Exists(Path.Combine(parentDirectory, ".Hidden"));
         var UpdateKeys = mod.UpdateKeys;
         var numberPart = string.Empty;
         var modUrl = UpdateKeys.Select(SMMHelper.Toolkit.GetUpdateUrl).FirstOrDefault(p => p != null) ?? "";
@@ -42,7 +43,7 @@ public sealed class LocalMod
         if (File.Exists(Path.Combine(Services.MainConfig.CachePath, numberPart + ".bmp")))
             picUrl = Path.Combine(Services.MainConfig.CachePath, numberPart + ".bmp");
 
-        OnlineMod = ModData.Instance.OnlineModsMap.TryGetValue(numberPart, out var onlineMod)
+        OnlineMod = ModsHelper.Instance.OnlineModsMap.TryGetValue(numberPart, out var onlineMod)
             ? onlineMod : new OnlineMod(modUrl, Name, picUrl);
     }
 
@@ -55,7 +56,21 @@ public sealed class LocalMod
     public string UniqueID { get; }
     public string PathS { get; }
     public List<string> Lang { get; }
-    
+
+    private bool _isHidden;
+    public bool IsHidden
+    {
+        get => _isHidden;
+        set
+        {
+            _isHidden = value;
+            if (value)
+                File.Create(Path.Combine(PathS, ".Hidden")).Close();
+            else
+                File.Delete(Path.Combine(PathS, ".Hidden"));
+        }
+    }
+
     public override bool Equals(object? obj)
     {
         if (obj is not LocalMod other) return false;

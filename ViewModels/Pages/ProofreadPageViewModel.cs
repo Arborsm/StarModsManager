@@ -7,14 +7,13 @@ using StarModsManager.Api;
 using StarModsManager.Common.Main;
 using StarModsManager.Common.Mods;
 using StarModsManager.Common.Trans;
-using StarDebug = StarModsManager.Api.StarDebug;
 
 // ReSharper disable UnusedParameterInPartialMethod
 // ReSharper disable ClassNeverInstantiated.Global
 
 namespace StarModsManager.ViewModels.Pages;
 
-public partial class ProofreadPageViewModel : ViewModelBase
+public partial class ProofreadPageViewModel : MainPageViewModelBase
 {
     private static Dictionary<string, (string?, string?)> _langMap = null!;
     private readonly Dictionary<string, (string?, string?)> _langEditedCache = [];
@@ -36,10 +35,10 @@ public partial class ProofreadPageViewModel : ViewModelBase
     [ObservableProperty]
     private bool _canResize = Services.ProofreadConfig.EnableHeaderResizing;
 
-    public required DataGridCollectionView ModLangsView { get; set; }
+    public DataGridCollectionView ModLangsView { get; set; } = null!;
     
     public static ObservableCollection<LocalMod> I18NMods { get; } = 
-        [..ModData.Instance.I18LocalMods.OrderBy(it => it.Name)];
+        [..ModsHelper.Instance.I18LocalMods.OrderBy(it => it.Name)];
 
     public void AddEditedLang(ModLang item)
     {
@@ -113,7 +112,7 @@ public partial class ProofreadPageViewModel : ViewModelBase
         }
         catch (Exception? e)
         {
-            StarDebug.Error(e, "保存翻译失败");
+            SMMDebug.Error(e, "保存翻译失败");
         }
         finally
         {

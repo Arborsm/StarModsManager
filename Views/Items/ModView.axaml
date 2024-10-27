@@ -19,15 +19,19 @@
             <MenuItem
                 Classes.EnabledMod="{Binding IsDisabled}"
                 Command="{Binding SwitchModCommand}"
-                IsVisible="{Binding LocalModIsNotNull}" />
+                IsVisible="{Binding !!LocalMod}" />
+            <MenuItem
+                Command="{Binding HideModCommand}"
+                Header="隐藏Mod"
+                IsVisible="{Binding !!LocalMod}" />
             <MenuItem
                 Command="{Binding OpenModFolderCommand}"
                 Header="打开Mod目录"
-                IsVisible="{Binding LocalModIsNotNull}" />
+                IsVisible="{Binding !!LocalMod}" />
             <MenuItem
                 Command="{Binding ChangeCoverCommand}"
                 Header="更改图片"
-                IsVisible="{Binding LocalModIsNotNull}" />
+                IsVisible="{Binding !!LocalMod}" />
             <MenuItem Command="{Binding GetDetailCommand}" Header="查看详情" />
             <MenuItem Command="{Binding OpenUrlCommand}" Header="访问Mod网页" />
             <MenuItem Command="{Binding LoadCoverCommand}" Header="刷新Mod" />
@@ -47,8 +51,8 @@
     </UserControl.Styles>
 
     <Grid
-        Width="200"
-        Height="200"
+        Width="198"
+        Height="198"
         RowDefinitions="*, Auto">
         <Border
             BorderBrush="Red"
@@ -78,7 +82,7 @@
         </Border>
         <TextBlock
             Grid.Row="1"
-            Width="200"
+            Width="198"
             MinHeight="40"
             HorizontalAlignment="Stretch"
             Text="{Binding OnlineMod.Title}"

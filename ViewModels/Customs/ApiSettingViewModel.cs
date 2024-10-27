@@ -1,9 +1,9 @@
 ﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using StarModsManager.Api;
 using StarModsManager.Common.Main;
 using StarModsManager.Common.Trans;
-using StarDebug = StarModsManager.Api.StarDebug;
 
 namespace StarModsManager.ViewModels.Customs;
 
@@ -46,7 +46,7 @@ public partial class ApiSettingViewModel(string selectedApi) : ViewModelBase
         }
         catch (Exception? e)
         {
-            StarDebug.Error(e);
+            SMMDebug.Error(e);
         }
     }
 

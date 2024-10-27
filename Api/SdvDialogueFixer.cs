@@ -1,4 +1,4 @@
-﻿namespace StarModsManager.Common.Mods;
+﻿namespace StarModsManager.Api;
 
 internal static class SdvDialogueFixer
 {

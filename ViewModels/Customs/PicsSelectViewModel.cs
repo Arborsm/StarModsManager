@@ -5,11 +5,11 @@ using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
+using StarModsManager.Api;
 using StarModsManager.Api.lib;
 using StarModsManager.Api.NexusMods;
 using StarModsManager.Common.Main;
 using StarModsManager.ViewModels.Items;
-using StarDebug = StarModsManager.Api.StarDebug;
 
 namespace StarModsManager.ViewModels.Customs;
 
@@ -18,26 +18,24 @@ public partial class PicsSelectViewModel : ViewModelBase
     private readonly ModViewModel _mod;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsListEmpty))]
     private bool _isLoading;
 
     [ObservableProperty]
     private BitmapViewModel? _selectedPic;
 
     // Test
-    public PicsSelectViewModel()
-    {
-        _mod = new ModViewModel();
-        Task.Run(LoadPicsAsync);
-    }
+    public PicsSelectViewModel() : this(new ModViewModel()) { }
 
     public PicsSelectViewModel(ModViewModel mod)
     {
         _mod = mod;
-        Task.Run(LoadPicsAsync);
+        _ = Task.Run(LoadPicsAsync);
+        Pics.CollectionChanged += (_, _) => OnPropertyChanged(nameof(IsListEmpty));
     }
 
     public ObservableCollection<BitmapViewModel> Pics { get; } = [];
-    public bool IsListEmpty => Pics.Count < 1;
+    public bool IsListEmpty => Pics.Count < 1 && !IsLoading;
 
     private async Task LoadPicsAsync()
     {
@@ -56,7 +54,8 @@ public partial class PicsSelectViewModel : ViewModelBase
     {
         IsLoading = true;
         List<BitmapViewModel> pics = [];
-        var modLinks = await new NexusPics(modUrl).GetModPicsUrlAsync(NexusPics.Pics);
+        var nexusMod = await NexusMod.Create(modUrl);
+        var modLinks = nexusMod.GetModPicsUrlAsync(NexusMod.Pics);
 
         await Task.WhenAll(modLinks.Select(async it =>
         {
@@ -78,7 +77,7 @@ public partial class PicsSelectViewModel : ViewModelBase
 
         IsLoading = false;
     }
-
+    
     [RelayCommand]
     private async Task SelectPicAsync(CancellationToken cancellationToken)
     {
@@ -91,7 +90,7 @@ public partial class PicsSelectViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            StarDebug.Error($"An error occurred: {ex.Message}");
+            SMMDebug.Error($"An error occurred: {ex.Message}");
         }
     }
 
@@ -109,7 +108,7 @@ public partial class PicsSelectViewModel : ViewModelBase
                 }
             };
 
-            var dialogMessage = new DialogMessage
+            var dialogMessage = new PickupFilesDialogMessage
             {
                 Title = "Select a custom picture",
                 FileTypeFilter = fileTypes
@@ -134,7 +133,7 @@ public partial class PicsSelectViewModel : ViewModelBase
                         }
                     }
 
-                    StarDebug.Error("Image converted and saved successfully.");
+                    SMMDebug.Error("Image converted and saved successfully.");
                 }
             }
 
@@ -142,7 +141,7 @@ public partial class PicsSelectViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            StarDebug.Error($"An error occurred: {ex.Message}");
+            SMMDebug.Error($"An error occurred: {ex.Message}");
         }
     }
 }

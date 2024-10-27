@@ -2,10 +2,11 @@
 
 public class NexusDownload(string modUrl)
 {
-    public int ModId => int.Parse(modUrl.Split('/').Last());
+    private int ModId => int.TryParse(modUrl.Split('/').Last(), out var result) ? result : -1;
 
     public async Task GetModDownloadUrlAsync(CancellationToken cancellationToken = default)
     {
+        if (ModId < 1) return;
         var mods = await NexusManager.GetModFilesAsync(ModId);
     }
 }

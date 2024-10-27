@@ -1,6 +1,5 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using CommunityToolkit.Mvvm.DependencyInjection;
 using StarModsManager.Common.Main;
 using StarModsManager.ViewModels.Pages;
 using StarModsManager.Views.Pages;
@@ -18,12 +17,12 @@ public partial class TranslatingView : UserControl
     private static async void OnInitialized(object? sender, EventArgs e)
     {
         if (Services.IsInDesignMode) return;
-        await Ioc.Default.GetRequiredService<TransPageViewModel>().TranslateAsync();
+        await ServiceLocator.Resolve<TransPageViewModel>().TranslateAsync();
     }
 
     private void CancelButton_OnClick(object? sender, RoutedEventArgs e)
     {
-        var vm = Ioc.Default.GetRequiredService<TransPageViewModel>();
+        var vm = ServiceLocator.Resolve<TransPageViewModel>();
         vm.CancellationTokenSource.Cancel();
         vm.Clear();
         this.Content = new TransPageView

@@ -2,7 +2,6 @@
     x:Class="StarModsManager.Views.Pages.DownloadPageView"
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:api="clr-namespace:StarModsManager.Api"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:ic="using:FluentIcons.Avalonia.Fluent"
     xmlns:lib="clr-namespace:StarModsManager.Api.lib"
@@ -38,7 +37,7 @@
         </Style>
     </UserControl.Styles>
 
-    <DockPanel Margin="20" ContextFlyout="{StaticResource ContextMenu}">
+    <DockPanel Margin="20,40,20,20" ContextFlyout="{StaticResource ContextMenu}">
         <StackPanel DockPanel.Dock="Top">
             <Grid ColumnDefinitions="*, Auto, Auto">
                 <TextBox Text="{Binding SearchText}" Watermark="Search for OnlineMod...." />

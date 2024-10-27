@@ -6,15 +6,14 @@ using StarModsManager.Api;
 using StarModsManager.Common.Main;
 using StarModsManager.Common.Mods;
 using StarModsManager.Common.Trans;
-using StarDebug = StarModsManager.Api.StarDebug;
 
 namespace StarModsManager.ViewModels.Pages;
 
-public partial class TransPageViewModel : ViewModelBase
+public partial class TransPageViewModel : MainPageViewModelBase
 {
     public TransPageViewModel()
     {
-        var mods = ModData.Instance.I18LocalMods
+        var mods = ModsHelper.Instance.I18LocalMods
             .Where(it => it.GetUntranslatedMap().Count > 0)
             .Select(it => new ToTansMod(true, it));
         Mods = new ObservableCollection<ToTansMod>(mods);
@@ -36,7 +35,7 @@ public partial class TransPageViewModel : ViewModelBase
     private async Task ReloadAsync()
     {
         Mods.Clear();
-        await Task.Run(() => ModData.Instance.I18LocalMods
+        await Task.Run(() => ModsHelper.Instance.I18LocalMods
             .AsQueryable()
             .Where(it => it.GetUntranslatedMap().Count > 0)
             .Select(it => new ToTansMod(true, it))
@@ -51,7 +50,7 @@ public partial class TransPageViewModel : ViewModelBase
         }
         try
         {
-            ModData.Instance.IsMismatchedTokens = false;
+            ModsHelper.Instance.IsMismatchedTokens = false;
             IsFinished = false;
             var mods = Mods.Where(it => it.IsChecked).Select(it => it.LocalMod).ToArray();
             await Translator.Instance.ProcessDirectoriesAsync(mods, CancellationTokenSource.Token);
@@ -62,7 +61,7 @@ public partial class TransPageViewModel : ViewModelBase
         }
         catch (Exception? e)
         {
-            StarDebug.Error(e);
+            SMMDebug.Error(e);
         }
         finally
         {
@@ -71,7 +70,7 @@ public partial class TransPageViewModel : ViewModelBase
             Progress = 0;
         }
 
-        if (ModData.Instance.IsMismatchedTokens)
+        if (ModsHelper.Instance.IsMismatchedTokens)
         {
             SMMHelper.Notification("发现符号匹配错误，建议到校对页面修复");
         }
@@ -85,7 +84,7 @@ public partial class TransPageViewModel : ViewModelBase
     private static void CreateBackup()
     {
         var tempPath = Services.BackupTempDir;
-        ModData.Instance.I18LocalMods
+        ModsHelper.Instance.I18LocalMods
             .Where(it => it.GetUntranslatedMap().Count > 0)
             .ForEach(it => BackupMod(it, tempPath));
 

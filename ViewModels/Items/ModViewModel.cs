@@ -1,8 +1,10 @@
 ﻿using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using FluentAvalonia.UI.Controls;
 using StarModsManager.Api;
+using StarModsManager.Api.lib;
 using StarModsManager.Api.NexusMods;
 using StarModsManager.Common.Mods;
 using StarModsManager.ViewModels.Customs;
@@ -15,6 +17,7 @@ public partial class ModViewModel : ViewModelBase
 {
     [ObservableProperty]
     private Bitmap? _pic;
+
     [ObservableProperty]
     private bool _isDisabled;
 
@@ -37,13 +40,13 @@ public partial class ModViewModel : ViewModelBase
     public ModViewModel() : this(
         new OnlineMod())
     {
-        Pic = new Bitmap("D:\\Users\\26537\\AppData\\Roaming\\StarModsManager\\Cache\\14070\\14070-1665488527-1800567611.bmp");
+        Pic = new Bitmap(
+            "D:\\Users\\26537\\AppData\\Roaming\\StarModsManager\\Cache\\14070\\14070-1665488527-1800567611.bmp");
         IsDisabled = true;
     }
 
     public OnlineMod OnlineMod { get; }
     public LocalMod? LocalMod { get; }
-    public bool LocalModIsNotNull => LocalMod is not null;
 
     private bool IsLocal => LocalMod is not null;
     private string? _localModPath;
@@ -57,51 +60,54 @@ public partial class ModViewModel : ViewModelBase
     [RelayCommand]
     private async Task GetDetailAsync()
     {
-        if (LocalMod is not null)
+        ViewModelBase content = LocalMod is not null 
+            ? new ModDetailViewModel(await File.ReadAllTextAsync(Path.Combine(LocalMod.PathS, "manifest.json"))) 
+            : new ModDetailViewModel(""); // ToDO
+        var dialog = new ContentDialog
         {
-            var content = new ModDetailViewModel(await File.ReadAllTextAsync(Path.Combine(LocalMod.PathS, "manifest.json")));
-            var dialog = new ContentDialog
+            Title = "Detail",
+            CloseButtonText = "Close",
+            Content = new ModDetailView
             {
-                Title = "Detail",
-                CloseButtonText = "Close",
-                Content = new ModDetailView
-                {
-                    Content = content
-                }
-            };
+                Content = content
+            }
+        };
 
-            await dialog.ShowAsync();
-        }
+        await dialog.ShowAsync();
     }
 
     [RelayCommand(CanExecute = nameof(IsLocal))]
     private async Task ChangeCoverAsync()
     {
-        if (LocalMod is not null)
+        var content = new PicsSelectViewModel(this);
+        var dialog = new ContentDialog
         {
-            var content = new PicsSelectViewModel(this);
-            var dialog = new ContentDialog
+            Title = "Change Cover",
+            PrimaryButtonText = "Select",
+            SecondaryButtonText = "Custom",
+            CloseButtonText = "Close",
+            Content = new PicsSelectView
             {
-                Title = "Change Cover",
-                PrimaryButtonText = "Select",
-                SecondaryButtonText = "Custom",
-                CloseButtonText = "Close",
-                Content = new PicsSelectView
-                {
-                    Content = content
-                },
-                PrimaryButtonCommand = content.SelectPicCommand,
-                SecondaryButtonCommand = content.CustomPicCommand
-            };
+                DataContext = content
+            },
+            PrimaryButtonCommand = content.SelectPicCommand,
+            SecondaryButtonCommand = content.CustomPicCommand
+        };
 
-            await dialog.ShowAsync();
-        }
+        await dialog.ShowAsync();
+    }
+
+    [RelayCommand(CanExecute = nameof(IsLocal))]
+    private void HideMod()
+    {
+        LocalMod!.IsHidden = !LocalMod.IsHidden;
+        WeakReferenceMessenger.Default.Send(new ModHiddenChangedMessage(LocalMod.UniqueID, LocalMod.IsHidden));
     }
 
     [RelayCommand(CanExecute = nameof(IsLocal))]
     private void OpenModFolder()
     {
-        if (LocalMod is not null) PlatformHelper.OpenFileOrUrl(LocalMod.PathS);
+        PlatformHelper.OpenFileOrUrl(LocalMod!.PathS);
     }
 
     [RelayCommand]
@@ -115,10 +121,10 @@ public partial class ModViewModel : ViewModelBase
     {
         await LoadCoverAsync(true, cancellationToken);
     }
-    
+
     [RelayCommand(CanExecute = nameof(IsLocal))]
     private void SwitchMod() => IsDisabled = ToggleDotPrefix();
-    
+
     private bool ToggleDotPrefix()
     {
         if (!Directory.Exists(_localModPath)) return IsDisabled;
@@ -140,13 +146,14 @@ public partial class ModViewModel : ViewModelBase
             Pic = await Task.Run(() => new Bitmap(LocalMod.InfoPicturePath), cancellationToken);
             return;
         }
+
         await using var imageStream = await OnlineMod.LoadPicBitmapAsync(refresh, cancellationToken);
         if (imageStream is not null && await IsValidImageFileAsync(imageStream))
         {
             Pic = await Task.Run(() => Bitmap.DecodeToWidth(imageStream, 400), cancellationToken);
         }
     }
-    
+
     private static async Task<bool> IsValidImageFileAsync(Stream stream)
     {
         return await Task.Run(() =>
@@ -156,7 +163,7 @@ public partial class ModViewModel : ViewModelBase
                 using var bitmap = new Bitmap(stream);
                 return true;
             }
-            catch (ArgumentException)
+            catch
             {
                 return false;
             }

@@ -57,7 +57,7 @@ public class NexusPage
         url.Append($"sort_by={SortBy}");
         if (!string.IsNullOrEmpty(searchText)) url.Append($",search_filename={searchText}");
         var fullUrl = url.ToString();
-        StarDebug.Info($"Get Mods Url: {fullUrl}");
+        SMMDebug.Info($"Get Mods Url: {fullUrl}");
         return fullUrl;
     }
     
@@ -70,7 +70,7 @@ public class NexusPage
         }
         catch (Exception e)
         {
-            StarDebug.Error($"请求失败，异常信息: {e.Message}");
+            SMMDebug.Error($"请求失败，异常信息: {e.Message}");
 
             response = new HttpResponseMessage();
         }
@@ -79,7 +79,7 @@ public class NexusPage
         if (response.IsSuccessStatusCode)
             responseData = await response.Content.ReadAsStringAsync(cancellationToken);
         else
-            StarDebug.Error($"请求失败，状态码: {response.StatusCode}");
+            SMMDebug.Error($"请求失败，状态码: {response.StatusCode}");
 
         var document = new HtmlDocument();
         document.LoadHtml(responseData);
@@ -96,7 +96,7 @@ public class NexusPage
                 where !string.IsNullOrEmpty(modPicLink)
                 select new OnlineMod(modLink, modName!, modPicLink);
 
-        StarDebug.Error("未找到 mod 信息");
+        SMMDebug.Error("未找到 mod 信息");
         return [];
     }
 }

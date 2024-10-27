@@ -1,10 +1,27 @@
 ﻿<ResourceDictionary
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:system="clr-namespace:System;assembly=System.Runtime">
+    xmlns:system="clr-namespace:System;assembly=System.Runtime"
+    xmlns:ui="using:FluentAvalonia.UI.Controls">
+
     <Thickness x:Key="SampleAppPageMargin">20 40 20 0</Thickness>
+
+    <ui:SymbolIconSource x:Key="HomeIcon" Symbol="Home" />
+    <ui:SymbolIconSource x:Key="HomeIconFilled" Symbol="HomeFilled" />
+    <ui:SymbolIconSource x:Key="DownloadIcon" Symbol="Download" />
+    <ui:SymbolIconSource x:Key="DownloadIconFilled" Symbol="Download" />
+    <ui:SymbolIconSource x:Key="SyncIcon" Symbol="Sync" />
+    <ui:SymbolIconSource x:Key="SyncIconFilled" Symbol="Sync" />
+    <ui:SymbolIconSource x:Key="CharacterIcon" Symbol="Character" />
+    <ui:SymbolIconSource x:Key="CharacterIconFilled" Symbol="Character" />
+    <ui:SymbolIconSource x:Key="ProofreadIcon" Symbol="Edit" />
+    <ui:SymbolIconSource x:Key="ProofreadIconFilled" Symbol="EditFilled" />
+    <ui:SymbolIconSource x:Key="SettingsIcon" Symbol="Settings" />
+    <ui:SymbolIconSource x:Key="SettingsFilled" Symbol="SettingsFilled" />
+
     <system:Boolean x:Key="True">True</system:Boolean>
     <system:Boolean x:Key="False">False</system:Boolean>
+
     <ResourceDictionary.ThemeDictionaries>
         <ResourceDictionary x:Key="Light">
             <Color x:Key="BackgroundBrush">Azure</Color>
@@ -13,4 +30,5 @@
             <Color x:Key="BackgroundBrush">Black</Color>
         </ResourceDictionary>
     </ResourceDictionary.ThemeDictionaries>
+
 </ResourceDictionary>

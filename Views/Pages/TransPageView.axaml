@@ -10,7 +10,7 @@
     x:DataType="pages:TransPageViewModel"
     mc:Ignorable="d">
 
-    <Grid Margin="30,20" RowDefinitions="*, Auto">
+    <Grid Margin="30,40,30,20" RowDefinitions="*, Auto">
         <Border BorderBrush="Gray" BorderThickness="1">
             <DataGrid
                 GridLinesVisibility="All"

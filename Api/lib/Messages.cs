@@ -3,9 +3,9 @@ using FluentAvalonia.UI.Controls;
 
 namespace StarModsManager.Api.lib;
 
-public class DialogMessage {
+public class PickupFilesDialogMessage {
     public required string Title { get; init; }
-    public bool AllowMultiple => false;
+    public bool AllowMultiple { get; init; } = false;
     public IReadOnlyList<FilePickerFileType>? FileTypeFilter { get; init; } = [];
     public TaskCompletionSource<IReadOnlyList<IStorageFile>> CompletionSource { get; } = new();
 }
@@ -19,3 +19,5 @@ public class NotificationMessage
     public bool IsClosable => true;
     public bool IsIconVisible => true;
 }
+
+record ModHiddenChangedMessage(string ModId, bool Hide);

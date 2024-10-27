@@ -1,5 +1,6 @@
 ﻿using RestEase;
 using StarModsManager.Api.NexusMods.Responses;
+using ModFile = StarModsManager.ViewModels.Customs.ModFile;
 
 namespace StarModsManager.Api.NexusMods.Interface;
 

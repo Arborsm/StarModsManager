@@ -2,7 +2,6 @@
     x:Class="StarModsManager.Views.Pages.ProofreadPageView"
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:api="clr-namespace:StarModsManager.Api"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:lib="clr-namespace:StarModsManager.Api.lib"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -22,7 +21,7 @@
     </Control.Resources>
 
     <Grid RowDefinitions="Auto, *">
-        <Grid Margin="20,10" ColumnDefinitions="Auto, *">
+        <Grid Margin="10,30,10,20" ColumnDefinitions="Auto, *">
             <ui:CommandBar OverflowButtonVisibility="Visible">
                 <ui:CommandBar.PrimaryCommands>
                     <ui:CommandBarButton

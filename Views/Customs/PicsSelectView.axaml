@@ -31,8 +31,8 @@
                 </ListBox.ItemsPanel>
             </ListBox>
             <TextBlock
-                IsEnabled="{Binding IsListEmpty}"
-                IsVisible="False"
+                FontSize="20"
+                IsVisible="{Binding IsListEmpty}"
                 Text="Cannot find any pictures in the mod page" />
         </Panel>
     </DockPanel>

@@ -1,5 +1,4 @@
 ﻿using Avalonia;
-using Avalonia.Threading;
 
 namespace StarModsManager.Api.lib;
 
@@ -15,11 +14,13 @@ public static class GlobalExceptionHandler
 
     private static void OnTaskSchedulerUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
     {
-        StarDebug.Error(e.Exception);
+        SMMDebug.Error("UnobservedTaskException: ");
+        e.Exception.InnerExceptions.ForEach(exception => SMMDebug.Error(exception, isMsg: false));
+        e.SetObserved();
     }
 
     private static void OnCurrentDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
     {
-        if (e.ExceptionObject is Exception exception) StarDebug.Error(exception);
+        if (e.ExceptionObject is Exception exception) SMMDebug.Error(exception);
     }
 }

@@ -17,9 +17,13 @@ public static class RateLimits
 
     public static bool IsBlocked()
     {
-        StarDebug.Info("Checking Nexus Api rate limits...");
-        StarDebug.Info($"DailyRemaining: {DailyRemaining}, HourlyRemaining: {HourlyRemaining}");
-        return DailyRemaining <= 0 && HourlyRemaining <= 0;
+        var lm = DailyRemaining <= 0 && HourlyRemaining <= 0;
+        if (!lm)
+        {
+            SMMDebug.Info("Checking Nexus Api rate limits...");
+            SMMDebug.Info($"DailyRemaining: {DailyRemaining}, HourlyRemaining: {HourlyRemaining}");
+        }
+        return lm;
     }
 
     public static TimeSpan GetTimeUntilRenewal()

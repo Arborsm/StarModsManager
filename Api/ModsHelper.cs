@@ -1,18 +1,85 @@
-﻿using System.Text.Json;
-using CommunityToolkit.Mvvm.DependencyInjection;
+﻿using System.IO.Compression;
+using System.Text.Json;
+using FluentAvalonia.UI.Controls;
 using StarModsManager.Assets.Lang;
 using StarModsManager.Common.Main;
+using StarModsManager.Common.Mods;
 using StarModsManager.ViewModels.Pages;
 
-namespace StarModsManager.Common.Mods;
+namespace StarModsManager.Api;
 
-internal class ModData
+internal class ModsHelper
 {
     public bool IsMismatchedTokens = false;
-    public static readonly ModData Instance = new();
+    public static readonly ModsHelper Instance = new();
     public readonly List<LocalMod> I18LocalMods = [];
     public Dictionary<string, LocalMod> LocalModsMap = []; // Id/UniqueId -> mod
     public Dictionary<string, OnlineMod> OnlineModsMap = []; // UniqueId -> mod
+    
+    public static void Install(string fileDir)
+    {
+        var targetDirectory = Services.MainConfig.DirectoryPath;
+        try
+        {
+            using var archive = ZipFile.OpenRead(fileDir);
+            var manifestEntry = archive.Entries.FirstOrDefault(e =>
+                e.Name.Equals("manifest.json", StringComparison.OrdinalIgnoreCase));
+
+            if (manifestEntry == null)
+            {
+                SMMHelper.Notification("未找到manifest.json文件", "非Mod压缩包", InfoBarSeverity.Warning);
+                return;
+            }
+            
+            var topLevelDir = Path.GetDirectoryName(manifestEntry.FullName);
+            if (string.IsNullOrEmpty(topLevelDir)) topLevelDir = Path.GetFileNameWithoutExtension(fileDir);
+            
+            var tempDir = Path.Combine(Services.TempDir, "ToInstallMod");
+            Directory.CreateDirectory(tempDir);
+
+            try
+            {
+                archive.ExtractToDirectory(tempDir, true);
+                
+                var sourceDir = Path.Combine(tempDir, topLevelDir);
+                var destDir = Path.Combine(targetDirectory, topLevelDir);
+                if (Directory.Exists(destDir)) Directory.Delete(destDir, true);
+                
+                MoveDirectory(Directory.Exists(sourceDir) ? sourceDir : tempDir, destDir);
+
+                SMMDebug.Info($"Mod installed successfully: {topLevelDir}");
+            }
+            finally
+            {
+                if (Directory.Exists(tempDir)) Directory.Delete(tempDir, true);
+            }
+        }
+        catch (InvalidDataException)
+        {
+            SMMDebug.Error("Error: Invalid zip file");
+        }
+        catch (Exception e)
+        {
+            SMMDebug.Error($"Error occurred during mod installation: {e.Message}");
+        }
+    }
+    
+    private static void MoveDirectory(string sourceDir, string destDir)
+    {
+        Directory.CreateDirectory(destDir);
+        
+        foreach (var file in Directory.GetFiles(sourceDir))
+        {
+            var destFile = Path.Combine(destDir, Path.GetFileName(file));
+            File.Move(file, destFile, true);
+        }
+        
+        foreach (var dir in Directory.GetDirectories(sourceDir))
+        {
+            var destSubDir = Path.Combine(destDir, Path.GetFileName(dir));
+            MoveDirectory(dir, destSubDir);
+        }
+    }
     
     public async Task FindModsAsync()
     {
@@ -27,7 +94,7 @@ internal class ModData
                 .Select(manifestFilePath => new LocalMod(manifestFilePath))
                 .GroupBy(mod => mod.UniqueID)
                 .ToDictionary(grouping => grouping.Key, grouping => grouping.LastOrDefault())!;
-            await Ioc.Default.GetRequiredService<MainPageViewModel>().LoadModsAsync();
+            await ServiceLocator.Resolve<MainPageViewModel>().LoadModsAsync();
             InitProcessMods();
         }
         else
@@ -49,7 +116,7 @@ internal class ModData
                 if (!string.IsNullOrWhiteSpace(new DirectoryInfo(file).Extension) && file.EndsWith("bmp")) continue;
 
                 await using var fs = File.OpenRead(file);
-                var mod = await LoadCachedAsync(fs).ConfigureAwait(false);
+                var mod = await LoadCachedAsync(fs);
                 if (mod is not null) results.Add(mod);
             }
             catch (Exception)
@@ -62,7 +129,7 @@ internal class ModData
 
     private static async Task<OnlineMod?> LoadCachedAsync(Stream stream)
     {
-        return await JsonSerializer.DeserializeAsync<OnlineMod>(stream).ConfigureAwait(false);
+        return await JsonSerializer.DeserializeAsync<OnlineMod>(stream);
     }
 
     private void InitProcessMods()

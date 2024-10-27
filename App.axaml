@@ -2,8 +2,8 @@
     x:Class="StarModsManager.App"
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:main="clr-namespace:StarModsManager.Common.Main"
-    xmlns:styling="clr-namespace:FluentAvalonia.Styling;assembly=FluentAvalonia"
+    xmlns:main="using:StarModsManager.Common.Main"
+    xmlns:styling="using:FluentAvalonia.Styling"
     RequestedThemeVariant="Dark">
     <!--  "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options.  -->
 
@@ -22,7 +22,8 @@
     <Application.Styles>
         <FluentTheme />
         <styling:FluentAvaloniaTheme PreferSystemTheme="True" PreferUserAccentColor="True" />
-        <StyleInclude Source="avares://StarModsManager/Assets/Icons.axaml" />
+        <StyleInclude Source="avares://Avalonia.Controls.TreeDataGrid/Themes/Fluent.axaml" />
+        <StyleInclude Source="avares://StarModsManager/Assets/Styles.axaml" />
         <Style Selector="Window">
             <Setter Property="FontFamily" Value="Microsoft YaHei UI,Simsun,苹方-简,宋体-简" />
         </Style>

@@ -1,4 +1,5 @@
 ﻿using System.Runtime.InteropServices;
+using System.Text;
 using CommunityToolkit.Mvvm.Messaging;
 using FluentAvalonia.UI.Controls;
 using NLog;
@@ -7,15 +8,16 @@ using StarModsManager.Common.Main;
 
 namespace StarModsManager.Api;
 
-public static partial class StarDebug
+public static partial class SMMDebug
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
     [LibraryImport("kernel32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
     private static partial void AttachConsole(int dwProcessId);
+
     private const int AttachParentProcess = -1;
-    
+
     /// <summary>
     ///     Redirects the console output of the current process to the parent process.
     /// </summary>
@@ -27,15 +29,16 @@ public static partial class StarDebug
         AttachConsole(AttachParentProcess);
     }
 
-    static StarDebug()
+    static SMMDebug()
     {
         var debugFileName = Path.Combine(Services.LogDir, "debug_${shortdate}.log");
         var logFileName = Path.Combine(Services.LogDir, "log_${shortdate}.log");
 
         LogManager.Setup().LoadConfiguration(builder =>
         {
-            builder.ForLogger().FilterMinLevel(LogLevel.Trace).WriteToConsole("${longdate}|${level:uppercase=true}|${message}");
-            builder.ForLogger().FilterMinLevel(LogLevel.Trace).WriteToFile(debugFileName, 
+            builder.ForLogger().FilterMinLevel(LogLevel.Trace)
+                .WriteToConsole("${longdate}|${level:uppercase=true}|${message}");
+            builder.ForLogger().FilterMinLevel(LogLevel.Trace).WriteToFile(debugFileName,
                 "${longdate}|${level:uppercase=true}|${message}", maxArchiveDays: 10);
             builder.ForLogger().FilterMinLevel(LogLevel.Info)
                 .WriteToFile(logFileName, "${longdate}|${level:uppercase=true}|${message}");
@@ -76,19 +79,30 @@ public static partial class StarDebug
         else if (logLevel == LogLevel.Error) Error(message, args);
     }
 
-    public static void Fatal(Exception e,string? message = default)
+    public static void Fatal(Exception e, string? message = default)
     {
         Logger.Fatal(e, message);
     }
 
-    public static void Error(Exception e, string? msg = default)
+    public static void Error(Exception e, string? msg = default, bool isMsg = true)
     {
-        WeakReferenceMessenger.Default.Send(new NotificationMessage
+        var finalMessage = new StringBuilder();
+        finalMessage.Append(msg ?? e.Message);
+
+        if (e.InnerException is not null) finalMessage.Append($" Inner Exception: {e.InnerException.Message}");
+
+        if (isMsg)
         {
-            Title = "Error",
-            Message = msg ?? e.Message,
-            Severity = InfoBarSeverity.Error
-        });
+            WeakReferenceMessenger.Default.Send(new NotificationMessage
+            {
+                Title = "Error",
+                Message = finalMessage.ToString(),
+                Severity = InfoBarSeverity.Error
+            });
+        }
+
         Logger.Error(e, msg);
+        Logger.Error(e.StackTrace);
+        if (e.InnerException is not null) Logger.Error(e.InnerException.StackTrace);
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Concurrent;
 using Avalonia.Threading;
-using CommunityToolkit.Mvvm.DependencyInjection;
 using Newtonsoft.Json;
 using StarModsManager.Api;
 using StarModsManager.Common.Config;
@@ -31,7 +30,7 @@ public class Translator
 
     internal async Task ProcessDirectoriesAsync(IList<LocalMod> toTansMods, CancellationToken token = default)
     {
-        var transPageViewModel = Ioc.Default.GetRequiredService<TransPageViewModel>();
+        var transPageViewModel = ServiceLocator.Resolve<TransPageViewModel>();
         var totalItems = toTansMods.Select(it => it.GetUntranslatedMap().Count).Sum();
         transPageViewModel.MaxProgress = totalItems;
         transPageViewModel.IsIndeterminate = true;
@@ -56,7 +55,7 @@ public class Translator
         var tran = 
             await ProcessTextAsync(defaultLang, targetLang, Services.TransConfig, progress, token);
 
-        if (defaultLang.IsMismatchedTokens(tran)) ModData.Instance.IsMismatchedTokens = true;
+        if (defaultLang.IsMismatchedTokens(tran)) ModsHelper.Instance.IsMismatchedTokens = true;
 
         var combined = targetLang
             .Union(tran, new KeyValuePairComparer<string, string>())
@@ -76,7 +75,7 @@ public class Translator
         mapAllCn ??= new Dictionary<string, string>();
         var processedMap = new ConcurrentDictionary<string, string>();
         var keys = map.Keys.Except(mapAllCn.Keys).ToList();
-        var transPageViewModel = Ioc.Default.GetRequiredService<TransPageViewModel>();
+        var transPageViewModel = ServiceLocator.Resolve<TransPageViewModel>();
         var processedItems = 0;
         if (Services.TransConfig.IsTurbo)
         {
