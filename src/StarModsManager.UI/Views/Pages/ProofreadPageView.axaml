@@ -1,0 +1,144 @@
+<UserControl
+    x:Class="StarModsManager.Views.Pages.ProofreadPageView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:api1="clr-namespace:StarModsManager.Api;assembly=StarModsManager"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:lib="clr-namespace:StarModsManager.lib"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:mods="clr-namespace:StarModsManager.Common.Mods;assembly=StarModsManager"
+    xmlns:pages="using:StarModsManager.ViewModels.Pages"
+    xmlns:ui="using:FluentAvalonia.UI.Controls"
+    d:DesignHeight="800"
+    d:DesignWidth="1200"
+    x:DataType="pages:ProofreadPageViewModel"
+    mc:Ignorable="d">
+
+    <Control.Resources>
+        <lib:NullableBoolToColorConverter x:Key="NullableBoolToColorConverter" />
+        <api1:ModLangIsMatchComparer x:Key="ModLangIsMatchComparer" />
+        <MenuFlyout x:Key="ContextMenu">
+            <MenuItem Command="{Binding TranslateCommand}" Header="翻译" />
+        </MenuFlyout>
+    </Control.Resources>
+
+    <Grid RowDefinitions="Auto, *">
+        <Grid Margin="10,30,10,20" ColumnDefinitions="Auto, *">
+            <ui:CommandBar OverflowButtonVisibility="Visible">
+                <ui:CommandBar.PrimaryCommands>
+                    <ui:CommandBarButton
+                        HorizontalAlignment="Right"
+                        Command="{Binding SaveCommand}"
+                        IconSource="Save"
+                        Label="Save" />
+                    <ui:CommandBarButton IconSource="Find" Label="Search" />
+                    <ui:CommandBarToggleButton
+                        IconSource="Filter"
+                        IsChecked="{Binding IsFilter}"
+                        Label="Filter" />
+                </ui:CommandBar.PrimaryCommands>
+                <ui:CommandBar.SecondaryCommands>
+                    <ui:CommandBarToggleButton
+                        IconSource="Stop"
+                        IsChecked="{Binding ShowLines}"
+                        Label="Lines" />
+                    <ui:CommandBarToggleButton
+                        IconSource="Comment"
+                        IsChecked="{Binding IsVisibleHeader}"
+                        Label="Header" />
+                    <ui:CommandBarToggleButton
+                        IconSource="Sort"
+                        IsChecked="{Binding CanSort}"
+                        Label="Sort" />
+                    <ui:CommandBarToggleButton
+                        IconSource="Switch"
+                        IsChecked="{Binding CanResize}"
+                        Label="Resize" />
+                </ui:CommandBar.SecondaryCommands>
+            </ui:CommandBar>
+
+            <ComboBox
+                Name="I18NModsComboBox"
+                Grid.Column="1"
+                MinWidth="350"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                ItemsSource="{Binding I18NMods}"
+                SelectedItem="{Binding CurrentMod}"
+                SelectionChanged="ComboBox_SelectionChanged">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Name}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+        </Grid>
+
+        <Panel Grid.Row="1">
+            <DataGrid
+                Name="ProofreadDataGrid"
+                CanUserResizeColumns="{Binding CanResize}"
+                CanUserSortColumns="{Binding CanSort}"
+                CellEditEnded="ProofreadDataGrid_OnCellEditEnded"
+                Classes.IsInvisibleHeader="{Binding !IsVisibleHeader}"
+                Classes.ShowLines="{Binding ShowLines}"
+                ContextFlyout="{StaticResource ContextMenu}"
+                ItemsSource="{Binding ModLangsView}"
+                SelectedItem="{Binding SelectedItem}"
+                SelectionChanged="ProofreadDataGrid_OnSelectionChanged">
+                <DataGrid.Styles>
+                    <Style Selector="TextBlock">
+                        <Setter Property="TextWrapping" Value="WrapWithOverflow" />
+                        <Setter Property="TextAlignment" Value="Center" />
+                        <Setter Property="Margin" Value="0 5" />
+                    </Style>
+                    <Style Selector="DataGrid.ShowLines">
+                        <Setter Property="GridLinesVisibility" Value="All" />
+                    </Style>
+                    <Style Selector="DataGrid.IsInvisibleHeader">
+                        <Setter Property="HeadersVisibility" Value="None" />
+                    </Style>
+                </DataGrid.Styles>
+                <DataGrid.Columns>
+                    <DataGridTextColumn
+                        Width="0.18*"
+                        Binding="{Binding Path=Key, DataType=mods:ModLang}"
+                        Header="语言键" />
+                    <DataGridTextColumn
+                        Width="0.37*"
+                        Binding="{Binding Path=SourceLang, DataType=mods:ModLang}"
+                        Header="默认语言"
+                        Tag="SourceLang" />
+                    <DataGridTextColumn
+                        Width="0.37*"
+                        Binding="{Binding Path=TargetLang, DataType=mods:ModLang}"
+                        Header="目标语言"
+                        IsReadOnly="False"
+                        Tag="TargetLang" />
+                    <DataGridTemplateColumn
+                        CanUserSort="True"
+                        CustomSortComparer="{StaticResource ModLangIsMatchComparer}"
+                        Header="符号">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Ellipse
+                                    Width="13"
+                                    Height="13"
+                                    Fill="{Binding Path=IsMatch, DataType=mods:ModLang, Converter={StaticResource NullableBoolToColorConverter}}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+
+            <ui:TeachingTip
+                Name="UnSavedTip"
+                Title="未保存"
+                ActionButtonCommand="{Binding SaveCommand}"
+                ActionButtonContent="保存"
+                CloseButtonContent="关闭"
+                IsOpen="{Binding IsNotSave}"
+                Subtitle="您有未保存的更改。是否要保存更改?" />
+        </Panel>
+    </Grid>
+</UserControl>

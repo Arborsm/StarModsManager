@@ -1,0 +1,50 @@
+<UserControl
+    x:Class="StarModsManager.Views.Pages.TransPageView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:pages="using:StarModsManager.ViewModels.Pages"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    x:DataType="pages:TransPageViewModel"
+    mc:Ignorable="d">
+
+    <Grid Margin="30,40,30,20" RowDefinitions="*, Auto">
+        <Border BorderBrush="Gray" BorderThickness="1">
+            <DataGrid
+                GridLinesVisibility="All"
+                ItemsSource="{Binding Mods}"
+                SelectionMode="Extended">
+                <DataGrid.Columns>
+                    <DataGridCheckBoxColumn
+                        Binding="{Binding IsChecked}"
+                        Header="选择"
+                        IsReadOnly="False" />
+                    <DataGridTextColumn
+                        Width="*"
+                        Binding="{Binding Name}"
+                        Header="ModInfo 名称" />
+                    <DataGridTextColumn Binding="{Binding Keys}" Header="未翻译条目" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+        <StackPanel
+            Grid.Row="1"
+            HorizontalAlignment="Center"
+            Orientation="Horizontal">
+            <Button
+                Margin="0,20,20,0"
+                Click="SettingButton_OnClick"
+                Content="设置" />
+            <Button
+                Margin="0,20,20,0"
+                Click="TransButton_OnClick"
+                Content="翻译" />
+            <Button
+                Margin="0,20,20,0"
+                Command="{Binding ReloadCommand}"
+                Content="刷新" />
+        </StackPanel>
+    </Grid>
+</UserControl>
