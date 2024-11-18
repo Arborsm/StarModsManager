@@ -1,4 +1,6 @@
-﻿namespace StarModsManager.Api.NexusMods.Limit;
+﻿using Serilog;
+
+namespace StarModsManager.Api.NexusMods.Limit;
 
 public static class RateLimits
 {
@@ -20,16 +22,13 @@ public static class RateLimits
     // x-rl-hourly-offset
     public static DateTimeOffset HourlyReset;
 
-    public static bool IsBlocked()
-    {
-        var lm = DailyRemaining <= 0 && HourlyRemaining <= 0;
-        if (!lm)
-        {
-            SMMDebug.Info("Checking Nexus Api rate limits...");
-            SMMDebug.Info($"DailyRemaining: {DailyRemaining}, HourlyRemaining: {HourlyRemaining}");
-        }
+    public static bool IsBlocked() => DailyRemaining <= 0 && HourlyRemaining <= 0;
 
-        return lm;
+    public static Task PrintRemaining()
+    {
+        Log.Information("Checking Nexus Api rate limits...");
+        Log.Information("DailyRemaining: {Day}, HourlyRemaining: {Hourly}", DailyRemaining, HourlyRemaining);
+        return Task.CompletedTask;
     }
 
     public static TimeSpan GetTimeUntilRenewal()

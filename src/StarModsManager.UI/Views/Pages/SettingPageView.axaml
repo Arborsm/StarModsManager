@@ -3,6 +3,7 @@
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:fluent="clr-namespace:FluentIcons.Avalonia.Fluent;assembly=FluentIcons.Avalonia.Fluent"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:pages="clr-namespace:StarModsManager.ViewModels.Pages"
     xmlns:ui="using:FluentAvalonia.UI.Controls"
@@ -10,6 +11,7 @@
     d:DesignWidth="1200"
     x:DataType="pages:SettingsPageViewModel"
     mc:Ignorable="d">
+
     <Design.DataContext>
         <pages:SettingsPageViewModel />
     </Design.DataContext>
@@ -25,13 +27,19 @@
                         <TextBlock
                             MinWidth="150"
                             VerticalAlignment="Center"
-                            Text="{Binding ModDir}" />
+                            Text="{Binding MainConfig.DirectoryPath}" />
                         <Button
                             Grid.Column="1"
                             Margin="5,0"
                             HorizontalAlignment="Right"
                             Click="OpenModFolderButton_OnClick"
                             Content="Browse" />
+                        <Button
+                            Grid.Column="2"
+                            Margin="5,0"
+                            HorizontalAlignment="Right"
+                            Command="{Binding AutoSelectCommand}"
+                            Content="Auto Select" />
                         <Button
                             Grid.Column="3"
                             Margin="5,0"
@@ -45,12 +53,53 @@
             <ui:SettingsExpander
                 Description="This is used to download the the mods from the Nexus Mods website"
                 Header="Nexus Api Key"
-                IconSource="">
+                IconSource="Permissions">
+                <ui:SettingsExpander.Styles>
+                    <Style Selector="TextBox:focus">
+                        <Setter Property="PasswordChar" Value="{Binding}" />
+                    </Style>
+                    <Style Selector="TextBox">
+                        <Setter Property="PasswordChar" Value="*" />
+                    </Style>
+                </ui:SettingsExpander.Styles>
                 <ui:SettingsExpanderItem>
-                    <TextBox
-                        MinWidth="150"
-                        PasswordChar="*"
-                        Text="{Binding NexusApiKey}" />
+                    <Grid ColumnDefinitions="Auto, *">
+                        <Label
+                            Width="75"
+                            VerticalAlignment="Center"
+                            Content="Api Key:" />
+                        <TextBox Grid.Column="1" Text="{Binding MainConfig.NexusModsApiKey}" />
+                    </Grid>
+                </ui:SettingsExpanderItem>
+                <ui:SettingsExpanderItem>
+                    <Grid ColumnDefinitions="Auto, *">
+                        <Label
+                            Width="75"
+                            VerticalAlignment="Center"
+                            Content="Cookie:" />
+                        <TextBox Grid.Column="1" Text="{Binding MainConfig.NexusModsCookie}" />
+                    </Grid>
+                </ui:SettingsExpanderItem>
+            </ui:SettingsExpander>
+
+            <ui:SettingsExpander Header="Others" IconSource="Settings">
+                <ui:SettingsExpanderItem>
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <StackPanel.Styles>
+                            <Style Selector="ToggleSwitch">
+                                <Setter Property="OnContent" Value="" />
+                                <Setter Property="OffContent" Value="" />
+                            </Style>
+                            <Style Selector="Label">
+                                <Setter Property="VerticalAlignment" Value="Center" />
+                            </Style>
+                        </StackPanel.Styles>
+
+                        <Label Content="Debug Mode:" />
+                        <ToggleSwitch IsChecked="{Binding MainConfig.Debug}" />
+                        <Label Content="Auto Check Updates:" />
+                        <ToggleSwitch IsChecked="{Binding MainConfig.AutoCheckUpdates}" />
+                    </StackPanel>
                 </ui:SettingsExpanderItem>
             </ui:SettingsExpander>
 
@@ -79,14 +128,24 @@
                         ItemsSource="{Binding AppFlowDirections}"
                         SelectedItem="{Binding CurrentFlowDirection}" />
                 </ui:SettingsExpander.Footer>
+            </ui:SettingsExpander>
 
+            <ui:SettingsExpander Description="Save current app window size" Header="Window Size">
+                <ui:SettingsExpander.IconSource>
+                    <fluent:SymbolIconSource Symbol="SlideSize" />
+                </ui:SettingsExpander.IconSource>
+                <ui:SettingsExpander.Footer>
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <Button Click="ClearSizeButton_OnClick" Content="Clear" />
+                        <Button Click="SaveWindowSizeButton_OnClick" Content="Save Current Size" />
+                    </StackPanel>
+                </ui:SettingsExpander.Footer>
             </ui:SettingsExpander>
 
             <ui:SettingsExpander
                 Description="Set a custom accent color for the App"
                 Header="App Accent Color"
-                IconSource="ColorLine"
-                IsExpanded="True">
+                IconSource="ColorLine">
 
                 <ui:SettingsExpanderItem Content="Preview">
                     <ui:SettingsExpanderItem.Footer>

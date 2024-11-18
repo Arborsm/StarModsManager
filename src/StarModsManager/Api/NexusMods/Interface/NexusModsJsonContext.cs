@@ -8,12 +8,22 @@ using StarModsManager.Api.NexusMods.Responses;
 
 namespace StarModsManager.Api.NexusMods.Interface;
 
-[JsonSourceGenerationOptions(WriteIndented = true, Converters = [typeof(UnixDateTimeConverter)])]
+[JsonSourceGenerationOptions(
+    WriteIndented = true,
+    Converters =
+    [
+        typeof(UnixDateTimeConverter),
+        typeof(JsonStringEnumConverter<ModStatus>),
+        typeof(JsonStringEnumConverter<EndorsementStatus>),
+        typeof(JsonStringEnumConverter<FileCategory>)
+    ])]
 [JsonSerializable(typeof(ColourScheme))]
 [JsonSerializable(typeof(Game))]
 [JsonSerializable(typeof(ModFile))]
 [JsonSerializable(typeof(ModFileDownloadLink))]
+[JsonSerializable(typeof(ModFileDownloadLink[]))]
 [JsonSerializable(typeof(ModFileList))]
+[JsonSerializable(typeof(DownloadResponse))]
 [JsonSerializable(typeof(ModHashResult))]
 [JsonSerializable(typeof(ModInfo))]
 [JsonSerializable(typeof(ModUpdate))]
@@ -24,6 +34,9 @@ namespace StarModsManager.Api.NexusMods.Interface;
 [JsonSerializable(typeof(Endorsement))]
 [JsonSerializable(typeof(ModFileWithHash))]
 [JsonSerializable(typeof(ModFileUpdate))]
+[JsonSerializable(typeof(ModStatus))]
+[JsonSerializable(typeof(EndorsementStatus))]
+[JsonSerializable(typeof(FileCategory))]
 internal partial class NexusModsJsonContext : JsonSerializerContext;
 
 internal class SystemTextJsonRequestBodySerializer : RequestBodySerializer
@@ -43,20 +56,28 @@ internal class SystemTextJsonResponseDeserializer : ResponseDeserializer
     private static T DeserializeJson<T>(string content)
     {
         var jsonTypeInfo = (JsonTypeInfo<T>)NexusModsJsonContext.Default.GetTypeInfo(typeof(T))!;
-        return JsonSerializer.Deserialize(content, jsonTypeInfo) ??
-               throw new InvalidOperationException("Can't deserialize the response content.");
+        var result = JsonSerializer.Deserialize(content, jsonTypeInfo) ??
+                     throw new InvalidOperationException("Can't deserialize the response content.");
+        return result;
     }
 
     public override T Deserialize<T>(string? content, HttpResponseMessage response, ResponseDeserializerInfo info)
     {
         if (string.IsNullOrEmpty(content)) throw new InvalidOperationException("The response content is null.");
 
-        RateLimits.DailyLimit = GetHeaderValue("x-rl-daily-limit", int.Parse);
-        RateLimits.DailyRemaining = GetHeaderValue("x-rl-daily-remaining", int.Parse);
-        RateLimits.DailyReset = GetHeaderValue("x-rl-daily-reset", DateTimeOffset.Parse);
-        RateLimits.HourlyLimit = GetHeaderValue("x-rl-hourly-limit", int.Parse);
-        RateLimits.HourlyRemaining = GetHeaderValue("x-rl-hourly-remaining", int.Parse);
-        RateLimits.HourlyReset = GetHeaderValue("x-rl-hourly-reset", DateTimeOffset.Parse);
+        try
+        {
+            RateLimits.DailyLimit = GetHeaderValue("x-rl-daily-limit", int.Parse);
+            RateLimits.DailyRemaining = GetHeaderValue("x-rl-daily-remaining", int.Parse);
+            RateLimits.DailyReset = GetHeaderValue("x-rl-daily-reset", DateTimeOffset.Parse);
+            RateLimits.HourlyLimit = GetHeaderValue("x-rl-hourly-limit", int.Parse);
+            RateLimits.HourlyRemaining = GetHeaderValue("x-rl-hourly-remaining", int.Parse);
+            RateLimits.HourlyReset = GetHeaderValue("x-rl-hourly-reset", DateTimeOffset.Parse);
+        }
+        catch (Exception)
+        {
+            // Ignored
+        }
 
         return DeserializeJson<T>(content);
 

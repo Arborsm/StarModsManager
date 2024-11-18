@@ -2,11 +2,11 @@
     x:Class="StarModsManager.Views.Pages.ProofreadPageView"
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:api1="clr-namespace:StarModsManager.Api;assembly=StarModsManager"
+    xmlns:api="using:StarModsManager.Api"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:lib="clr-namespace:StarModsManager.lib"
+    xmlns:lib="clr-namespace:StarModsManager.Lib"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:mods="clr-namespace:StarModsManager.Common.Mods;assembly=StarModsManager"
+    xmlns:mods="using:StarModsManager.Mods"
     xmlns:pages="using:StarModsManager.ViewModels.Pages"
     xmlns:ui="using:FluentAvalonia.UI.Controls"
     d:DesignHeight="800"
@@ -16,7 +16,7 @@
 
     <Control.Resources>
         <lib:NullableBoolToColorConverter x:Key="NullableBoolToColorConverter" />
-        <api1:ModLangIsMatchComparer x:Key="ModLangIsMatchComparer" />
+        <api:ModLangIsMatchComparer x:Key="ModLangIsMatchComparer" />
         <MenuFlyout x:Key="ContextMenu">
             <MenuItem Command="{Binding TranslateCommand}" Header="翻译" />
         </MenuFlyout>
@@ -31,7 +31,27 @@
                         Command="{Binding SaveCommand}"
                         IconSource="Save"
                         Label="Save" />
-                    <ui:CommandBarButton IconSource="Find" Label="Search" />
+                    <ui:CommandBarButton IconSource="Find" Label="Search">
+                        <ui:CommandBarButton.Flyout>
+                            <Flyout>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBox Text="{Binding SearchText}" />
+                                    <Button
+                                        Command="{Binding SearchCommand}">
+                                        <ui:SymbolIcon Symbol="Find" />
+                                    </Button>
+                                    <Button
+                                        Command="{Binding NextSearchCommand}">
+                                        <ui:SymbolIcon Symbol="Next" />
+                                    </Button>
+                                    <Button
+                                        Command="{Binding PrevSearchCommand}">
+                                        <ui:SymbolIcon Symbol="Previous" />
+                                    </Button>
+                                </StackPanel>
+                            </Flyout>
+                        </ui:CommandBarButton.Flyout>
+                    </ui:CommandBarButton>
                     <ui:CommandBarToggleButton
                         IconSource="Filter"
                         IsChecked="{Binding IsFilter}"
@@ -40,19 +60,19 @@
                 <ui:CommandBar.SecondaryCommands>
                     <ui:CommandBarToggleButton
                         IconSource="Stop"
-                        IsChecked="{Binding ShowLines}"
+                        IsChecked="{Binding ProofreadConfig.HasBorder}"
                         Label="Lines" />
                     <ui:CommandBarToggleButton
                         IconSource="Comment"
-                        IsChecked="{Binding IsVisibleHeader}"
+                        IsChecked="{Binding ProofreadConfig.IsVisibleHeader}"
                         Label="Header" />
                     <ui:CommandBarToggleButton
                         IconSource="Sort"
-                        IsChecked="{Binding CanSort}"
+                        IsChecked="{Binding ProofreadConfig.CanSort}"
                         Label="Sort" />
                     <ui:CommandBarToggleButton
                         IconSource="Switch"
-                        IsChecked="{Binding CanResize}"
+                        IsChecked="{Binding ProofreadConfig.EnableHeaderResizing}"
                         Label="Resize" />
                 </ui:CommandBar.SecondaryCommands>
             </ui:CommandBar>
@@ -60,15 +80,18 @@
             <ComboBox
                 Name="I18NModsComboBox"
                 Grid.Column="1"
-                MinWidth="350"
+                MinWidth="400"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Center"
-                ItemsSource="{Binding I18NMods}"
+                ItemsSource="{Binding ShowMods}"
                 SelectedItem="{Binding CurrentMod}"
                 SelectionChanged="ComboBox_SelectionChanged">
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
-                        <TextBlock Text="{Binding Name}" />
+                        <TextBlock
+                            x:DataType="mods:LocalMod"
+                            Foreground="{Binding LazyIsMisMatch.Value, Converter={StaticResource NullableBoolToColorConverter}}"
+                            Text="{Binding Manifest.Name}" />
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
@@ -77,11 +100,11 @@
         <Panel Grid.Row="1">
             <DataGrid
                 Name="ProofreadDataGrid"
-                CanUserResizeColumns="{Binding CanResize}"
-                CanUserSortColumns="{Binding CanSort}"
+                CanUserResizeColumns="{Binding ProofreadConfig.EnableHeaderResizing}"
+                CanUserSortColumns="{Binding ProofreadConfig.CanSort}"
                 CellEditEnded="ProofreadDataGrid_OnCellEditEnded"
-                Classes.IsInvisibleHeader="{Binding !IsVisibleHeader}"
-                Classes.ShowLines="{Binding ShowLines}"
+                Classes.IsInvisibleHeader="{Binding !ProofreadConfig.IsVisibleHeader}"
+                Classes.ShowLines="{Binding ProofreadConfig.HasBorder}"
                 ContextFlyout="{StaticResource ContextMenu}"
                 ItemsSource="{Binding ModLangsView}"
                 SelectedItem="{Binding SelectedItem}"
@@ -124,7 +147,7 @@
                                 <Ellipse
                                     Width="13"
                                     Height="13"
-                                    Fill="{Binding Path=IsMatch, DataType=mods:ModLang, Converter={StaticResource NullableBoolToColorConverter}}" />
+                                    Fill="{Binding Path=IsMisMatch, DataType=mods:ModLang, Converter={StaticResource NullableBoolToColorConverter}}" />
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>

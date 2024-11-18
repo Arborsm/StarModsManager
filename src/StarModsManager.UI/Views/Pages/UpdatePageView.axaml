@@ -1,0 +1,62 @@
+﻿<UserControl
+    x:Class="StarModsManager.Views.Pages.UpdatePageView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:pages="clr-namespace:StarModsManager.ViewModels.Pages"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    x:DataType="pages:UpdatePageViewModel"
+    mc:Ignorable="d">
+    <Grid Margin="30,40,30,20" RowDefinitions="*, Auto">
+        <Panel>
+            <Border BorderBrush="Gray" BorderThickness="1">
+                <DataGrid
+                    GridLinesVisibility="All"
+                    ItemsSource="{Binding Mods}"
+                    SelectionMode="Extended">
+                    <DataGrid.Columns>
+                        <DataGridCheckBoxColumn
+                            Binding="{Binding IsChecked}"
+                            Header="选择"
+                            IsReadOnly="False" />
+                        <DataGridTextColumn
+                            Width="*"
+                            Binding="{Binding Name}"
+                            Header="Mod 名称" />
+                        <DataGridTextColumn Binding="{Binding CurrentVersion}" Header="当前版本" />
+                        <DataGridTextColumn Binding="{Binding LatestVersion}" Header="最新版本" />
+                        <DataGridTemplateColumn Header="打开下载页面">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button Content="浏览" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Border>
+            <controls:ProgressRing
+                Width="100"
+                Height="100"
+                IsVisible="{Binding IsLoading}" />
+            <TextBlock
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                FontSize="24"
+                IsVisible="{Binding ShowNull}"
+                Text="未检测到可更新Mod" />
+        </Panel>
+        <StackPanel
+            Grid.Row="1"
+            Margin="0,10,0,0"
+            HorizontalAlignment="Center"
+            Orientation="Horizontal"
+            Spacing="20">
+            <Button Command="{Binding RefreshCommand}" Content="刷新" />
+            <Button Command="{Binding DownloadCommand}" Content="更新" />
+        </StackPanel>
+    </Grid>
+</UserControl>

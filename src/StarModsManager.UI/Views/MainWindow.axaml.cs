@@ -1,8 +1,7 @@
 using Avalonia.Input;
 using Avalonia.Platform.Storage;
-using CommunityToolkit.Mvvm.Messaging;
 using FluentAvalonia.UI.Controls;
-using StarModsManager.lib;
+using StarModsManager.Api;
 using StarModsManager.ViewModels.Customs;
 using StarModsManager.Views.Customs;
 
@@ -12,8 +11,14 @@ public partial class MainWindow : Window
 {
     public MainWindow()
     {
+        if (Services.MainConfig.ClientSize != System.Drawing.Size.Empty)
+        {
+            WindowState = WindowState.Normal;
+            Width = Services.MainConfig.ClientSize.Width;
+            Height = Services.MainConfig.ClientSize.Height;
+        }
         InitializeComponent();
-        WeakReferenceMessenger.Default.Register<PickupFilesDialogMessage>(this, ShowDialogAsync);
+        Services.Dialog = new Dialog(GetTopLevel(this)!);
         DragDrop.SetAllowDrop(this, true);
         AddHandler(DragDrop.DragEnterEvent, DragInput);
         AddHandler(DragDrop.DragOverEvent, DragInput);
@@ -66,15 +71,35 @@ public partial class MainWindow : Window
         dialog.ShowAsync();
         e.Handled = true;
     }
+}
 
-    private async void ShowDialogAsync(object recipient, PickupFilesDialogMessage message)
+public class Dialog(TopLevel topLevel) : IDialog
+{
+    public async Task<IReadOnlyList<IStorageFile>> ShowPickupFilesDialogAsync(string title, bool allowMultiple, IReadOnlyList<FilePickerFileType>? fileTypeFilter)
     {
-        var files = await GetTopLevel(this)!.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+        return await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
         {
-            Title = message.Title,
-            AllowMultiple = message.AllowMultiple,
-            FileTypeFilter = message.FileTypeFilter
+            Title = title,
+            AllowMultiple = allowMultiple,
+            FileTypeFilter = fileTypeFilter
         });
-        message.CompletionSource.SetResult(files);
+    }
+
+    public async Task<string?> ShowDownloadDialogAsync()
+    {
+        var dialog = new ContentDialog
+        {
+            Title = "New Download",
+            Content = new TextBox
+            {
+                Name = "TextBox",
+                Watermark = "Enter URL",
+                Width = 400
+            },
+            PrimaryButtonText = "OK",
+            CloseButtonText = "Cancel"
+        };
+        var result = await dialog.ShowAsync();
+        return result == ContentDialogResult.Primary ? (dialog.Content as TextBox)?.Text : null;
     }
 }

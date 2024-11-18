@@ -1,96 +1,93 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using System.Text;
-using NLog;
+using Serilog;
+using Serilog.Events;
 
 namespace StarModsManager.Api;
 
-public static partial class SMMDebug
+public static class SMMDebug
 {
-    private const int AttachParentProcess = -1;
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-    static SMMDebug()
+    public static void Init()
     {
-        var debugFileName = Path.Combine(Services.LogDir, "debug_${shortdate}.log");
-        var logFileName = Path.Combine(Services.LogDir, "log_${shortdate}.log");
-
-        LogManager.Setup().LoadConfiguration(builder =>
-        {
-            builder.ForLogger().FilterMinLevel(LogLevel.Trace)
-                .WriteToConsole("${longdate}|${level:uppercase=true}|${message}");
-            builder.ForLogger().FilterMinLevel(LogLevel.Trace).WriteToFile(debugFileName,
-                "${longdate}|${level:uppercase=true}|${message}", maxArchiveDays: 10);
-            builder.ForLogger().FilterMinLevel(LogLevel.Info)
-                .WriteToFile(logFileName, "${longdate}|${level:uppercase=true}|${message}");
-        });
-    }
-
-    [LibraryImport("kernel32.dll")]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    private static partial void AttachConsole(int dwProcessId);
-
-    /// <summary>
-    ///     Redirects the console output of the current process to the parent process.
-    /// </summary>
-    /// <remarks>
-    ///     Must be called before calls to <see cref="Console.WriteLine()" />.
-    /// </remarks>
-    public static void AttachToParentConsole()
-    {
-        AttachConsole(AttachParentProcess);
-    }
-
-    public static void Trace(string message, params object[] args)
-    {
-        Logger.Trace(message, args);
-    }
-
-    public static void Debug(string message, params object[] args)
-    {
-        Logger.Debug(message, args);
-    }
-
-    public static void Info(string message, params object[] args)
-    {
-        Logger.Info(message, args);
-    }
-
-    public static void Warning(string message, params object[] args)
-    {
-        Logger.Warn(message, args);
-    }
-
-    public static void Error(string message, params object[] args)
-    {
-        Logger.Error(message, args);
-    }
-
-    public static void Log(string message, LogLevel logLevel, params object[] args)
-    {
-        if (logLevel == LogLevel.Trace) Trace(message, args);
-        else if (logLevel == LogLevel.Debug) Debug(message, args);
-        else if (logLevel == LogLevel.Info) Info(message, args);
-        else if (logLevel == LogLevel.Warn) Warning(message, args);
-        else if (logLevel == LogLevel.Error) Error(message, args);
-    }
-
-    public static void Fatal(Exception e, string? message = default)
-    {
-        Logger.Fatal(e, message);
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) DebugHelper.InitConsole();
+        
+        var debugFileName = Path.Combine(Services.LogDir, "debug_.log");
+        var logFileName = Path.Combine(Services.LogDir, "log_.log");
+        
+        using var log = new LoggerConfiguration()
+            .MinimumLevel.Verbose()
+            .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Verbose)
+            .WriteTo.File(debugFileName,
+                rollingInterval: RollingInterval.Day,
+                retainedFileCountLimit: 10,
+                restrictedToMinimumLevel: LogEventLevel.Verbose)
+            .WriteTo.File(logFileName,
+                rollingInterval: RollingInterval.Day,
+                retainedFileCountLimit: 10,
+                restrictedToMinimumLevel: LogEventLevel.Information)
+            .CreateLogger();
+        Log.Logger = log;
     }
 
     public static void Error(Exception e, string? msg = default, bool isMsg = true)
     {
-        var finalMessage = new StringBuilder();
-        finalMessage.Append(msg ?? e.Message);
+        if (isMsg) Services.Notification.Show("Error", msg ?? e.Message, Severity.Error);
+        Log.Error(e, msg ?? e.Message);
+    }
+}
 
-        if (e.InnerException is not null) finalMessage.Append($" Inner Exception: {e.InnerException.Message}");
+[SupportedOSPlatform("windows")]
+[SuppressMessage("ReSharper", "All")]
+public static partial class DebugHelper
+{
+    private const int AttachParentProcess = -1;
+    
+    [LibraryImport("kernel32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial void AttachConsole(int dwProcessId);
+    
+    [LibraryImport("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool AllocConsole();
+    
+    [LibraryImport("kernel32.dll")]
+    private static partial IntPtr GetConsoleWindow();
 
-        if (isMsg)
-            Services.Notification.Show("Error", finalMessage.ToString(), Severity.Error);
+    [LibraryImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
-        Logger.Error(e, msg);
-        Logger.Error(e.StackTrace);
-        if (e.InnerException is not null) Logger.Error(e.InnerException.StackTrace);
+    private const int SW_HIDE = 0;
+    private const int SW_SHOW = 5;
+
+    public static void ShowConsole()
+    {
+        var handle = GetConsoleWindow();
+        if (handle != IntPtr.Zero) ShowWindow(handle, SW_SHOW);
+    }
+
+    public static void HideConsole()
+    {
+        var handle = GetConsoleWindow();
+        if (handle != IntPtr.Zero) ShowWindow(handle, SW_HIDE);
+    }
+    
+    public static void AttachToParentConsole()
+    {
+        AttachConsole(AttachParentProcess);
+    }
+    
+    public static void InitConsole()
+    {
+        AllocConsole();
+        HideConsole();
+        
+        Console.OutputEncoding = Encoding.UTF8;
+        Console.InputEncoding = Encoding.UTF8;
+        Console.SetWindowSize(60, 25);
+        Console.SetBufferSize(60, 25);
     }
 }

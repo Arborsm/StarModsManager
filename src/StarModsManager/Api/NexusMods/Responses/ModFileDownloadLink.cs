@@ -14,5 +14,12 @@ public sealed class ModFileDownloadLink
     public string ShortName { get; set; } = null!;
 
     /// <summary>The download URL.</summary>
-    public Uri Uri { get; set; } = null!;
+    [JsonPropertyName("URI")]
+    public string Uri { get; set; } = null!;
+}
+
+public sealed class DownloadResponse
+{
+    [JsonPropertyName("url")]
+    public Uri? Url { get; set; }
 }

@@ -1,7 +1,8 @@
-﻿using System.IO.Compression;
-using System.Text.Json;
-using StarModsManager.Api.Lang;
-using StarModsManager.Common.Mods;
+﻿using System.Text.Json;
+using Serilog;
+using StardewModdingAPI.Toolkit.Framework.GameScanning;
+using StarModsManager.Assets;
+using StarModsManager.Mods;
 
 namespace StarModsManager.Api;
 
@@ -12,76 +13,16 @@ public class ModsHelper
     public bool IsMismatchedTokens = false;
     public Dictionary<string, LocalMod> LocalModsMap = []; // Id/UniqueId -> mod
     public Dictionary<string, OnlineMod> OnlineModsMap = []; // UniqueId -> mod
+    public readonly IEnumerable<DirectoryInfo> GameFolders = new GameScanner().Scan();
 
-    public static void Install(string fileDir)
+    private ModsHelper()
     {
-        var targetDirectory = Services.MainConfig.DirectoryPath;
-        try
-        {
-            using var archive = ZipFile.OpenRead(fileDir);
-            var manifestEntry = archive.Entries.FirstOrDefault(e =>
-                e.Name.Equals("manifest.json", StringComparison.OrdinalIgnoreCase));
-
-            if (manifestEntry == null)
-            {
-                Services.Notification.Show("未找到manifest.json文件", "非Mod压缩包", Severity.Warning);
-                return;
-            }
-
-            var topLevelDir = Path.GetDirectoryName(manifestEntry.FullName);
-            if (string.IsNullOrEmpty(topLevelDir)) topLevelDir = Path.GetFileNameWithoutExtension(fileDir);
-
-            var tempDir = Path.Combine(Services.TempDir, "ToInstallMod");
-            Directory.CreateDirectory(tempDir);
-
-            try
-            {
-                archive.ExtractToDirectory(tempDir, true);
-
-                var sourceDir = Path.Combine(tempDir, topLevelDir);
-                var destDir = Path.Combine(targetDirectory, topLevelDir);
-                if (Directory.Exists(destDir)) Directory.Delete(destDir, true);
-
-                MoveDirectory(Directory.Exists(sourceDir) ? sourceDir : tempDir, destDir);
-
-                SMMDebug.Info($"Mod installed successfully: {topLevelDir}");
-            }
-            finally
-            {
-                if (Directory.Exists(tempDir)) Directory.Delete(tempDir, true);
-            }
-        }
-        catch (InvalidDataException)
-        {
-            SMMDebug.Error("Error: Invalid zip file");
-        }
-        catch (Exception e)
-        {
-            SMMDebug.Error($"Error occurred during mod installation: {e.Message}");
-        }
-    }
-
-    private static void MoveDirectory(string sourceDir, string destDir)
-    {
-        Directory.CreateDirectory(destDir);
-
-        foreach (var file in Directory.GetFiles(sourceDir))
-        {
-            var destFile = Path.Combine(destDir, Path.GetFileName(file));
-            File.Move(file, destFile, true);
-        }
-
-        foreach (var dir in Directory.GetDirectories(sourceDir))
-        {
-            var destSubDir = Path.Combine(destDir, Path.GetFileName(dir));
-            MoveDirectory(dir, destSubDir);
-        }
     }
 
     public async Task FindModsAsync()
     {
         var path = Services.MainConfig.DirectoryPath;
-        SMMDebug.Info($"Searching Mods in Dir: {path}");
+        Log.Information("Searching Mods in Dir: {Path}", path);
         if (!Directory.Exists(path)) Console.WriteLine(Strings.ErrorFoldersMsg);
         OnlineModsMap = (await LoadCachedAsync()).ToDictionary(mod => mod.ModId, mod => mod);
         LocalModsMap = new Dictionary<string, LocalMod>();
@@ -89,7 +30,7 @@ public class ModsHelper
         await FindManifestFilesAsync(path, manifestFiles);
         LocalModsMap = manifestFiles.AsParallel()
             .Select(manifestFilePath => new LocalMod(manifestFilePath))
-            .GroupBy(mod => mod.UniqueID)
+            .GroupBy(mod => mod.Manifest.UniqueID)
             .ToDictionary(grouping => grouping.Key, grouping => grouping.LastOrDefault())!;
         InitProcessMods();
     }

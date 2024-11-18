@@ -1,18 +1,18 @@
 ﻿using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using CommunityToolkit.Mvvm.Messaging;
+using Serilog;
 using StarModsManager.Api;
 using StarModsManager.Api.NexusMods;
-using StarModsManager.lib;
 using StarModsManager.ViewModels.Items;
 
 namespace StarModsManager.ViewModels.Customs;
 
-public partial class PicsSelectViewModel : ViewModelBase
+public partial class PicsSelectViewModel : ViewModelBase, IDisposable
 {
     private readonly ModViewModel _mod;
 
@@ -32,7 +32,15 @@ public partial class PicsSelectViewModel : ViewModelBase
     {
         _mod = mod;
         _ = Task.Run(LoadPicsAsync);
-        Pics.CollectionChanged += (_, _) => OnPropertyChanged(nameof(IsListEmpty));
+        Pics.CollectionChanged += OnPicsOnCollectionChanged;
+    }
+
+    private void OnPicsOnCollectionChanged(object? o, NotifyCollectionChangedEventArgs args) => OnPropertyChanged(nameof(IsListEmpty));
+
+    public void Dispose()
+    {
+        Pics.CollectionChanged -= OnPicsOnCollectionChanged;
+        GC.SuppressFinalize(this);
     }
 
     public ObservableCollection<BitmapViewModel> Pics { get; } = [];
@@ -43,7 +51,7 @@ public partial class PicsSelectViewModel : ViewModelBase
         try
         {
             var url = _mod.OnlineMod.Url;
-            if (url is not null) await LoadPicsAsync(url);
+            await LoadPicsAsync(url);
         }
         catch (Exception)
         {
@@ -55,7 +63,7 @@ public partial class PicsSelectViewModel : ViewModelBase
     {
         IsLoading = true;
         List<BitmapViewModel> pics = [];
-        var nexusMod = await NexusMod.Create(modUrl);
+        var nexusMod = await NexusMod.CreateAsync(modUrl);
         var modLinks = nexusMod.GetModPicsUrlAsync(NexusMod.Pics);
 
         await Task.WhenAll(modLinks.Select(async it =>
@@ -91,7 +99,7 @@ public partial class PicsSelectViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            SMMDebug.Error($"An error occurred: {ex.Message}");
+            Log.Error(ex, "An error occurred");
         }
     }
 
@@ -109,15 +117,8 @@ public partial class PicsSelectViewModel : ViewModelBase
                 }
             };
 
-            var dialogMessage = new PickupFilesDialogMessage
-            {
-                Title = "Select a custom picture",
-                FileTypeFilter = fileTypes
-            };
-
-            WeakReferenceMessenger.Default.Send(dialogMessage);
-
-            var customPicPath = await dialogMessage.CompletionSource.Task;
+            var customPicPath = 
+                await Services.Dialog.ShowPickupFilesDialogAsync("Select a picture", false, fileTypes);
 
             var picPath = _mod.LocalMod!.InfoPicturePath;
             if (customPicPath.Count > 0)
@@ -134,7 +135,7 @@ public partial class PicsSelectViewModel : ViewModelBase
                         }
                     }
 
-                    SMMDebug.Error("Image converted and saved successfully.");
+                    Log.Verbose("Image converted and saved successfully.");
                 }
             }
 
@@ -142,7 +143,7 @@ public partial class PicsSelectViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            SMMDebug.Error($"An error occurred: {ex.Message}");
+            Log.Error(ex, "An error occurred");
         }
     }
 }

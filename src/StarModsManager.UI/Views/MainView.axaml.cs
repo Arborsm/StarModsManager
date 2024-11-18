@@ -1,31 +1,42 @@
 ﻿using Avalonia;
-using Avalonia.Media;
-using Avalonia.Styling;
+using Avalonia.Controls.Notifications;
+using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Primitives.PopupPositioning;
 using Avalonia.Threading;
-using CommunityToolkit.Mvvm.Messaging;
-using FluentAvalonia.Core;
 using FluentAvalonia.UI.Controls;
 using FluentAvalonia.UI.Navigation;
-using StarModsManager.lib;
+using StarModsManager.Api;
+using StarModsManager.Lib;
 using StarModsManager.ViewModels;
+using StarModsManager.ViewModels.Customs;
+using StarModsManager.Views.Customs;
 
 namespace StarModsManager.Views;
 
 public partial class MainView : UserControl
 {
     private bool _isDesktop;
+    private readonly FlyoutBase _flyout;
 
     public MainView()
     {
         InitializeComponent();
-        WeakReferenceMessenger.Default.Register<NotificationMessage>(this, ShowNotification);
+
+        DownloadItem.Tapped += (_, _) => _flyout?.ShowAt(DownloadItem);
+        _flyout = new Flyout
+        {
+            Placement = PlacementMode.RightEdgeAlignedBottom,
+            PlacementConstraintAdjustment = PopupPositionerConstraintAdjustment.All,
+            Content = new DownloadManagerView(ViewModelService.Resolve<DownloadManagerViewModel>())
+        };
+        Services.PopUp = new PopUp(this, () => _flyout.ShowAt(DownloadItem));
     }
 
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
         _isDesktop = TopLevel.GetTopLevel(this) is Window;
-        var vm = new MainWindowViewModel();
+        var vm = ViewModelService.Resolve<MainViewModel>();
         DataContext = vm;
         FrameView.NavigationPageFactory = vm.NavigationFactory;
         NavigationService.Instance.SetFrame(FrameView);
@@ -33,60 +44,26 @@ public partial class MainView : UserControl
         FrameView.Navigated += OnFrameViewNavigated;
         MainNav.ItemInvoked += OnNavigationViewItemInvoked;
         MainNav.BackRequested += OnNavigationViewBackRequested;
-    }
-
-    private void ShowNotification(object recipient, NotificationMessage message)
-    {
-        Dispatcher.UIThread.Invoke(() =>
+        var manager = new WindowNotificationManager(TopLevel.GetTopLevel(this))
         {
-            if (message.Severity == InfoBarSeverity.Informational)
-                MainInfoBar.Background =
-                    Application.Current!.RequestedThemeVariant == ThemeVariant.Light
-                        ? Brushes.Azure
-                        : Brushes.MediumSlateBlue;
-            MainInfoBar.IsClosable = message.IsClosable;
-            MainInfoBar.Title = message.Title;
-            MainInfoBar.Message = message.Message;
-            MainInfoBar.Severity = message.Severity;
-            MainInfoBar.IsIconVisible = message.IsIconVisible;
-            MainInfoBar.IsOpen = true;
-        });
+            Margin = new Thickness(0, 25, 5, 0)
+        };
+        Services.Notification = new Notification(manager);
     }
 
     private void InitializeNavigationPages()
     {
-        var menuItems = new List<NavigationViewItemBase>(4);
-        var footerItems = new List<NavigationViewItemBase>(1);
-
         Dispatcher.UIThread.Post(() =>
         {
-            List<Page> list =
-            [
-                new("主页", new SymbolIconSource { Symbol = Symbol.Home }, NavigationService.Main),
-                new("下载", new SymbolIconSource { Symbol = Symbol.Download }, NavigationService.Download),
-                new("更新", new SymbolIconSource { Symbol = Symbol.Sync }, NavigationService.Update),
-                new("翻译", new SymbolIconSource { Symbol = Symbol.Character }, NavigationService.Trans),
-                new("校对", new SymbolIconSource { Symbol = Symbol.Edit }, NavigationService.Check)
-            ];
-            foreach (var nvi in list.Select(pg => new NavigationViewItem
-                     {
-                         Content = pg.Content,
-                         Tag = pg.Tag,
-                         IconSource = pg.IconSource
-                     }))
+            foreach (var o in MainNav.MenuItems)
             {
+                if (o is not NavigationViewItem nvi) continue;
                 if (!_isDesktop) nvi.Classes.Add("SampleAppNav");
-                menuItems.Add(nvi);
             }
 
-            MainNav.MenuItemsSource = menuItems;
-            MainNav.FooterMenuItemsSource = footerItems;
             MainNav.SettingsItem.Tag = NavigationService.Settings;
-            MainNav.SelectedItem = MainNav.MenuItemsSource.ElementAt(0);
-
-            if (OperatingSystem.IsBrowser())
-                MainNav.Classes.Add("SampleAppNav");
-            else if (!_isDesktop) MainNav.PaneDisplayMode = NavigationViewPaneDisplayMode.LeftMinimal;
+            MainNav.SelectedItem = MainNav.MenuItems.ElementAt(0);
+            if (OperatingSystem.IsBrowser()) MainNav.Classes.Add("SampleAppNav");
 
             FrameView.NavigateFromObject((MainNav.SelectedItem as Control)?.Tag);
         });
@@ -101,7 +78,7 @@ public partial class MainView : UserControl
 
         if (dc is MainPageViewModelBase pageBase) thisPage = pageBase;
 
-        foreach (NavigationViewItem nvi in MainNav.MenuItemsSource)
+        foreach (NavigationViewItem nvi in MainNav.MenuItems)
             if (nvi.Tag as string == thisPage?.NavHeader)
                 MainNav.SelectedItem = nvi;
         if (FrameView.BackStackDepth > 0 && !MainNav.IsBackButtonVisible)
@@ -126,9 +103,54 @@ public partial class MainView : UserControl
     }
 }
 
-public class Page(string content, IconSource iconSource, string tag)
+public class PopUp(Control control, Action downloadManager) : IPopUp
 {
-    public readonly string Content = content;
-    public readonly IconSource IconSource = iconSource;
-    public readonly string Tag = tag;
+    public void ShowDownloadManager() => downloadManager();
+    public void AddDownload(string url) => ViewModelService.Resolve<DownloadManagerViewModel>().AddDownload(url);
+    public void ShowFlyout(object flyout) => (flyout as Flyout)?.ShowAt(control);
+}
+
+public class Notification(WindowNotificationManager manager) : Api.INotification
+{
+    public void Close(object? o)
+    { 
+        if (o is not null)
+        {
+            manager.Close(o);
+        }
+    }
+
+    public void CloseAll() => manager.CloseAll();
+
+    public void Show(object content, Severity severity)
+    {
+        var type = GetInfoType(severity);
+        Dispatcher.UIThread.Invoke(() => manager.Show(content, type));
+    }
+
+    public object Show(string title, string message, Severity severity,
+        TimeSpan? expiration = null,
+        Action? onClick = null,
+        Action? onClose = null)
+    {
+        var type = GetInfoType(severity);
+        if (type == NotificationType.Error && expiration is null) expiration = TimeSpan.Zero;
+        var msg = new Avalonia.Controls.Notifications.Notification(title, message, type, expiration, onClick, onClose);
+        Dispatcher.UIThread.Invoke(() =>
+        {
+            manager.Show(msg);
+        });
+        return msg;
+    }
+
+    public object Show(string message) => Show("Info", message, Severity.Informational);
+
+    private static NotificationType GetInfoType(Severity severity) => severity switch
+    {
+        Severity.Informational => NotificationType.Information,
+        Severity.Success => NotificationType.Success,
+        Severity.Warning => NotificationType.Warning,
+        Severity.Error => NotificationType.Error,
+        _ => throw new ArgumentOutOfRangeException(nameof(severity), severity, null)
+    };
 }

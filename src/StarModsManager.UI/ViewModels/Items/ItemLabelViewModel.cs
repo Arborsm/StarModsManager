@@ -9,42 +9,60 @@ namespace StarModsManager.ViewModels.Items;
 
 public partial class ItemLabelViewModel : ViewModelBase
 {
-    public readonly string SavePath;
+    [ObservableProperty]
+    private bool _isEditing;
+    
+    private readonly bool _isInit;
+    private string SavePath => Path.Combine(Services.ModLabelsPath, $"{Title}.json");
 
     [ObservableProperty]
     private Color _borderColor;
 
-    public ItemLabelViewModel(string? title = default) : this(title ?? "Hidden", Colors.LightBlue, [])
+    public const string Hidden = "Hidden";
+    public ItemLabelViewModel() : this("Hidden", [], Colors.LightBlue)
     {
     }
 
-    public ItemLabelViewModel(string title, Color borderColor, ObservableCollection<string> labelItems)
+    public ItemLabelViewModel(string title, IEnumerable<ModViewModel> allMods, Color? borderColor = default)
     {
+        _isInit = true;
         Title = title;
-        SavePath = Path.Combine(Services.ModLabelsPath, $"{title}.json");
         if (!File.Exists(SavePath))
         {
-            BorderColor = borderColor;
-            Items = labelItems;
+            BorderColor = borderColor ?? Colors.LightBlue;
+            Items = new ObservableCollection<ModViewModel>([]);
         }
         else
         {
             var model = JsonSerializer.Deserialize(File.ReadAllText(SavePath),
                 FullItemLabelContext.Default.FullItemLabelViewModel);
             BorderColor = Color.FromUInt32(model!.BorderColor);
-            Items = new(model.Items);
+            Items = new ObservableCollection<ModViewModel>(allMods
+                .Where(it => model.Items.Any(modId => modId == it.LocalMod!.Manifest.UniqueID)));
         }
 
         Items.CollectionChanged += (_, _) => Save();
+        _isInit = false;
     }
 
-    public string Title { get; set; }
+    [ObservableProperty]
+    private string _title;
 
-    [JsonIgnore] public ObservableCollection<string>? Items { get; set; }
+    [JsonIgnore] 
+    public ObservableCollection<ModViewModel> Items { get; set; }
+
+    partial void OnTitleChanged(string? oldValue, string newValue)
+    {
+        if (oldValue == newValue || _isInit) return; 
+        Save();
+        var filePath = Path.Combine(Services.ModLabelsPath, $"{oldValue}.json");
+        if (File.Exists(filePath)) File.Delete(filePath);
+        OnPropertyChanged();
+    }
 
     partial void OnBorderColorChanged(Color oldValue, Color newValue)
     {
-        if (oldValue == newValue) return;
+        if (oldValue == newValue || _isInit) return;
         Save();
     }
 
@@ -89,7 +107,7 @@ public class FullItemLabelViewModel
     public FullItemLabelViewModel(ItemLabelViewModel viewModel)
     {
         BorderColor = viewModel.BorderColor.ToUInt32();
-        Items = [..viewModel.Items ?? []];
+        Items = [..viewModel.Items.Select(it => it.LocalMod!.Manifest.UniqueID)];
     }
 
     public uint BorderColor { get; set; }

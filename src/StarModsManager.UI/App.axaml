@@ -2,13 +2,13 @@
     x:Class="StarModsManager.App"
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:main="clr-namespace:StarModsManager.Main"
+    xmlns:starModsManager="clr-namespace:StarModsManager"
     xmlns:styling="using:FluentAvalonia.Styling"
     RequestedThemeVariant="Dark">
     <!--  "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options.  -->
 
     <Application.DataTemplates>
-        <main:ViewLocator />
+        <starModsManager:ViewLocator />
     </Application.DataTemplates>
 
     <Application.Resources>

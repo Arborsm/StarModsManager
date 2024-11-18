@@ -5,17 +5,19 @@ namespace StarModsManager.Api;
 
 public static class PlatformHelper
 {
-    public static void OpenFileOrUrl(string path)
+    public static bool OpenFileOrUrl(string path)
     {
         try
         {
             if (Uri.TryCreate(path, UriKind.Absolute, out var uriResult) &&
                 (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps)) OpenUrl(path);
             else OpenFolder(path);
+            return true;
         }
         catch (Exception? e)
         {
             SMMDebug.Error(e);
+            return false;
         }
     }
 

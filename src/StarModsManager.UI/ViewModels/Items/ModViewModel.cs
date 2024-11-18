@@ -1,27 +1,31 @@
-﻿using Avalonia.Media.Imaging;
+﻿using System.Text.Json;
+using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using CommunityToolkit.Mvvm.Messaging;
 using FluentAvalonia.UI.Controls;
 using StarModsManager.Api;
 using StarModsManager.Api.NexusMods;
-using StarModsManager.Common.Mods;
-using StarModsManager.lib;
+using StarModsManager.Api.SMAPI;
+using StarModsManager.Mods;
 using StarModsManager.ViewModels.Customs;
 using StarModsManager.Views.Customs;
-using PicsSelectView = StarModsManager.Views.Customs.PicsSelectView;
 
 namespace StarModsManager.ViewModels.Items;
 
 public partial class ModViewModel : ViewModelBase
 {
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsDependencyMissing))]
+    [NotifyPropertyChangedFor(nameof(IsDisabledOrDependencyMissing))]
     private bool _isDisabled;
 
     private string? _localModPath;
 
     [ObservableProperty]
     private Bitmap? _pic;
+    
+    public bool IsDependencyMissing => IsLocal && LocalMod!.IsDependencyMissing && !IsDisabled;
+    public bool IsDisabledOrDependencyMissing => IsDisabled || IsLocal && IsDependencyMissing;
 
     public ModViewModel(OnlineMod onlineMod, LocalMod? localMod = default)
     {
@@ -46,7 +50,7 @@ public partial class ModViewModel : ViewModelBase
             "D:\\Users\\26537\\AppData\\Roaming\\StarModsManager\\Cache\\14070\\14070-1665488527-1800567611.bmp");
         IsDisabled = true;
     }
-
+    
     public OnlineMod OnlineMod { get; }
     public LocalMod? LocalMod { get; }
 
@@ -55,26 +59,29 @@ public partial class ModViewModel : ViewModelBase
     [RelayCommand]
     private async Task DownloadAsync()
     {
-        if (OnlineMod.Url != null) await new NexusDownload(OnlineMod.Url).GetModDownloadUrlAsync();
+        Services.Notification.Show("正在获取模组下载链接...");
+        await new NexusDownload(OnlineMod.Url).GetModDownloadUrlAsync();
+        Services.PopUp.ShowDownloadManager();
     }
 
     [RelayCommand]
     private async Task GetDetailAsync()
     {
-        ViewModelBase content = LocalMod is not null
-            ? new ModDetailViewModel(await File.ReadAllTextAsync(Path.Combine(LocalMod.PathS, "manifest.json")))
-            : new ModDetailViewModel(""); // ToDO
-        var dialog = new ContentDialog
+        object? content = null;
+        if (LocalMod is not null)
         {
-            Title = "Detail",
-            CloseButtonText = "Close",
-            Content = new ModDetailView
-            {
-                Content = content
-            }
+            var manifest = await File.ReadAllTextAsync(Path.Combine(LocalMod!.PathS, "manifest.json"));
+            var mod = JsonSerializer.Deserialize(manifest, ManifestContent.Default.Manifest)!;
+            content = new ModDetailViewModel(mod, LocalMod!.MissingDependencies);
+        }
+        
+        var flyout = new Flyout
+        {
+            Content = content!,
+            Placement = PlacementMode.Center
         };
 
-        await dialog.ShowAsync();
+        Services.PopUp.ShowFlyout(flyout);
     }
 
     [RelayCommand(CanExecute = nameof(IsLocal))]
@@ -99,13 +106,6 @@ public partial class ModViewModel : ViewModelBase
     }
 
     [RelayCommand(CanExecute = nameof(IsLocal))]
-    private void HideMod()
-    {
-        LocalMod!.IsHidden = !LocalMod.IsHidden;
-        WeakReferenceMessenger.Default.Send(new ModHiddenChangedMessage(LocalMod.UniqueID, LocalMod.IsHidden));
-    }
-
-    [RelayCommand(CanExecute = nameof(IsLocal))]
     private void OpenModFolder()
     {
         PlatformHelper.OpenFileOrUrl(LocalMod!.PathS);
@@ -114,7 +114,7 @@ public partial class ModViewModel : ViewModelBase
     [RelayCommand]
     private void OpenUrl()
     {
-        if (OnlineMod.Url is not null) PlatformHelper.OpenFileOrUrl(OnlineMod.Url);
+        PlatformHelper.OpenFileOrUrl(OnlineMod.Url);
     }
 
     [RelayCommand]

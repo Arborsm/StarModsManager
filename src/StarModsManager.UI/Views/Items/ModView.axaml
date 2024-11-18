@@ -2,9 +2,14 @@
     x:Class="StarModsManager.Views.Items.ModView"
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ct="clr-namespace:Avalonia.Markup.Xaml.Converters;assembly=Avalonia.Markup.Xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:items="clr-namespace:StarModsManager.ViewModels.Items"
+    xmlns:lib="clr-namespace:StarModsManager.Lib"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
+    xmlns:v="clr-namespace:StarModsManager.Views.Pages"
+    xmlns:vm="clr-namespace:StarModsManager.ViewModels.Pages"
     d:DesignHeight="200"
     d:DesignWidth="200"
     x:DataType="items:ModViewModel"
@@ -14,39 +19,59 @@
         <items:ModViewModel />
     </Design.DataContext>
 
+    <!--  ReSharper disable Xaml.PossibleNullReferenceException  -->
     <UserControl.Resources>
-        <MenuFlyout x:Key="ContextMenu">
-            <MenuItem
+        <ct:ColorToBrushConverter x:Key="ColorToBrush" />
+        <lib:ModViewModelToColorConverter x:Key="ModViewModelToColorConverter" />
+
+        <ui:FAMenuFlyout x:Key="ContextMenu">
+            <ui:MenuFlyoutItem
                 Classes.EnabledMod="{Binding IsDisabled}"
                 Command="{Binding SwitchModCommand}"
                 IsVisible="{Binding !!LocalMod}" />
-            <MenuItem
-                Command="{Binding HideModCommand}"
-                Header="隐藏Mod"
-                IsVisible="{Binding !!LocalMod}" />
-            <MenuItem
+            <ui:MenuFlyoutSubItem
+                IsVisible="{Binding !!LocalMod}"
+                ItemsSource="{Binding $parent[v:MainPageView].((vm:MainPageViewModel)DataContext).ModLabels}"
+                Text="添加到标签" />
+            <ui:MenuFlyoutItem
+                Command="{Binding $parent[v:MainPageView].((vm:MainPageViewModel)DataContext).RmFromLabelCommand}"
+                IsVisible="{Binding !!LocalMod}"
+                Text="从标签中删除" />
+            <ui:MenuFlyoutItem
                 Command="{Binding OpenModFolderCommand}"
-                Header="打开Mod目录"
-                IsVisible="{Binding !!LocalMod}" />
-            <MenuItem
+                IsVisible="{Binding !!LocalMod}"
+                Text="打开Mod目录" />
+            <ui:MenuFlyoutItem
                 Command="{Binding ChangeCoverCommand}"
-                Header="更改图片"
-                IsVisible="{Binding !!LocalMod}" />
-            <MenuItem Command="{Binding GetDetailCommand}" Header="查看详情" />
-            <MenuItem Command="{Binding OpenUrlCommand}" Header="访问Mod网页" />
-            <MenuItem Command="{Binding LoadCoverCommand}" Header="刷新Mod" />
-            <MenuItem Command="{Binding DownloadCommand}" Header="下载" />
-        </MenuFlyout>
+                IsVisible="{Binding !!LocalMod}"
+                Text="更改图片" />
+            <ui:MenuFlyoutItem Command="{Binding GetDetailCommand}" Text="查看详情" />
+            <ui:MenuFlyoutItem Command="{Binding OpenUrlCommand}" Text="访问Mod网页" />
+            <ui:MenuFlyoutItem Command="{Binding LoadCoverCommand}" Text="刷新Mod" />
+            <ui:MenuFlyoutItem Command="{Binding DownloadCommand}" Text="下载最新版本" />
+        </ui:FAMenuFlyout>
     </UserControl.Resources>
+
+    <UserControl.DataTemplates>
+        <DataTemplate DataType="{x:Type items:ItemLabelViewModel}">
+            <ui:MenuFlyoutItem
+                Command="{Binding $parent[v:MainPageView].((vm:MainPageViewModel)DataContext).AddToLabelCommand}"
+                CommandParameter="{Binding Title}"
+                Foreground="{Binding BorderColor, Converter={StaticResource ColorToBrush}}"
+                Text="{Binding Title}" />
+        </DataTemplate>
+    </UserControl.DataTemplates>
+    <!--  ReSharper restore Xaml.PossibleNullReferenceException  -->
+
     <UserControl.Styles>
         <Style Selector="Border.Disabled">
             <Setter Property="BorderThickness" Value="2" />
         </Style>
-        <Style Selector="MenuItem.EnabledMod">
-            <Setter Property="Header" Value="启用Mod" />
+        <Style Selector="ui|MenuFlyoutItem.EnabledMod">
+            <Setter Property="Text" Value="启用Mod" />
         </Style>
-        <Style Selector="MenuItem">
-            <Setter Property="Header" Value="禁用Mod" />
+        <Style Selector="ui|MenuFlyoutItem">
+            <Setter Property="Text" Value="禁用Mod" />
         </Style>
     </UserControl.Styles>
 
@@ -55,8 +80,8 @@
         Height="198"
         RowDefinitions="*, Auto">
         <Border
-            BorderBrush="Red"
-            Classes.Disabled="{Binding IsDisabled}"
+            BorderBrush="{Binding IsDisabled, Converter={StaticResource ModViewModelToColorConverter}}"
+            Classes.Disabled="{Binding IsDisabledOrDependencyMissing}"
             ClipToBounds="True">
             <Panel Background="Transparent" ContextFlyout="{StaticResource ContextMenu}">
                 <Image
@@ -69,7 +94,7 @@
                         Height="75"
                         Data="{StaticResource GameRegular}" />
                 </Panel>
-                <Rectangle Fill="#80000000" IsVisible="{Binding IsDisabled}" />
+                <Rectangle Fill="#80000000" IsVisible="{Binding IsDisabledOrDependencyMissing}" />
                 <TextBlock
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
@@ -78,6 +103,20 @@
                     Foreground="White"
                     IsVisible="{Binding IsDisabled}"
                     Text="已禁用" />
+                <StackPanel
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    IsVisible="{Binding IsDependencyMissing}">
+                    <TextBlock
+                        FontSize="20"
+                        FontWeight="Bold"
+                        Foreground="White"
+                        Text="依赖项丢失" />
+                    <Button
+                        HorizontalAlignment="Center"
+                        Command="{Binding GetDetailCommand}"
+                        Content="详情" />
+                </StackPanel>
             </Panel>
         </Border>
         <TextBlock

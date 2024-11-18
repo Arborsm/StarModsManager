@@ -1,13 +1,11 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using StardewModdingAPI;
 using StardewModdingAPI.Toolkit;
 using StardewModdingAPI.Toolkit.Serialization.Models;
 
 namespace StarModsManager.Api.SMAPI;
-
-using System.Collections.Generic;
-using System.Text.Json.Serialization;
 
 [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
 public class Manifest : IManifest
@@ -40,8 +38,7 @@ public class Manifest : IManifest
 
     public string UniqueID { get; set; } = string.Empty;
 
-    [JsonExtensionData]
-    public IDictionary<string, object> ExtraFields { get; set; } = new Dictionary<string, object>();
+    [JsonExtensionData] public IDictionary<string, object> ExtraFields { get; set; } = new Dictionary<string, object>();
 }
 
 internal class UpdateKeysConverter : JsonConverter<string[]>
@@ -49,38 +46,29 @@ internal class UpdateKeysConverter : JsonConverter<string[]>
     public override string[] Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         if (reader.TokenType != JsonTokenType.StartArray)
-        {
             throw new JsonException("Expected start of array for UpdateKeys.");
-        }
 
         var updateKeys = new List<string>();
 
         while (reader.Read())
         {
-            if (reader.TokenType == JsonTokenType.EndArray)
-            {
-                break;
-            }
+            if (reader.TokenType == JsonTokenType.EndArray) break;
 
             if (reader.TokenType == JsonTokenType.Number)
-            {
                 updateKeys.Add(reader.GetInt32().ToString());
-            }
             else if (reader.TokenType == JsonTokenType.String)
-            {
                 updateKeys.Add(reader.GetString() ?? string.Empty);
-            }
             else
-            {
                 throw new JsonException($"Unexpected token type in UpdateKeys: {reader.TokenType}");
-            }
         }
 
         return updateKeys.ToArray();
     }
 
-    public override void Write(Utf8JsonWriter writer, string[] value, JsonSerializerOptions options) => 
+    public override void Write(Utf8JsonWriter writer, string[] value, JsonSerializerOptions options)
+    {
         throw new InvalidOperationException("This converter does not write JSON.");
+    }
 }
 
 internal class ManifestDependencyArrayConverter : JsonConverter<IManifestDependency[]>
@@ -88,24 +76,15 @@ internal class ManifestDependencyArrayConverter : JsonConverter<IManifestDepende
     public override ManifestDependency[] Read(ref Utf8JsonReader reader, Type typeToConvert,
         JsonSerializerOptions options)
     {
-        if (reader.TokenType != JsonTokenType.StartArray)
-        {
-            throw new JsonException("Expected start of array.");
-        }
+        if (reader.TokenType != JsonTokenType.StartArray) throw new JsonException("Expected start of array.");
 
         var dependencies = new List<ManifestDependency>();
 
         while (reader.Read())
         {
-            if (reader.TokenType == JsonTokenType.EndArray)
-            {
-                break;
-            }
+            if (reader.TokenType == JsonTokenType.EndArray) break;
 
-            if (reader.TokenType != JsonTokenType.StartObject)
-            {
-                throw new JsonException("Expected start of object.");
-            }
+            if (reader.TokenType != JsonTokenType.StartObject) throw new JsonException("Expected start of object.");
 
             string? uniqueID = null;
             string? minimumVersion = null;
@@ -113,10 +92,7 @@ internal class ManifestDependencyArrayConverter : JsonConverter<IManifestDepende
 
             while (reader.Read())
             {
-                if (reader.TokenType == JsonTokenType.EndObject)
-                {
-                    break;
-                }
+                if (reader.TokenType == JsonTokenType.EndObject) break;
 
                 if (reader.TokenType == JsonTokenType.PropertyName)
                 {
@@ -140,6 +116,7 @@ internal class ManifestDependencyArrayConverter : JsonConverter<IManifestDepende
                                 var value = reader.GetString()!;
                                 isRequired = value.Equals("true", StringComparison.OrdinalIgnoreCase);
                             }
+
                             break;
                     }
                 }
@@ -151,8 +128,10 @@ internal class ManifestDependencyArrayConverter : JsonConverter<IManifestDepende
         return dependencies.ToArray();
     }
 
-    public override void Write(Utf8JsonWriter writer, IManifestDependency[] value, JsonSerializerOptions options) => 
+    public override void Write(Utf8JsonWriter writer, IManifestDependency[] value, JsonSerializerOptions options)
+    {
         throw new InvalidOperationException("This converter does not write JSON.");
+    }
 }
 
 public class ManifestContentPackForConverter : JsonConverter<IManifestContentPackFor>
@@ -163,8 +142,10 @@ public class ManifestContentPackForConverter : JsonConverter<IManifestContentPac
         return JsonSerializer.Deserialize(ref reader, ManifestContent.Default.ManifestContentPackFor);
     }
 
-    public override void Write(Utf8JsonWriter writer, IManifestContentPackFor value, JsonSerializerOptions options) => 
+    public override void Write(Utf8JsonWriter writer, IManifestContentPackFor value, JsonSerializerOptions options)
+    {
         throw new InvalidOperationException("This converter does not write JSON.");
+    }
 }
 
 public class SemanticVersionConverter : JsonConverter<ISemanticVersion>
@@ -172,19 +153,14 @@ public class SemanticVersionConverter : JsonConverter<ISemanticVersion>
     public override ISemanticVersion Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         if (reader.TokenType != JsonTokenType.String)
-        {
             throw new JsonException($"Expected a string value for SemanticVersion, but got {reader.TokenType}.");
-        }
 
         var versionString = reader.GetString();
-        if (string.IsNullOrEmpty(versionString))
-        {
-            throw new JsonException("Version string is null or empty.");
-        }
+        if (string.IsNullOrEmpty(versionString)) throw new JsonException("Version string is null or empty.");
 
         try
         {
-            return new SemanticVersion(versionString, allowNonStandard: true);
+            return new SemanticVersion(versionString, true);
         }
         catch (Exception ex)
         {
@@ -192,8 +168,29 @@ public class SemanticVersionConverter : JsonConverter<ISemanticVersion>
         }
     }
 
-    public override void Write(Utf8JsonWriter writer, ISemanticVersion? value, JsonSerializerOptions options) => 
-        throw new InvalidOperationException("This converter does not write JSON.");
+    public override void Write(Utf8JsonWriter writer, ISemanticVersion? value, JsonSerializerOptions options)
+    {
+        if (value == null)
+        {
+            writer.WriteNullValue();
+        }
+        else
+        {
+            writer.WriteStringValue(value.ToString());
+        }
+    }
+
+    public static ISemanticVersion? Parse(string? versionString)
+    {
+        try
+        {
+            return string.IsNullOrEmpty(versionString) ? null : new SemanticVersion(versionString, true);
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
 }
 
 [JsonSourceGenerationOptions(
@@ -203,9 +200,9 @@ public class SemanticVersionConverter : JsonConverter<ISemanticVersion>
     PropertyNameCaseInsensitive = true,
     AllowTrailingCommas = true,
     ReadCommentHandling = JsonCommentHandling.Skip,
-    Converters = 
+    Converters =
     [
-        typeof(ManifestDependencyArrayConverter), 
+        typeof(ManifestDependencyArrayConverter),
         typeof(ManifestContentPackForConverter),
         typeof(SemanticVersionConverter)
     ],

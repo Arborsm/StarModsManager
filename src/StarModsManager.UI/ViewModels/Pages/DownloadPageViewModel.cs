@@ -4,8 +4,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using StarModsManager.Api.NexusMods;
 using StarModsManager.Api.NexusMods.Limit;
-using StarModsManager.Common.Mods;
-using StarModsManager.lib;
+using StarModsManager.Lib;
 using StarModsManager.ViewModels.Items;
 
 namespace StarModsManager.ViewModels.Pages;
@@ -135,34 +134,14 @@ public partial class DownloadPageViewModel : MainPageViewModelBase
         IsBusy = true;
         _cts?.CancelAsync();
         _cts = new CancellationTokenSource();
-        var cancellationToken = _cts.Token;
-
+        
         SearchResults.Clear();
+        var cancellationToken = _cts.Token;
         var mods = await NexusPage.GetModsAsync(s, cancellationToken);
-
-        if (s.Equals("test"))
-        {
-            await TestModsAsync(mods, () => s.Equals("test"), cancellationToken);
-        }
-        else
-        {
-            AddSearchResults(mods.Select(it => new ModViewModel(it)), cancellationToken);
-            if (!cancellationToken.IsCancellationRequested) await LoadCoversAsync(cancellationToken);
-        }
+        AddSearchResults(mods.Select(it => new ModViewModel(it)), cancellationToken);
+        if (!cancellationToken.IsCancellationRequested) await LoadCoversAsync(cancellationToken);
 
         IsBusy = false;
-    }
-
-    private async Task TestModsAsync(IEnumerable<OnlineMod> mods, Func<bool> predicate,
-        CancellationToken cancellationToken = default)
-    {
-        var modList = mods.ToList();
-        do
-        {
-            AddSearchResults(modList.Select(mod => new ModViewModel(mod)), cancellationToken);
-            if (!cancellationToken.IsCancellationRequested) await LoadCoversAsync(cancellationToken);
-            await Task.Delay(1000, cancellationToken);
-        } while (predicate());
     }
 
     private async Task LoadCoversAsync(CancellationToken cancellationToken = default)

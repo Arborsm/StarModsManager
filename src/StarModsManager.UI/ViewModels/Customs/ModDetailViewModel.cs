@@ -1,16 +1,14 @@
 ﻿using System.Text;
-using System.Text.Json;
-using StarModsManager.Api.SMAPI;
+using StardewModdingAPI;
 
 namespace StarModsManager.ViewModels.Customs;
 
-public class ModDetailViewModel(string manifest) : ViewModelBase
+public class ModDetailViewModel(IManifest mod, string? addition = null) : ViewModelBase
 {
     public string Mod
     {
         get
         {
-            var mod = JsonSerializer.Deserialize(manifest, ManifestContent.Default.Manifest)!;
             var stringBuilder = new StringBuilder();
             stringBuilder.Append($"名称： {mod.Name}\n");
             stringBuilder.Append($"唯一ID： {mod.UniqueID}\n");
@@ -31,13 +29,15 @@ public class ModDetailViewModel(string manifest) : ViewModelBase
                 foreach (var dependency in mod.Dependencies)
                 {
                     stringBuilder.Append($"--唯一ID:{dependency.UniqueID}\n");
-                    stringBuilder.Append($"  是否必须:{dependency.IsRequired}  ");
+                    stringBuilder.Append($"  是否必须:{dependency.IsRequired}\n");
                     if (dependency.MinimumVersion is not null)
                         stringBuilder.Append($"  最小版本:{dependency.MinimumVersion}\n");
                 }
             }
-
+            
             return stringBuilder.ToString();
         }
     }
+
+    public string? Addition { get; } = addition;
 }

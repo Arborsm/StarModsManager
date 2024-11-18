@@ -3,9 +3,9 @@ using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using StarModsManager.Api;
-using StarModsManager.Common.Mods;
-using StarModsManager.Common.Trans;
-using StarModsManager.lib;
+using StarModsManager.Lib;
+using StarModsManager.Mods;
+using StarModsManager.Trans;
 
 namespace StarModsManager.ViewModels.Pages;
 
@@ -97,7 +97,7 @@ public partial class TransPageViewModel : MainPageViewModelBase, IProgress
         var i18NFolderPath = Path.Combine(mod.PathS, "i18n");
         var files = Directory.GetFiles(i18NFolderPath, "*", SearchOption.AllDirectories);
 
-        var backupPath = Path.Combine(tempPath, mod.Name.SanitizePath(), "i18n");
+        var backupPath = Path.Combine(tempPath, mod.Manifest.Name.SanitizePath(), "i18n");
         Directory.CreateDirectory(backupPath);
 
         foreach (var file in files)
@@ -118,6 +118,6 @@ public class ToTansMod(bool isChecked, LocalMod localMod)
 {
     public LocalMod LocalMod { get; } = localMod;
     public bool IsChecked { get; set; } = isChecked;
-    public string Name { get; } = localMod.Name;
+    public string Name { get; } = localMod.Manifest.Name;
     public string Keys { get; } = localMod.GetUntranslatedMap().Count.ToString();
 }

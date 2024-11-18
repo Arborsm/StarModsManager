@@ -35,7 +35,7 @@ public interface INexusApi
     Task<List<ModInfo>> GetTrendingMods([Path] string gameDomainName);
 
     [Get("v1/games/{gameDomainName}/mods/{id}.json")]
-    Task<ModInfo> GetMod([Path] string gameDomainName, [Path] int id);
+    Task<ModInfo?> GetMod([Path] string gameDomainName, [Path] int id);
 
     [Get("v1/games/{gameDomainName}/mods/md5_search/{md5Hash}.json")]
     Task<ModHashResult> SearchModByMd5([Path] string gameDomainName, [Path] string md5Hash);
@@ -51,13 +51,16 @@ public interface INexusApi
     #region ModInfo Files
 
     [Get("v1/games/{gameDomainName}/mods/{modId}/files.json")]
-    Task<ModFileList> GetModFiles([Path] string gameDomainName, [Path] int modId);
+    Task<ModFileList?> GetModFiles([Path] string gameDomainName, [Path] int modId);
 
     [Get("v1/games/{gameDomainName}/mods/{modId}/files/{fileId}.json")]
     Task<ModFile> GetModFile([Path] string gameDomainName, [Path] int modId, [Path] int fileId);
 
     [Get("v1/games/{gameDomainName}/mods/{modId}/files/{id}/download_link.json")]
-    Task<ModFileDownloadLink> GetModFileDownloadLink([Path] string gameDomainName, [Path] int modId, [Path] int id);
+    Task<ModFileDownloadLink[]?> GetModFileDownloadLink([Path] string gameDomainName, [Path] int modId, [Path] int id);
+    
+    [Post("/Core/Libs/Common/Managers/Downloads?GenerateDownloadUrl")]
+    Task<DownloadResponse?> GetDownloadUrlAsync([Body(BodySerializationMethod.UrlEncoded)] Dictionary<string, object> request);
 
     #endregion
 

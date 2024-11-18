@@ -1,4 +1,4 @@
-﻿using StarModsManager.Common.Trans;
+﻿using StarModsManager.Trans;
 
 namespace StarModsManager.Api;
 

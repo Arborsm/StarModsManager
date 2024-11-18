@@ -1,0 +1,117 @@
+<UserControl
+    x:Class="StarModsManager.Views.Items.DownloadItemView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:avalonia="clr-namespace:FluentIcons.Avalonia;assembly=FluentIcons.Avalonia"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:items="clr-namespace:StarModsManager.ViewModels.Items"
+    xmlns:lib="clr-namespace:StarModsManager.Lib"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="using:FluentAvalonia.UI.Controls"
+    x:DataType="items:DownloadItemViewModel"
+    mc:Ignorable="d">
+
+    <UserControl.Resources>
+        <lib:ClipRectConverter x:Key="ClipRectConverter" />
+        <MenuFlyout x:Key="ItemMenu">
+            <MenuItem Command="{Binding OpenFileCommand}" Header="Open File" />
+        </MenuFlyout>
+    </UserControl.Resources>
+
+    <UserControl.Styles>
+        <Style Selector="ListBoxItem Button">
+            <Setter Property="IsVisible" Value="False" />
+            <Setter Property="Opacity" Value="0" />
+            <Setter Property="Transitions">
+                <Transitions>
+                    <DoubleTransition Property="Opacity" Duration="0:0:0.2" />
+                </Transitions>
+            </Setter>
+        </Style>
+        <Style Selector="ListBoxItem:pointerover Button">
+            <Setter Property="IsVisible" Value="True" />
+            <Setter Property="Opacity" Value="1" />
+        </Style>
+
+        <Style Selector="ListBoxItem:pointerover Button.NotCompleted">
+            <Setter Property="IsVisible" Value="{Binding !IsCompleted}" />
+        </Style>
+        <Style Selector="ListBoxItem:pointerover Button.Completed">
+            <Setter Property="IsVisible" Value="{Binding IsCompleted}" />
+        </Style>
+    </UserControl.Styles>
+
+    <Panel Width="380" ContextFlyout="{StaticResource ItemMenu}">
+        <Grid
+            Name="ContentGrid"
+            Margin="5"
+            RowDefinitions="Auto, Auto, Auto">
+            <Grid.Clip>
+                <MultiBinding Converter="{StaticResource ClipRectConverter}">
+                    <Binding ElementName="ContentGrid" Path="Bounds" />
+                    <Binding ElementName="ButtonStack" Path="Bounds.Width" />
+                </MultiBinding>
+            </Grid.Clip>
+            <TextBlock
+                Grid.Row="0"
+                FontSize="16"
+                Text="{Binding FileName}"
+                ToolTip.Tip="{Binding FileName}" />
+            <ProgressBar
+                Grid.Row="1"
+                Height="10"
+                Margin="0,5,0,0"
+                IsVisible="{Binding !IsCompleted}"
+                Value="{Binding Progress}" />
+            <Panel
+                Grid.Row="1"
+                Margin="0,5,0,0"
+                IsVisible="{Binding IsCompleted}" />
+            <TextBlock
+                Grid.Row="2"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                FontSize="13"
+                Text="{Binding Status}"
+                ToolTip.Tip="{Binding Status}" />
+        </Grid>
+
+        <StackPanel
+            Name="ButtonStack"
+            HorizontalAlignment="Right"
+            Background="Transparent"
+            Orientation="Horizontal">
+            <StackPanel.Styles>
+                <Style Selector="Button">
+                    <Setter Property="Margin" Value="5" />
+                    <Setter Property="BorderThickness" Value="0" />
+                    <Setter Property="Background" Value="Transparent" />
+                </Style>
+                <Style Selector="Button ui|SymbolIcon.Pause">
+                    <Setter Property="IsVisible" Value="{Binding IsDownloading}" />
+                </Style>
+                <Style Selector="Button ui|SymbolIcon.Play">
+                    <Setter Property="IsVisible" Value="{Binding !IsDownloading}" />
+                </Style>
+            </StackPanel.Styles>
+            <Button Classes="NotCompleted" Command="{Binding PauseResumeCommand}">
+                <Panel>
+                    <ui:SymbolIcon
+                        Classes="Play"
+                        FontSize="24"
+                        Symbol="Play" />
+                    <ui:SymbolIcon
+                        Classes="Pause"
+                        FontSize="24"
+                        Symbol="Pause" />
+                </Panel>
+            </Button>
+            <Button Classes="Completed" Command="{Binding InstallCommand}">
+                <avalonia:SymbolIcon FontSize="24" Symbol="Add" />
+            </Button>
+            <Button Command="{Binding DeleteCommand}">
+                <ui:SymbolIcon FontSize="24" Symbol="Delete" />
+            </Button>
+        </StackPanel>
+    </Panel>
+</UserControl>

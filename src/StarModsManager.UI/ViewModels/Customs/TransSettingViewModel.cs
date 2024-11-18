@@ -1,7 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using StarModsManager.Api;
-using StarModsManager.Common.Trans;
+using StarModsManager.Trans;
 
 namespace StarModsManager.ViewModels.Customs;
 

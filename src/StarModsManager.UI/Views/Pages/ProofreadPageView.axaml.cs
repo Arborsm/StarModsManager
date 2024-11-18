@@ -3,8 +3,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
-using StarModsManager.Common.Mods;
-using StarModsManager.Main;
+using StarModsManager.Mods;
 using StarModsManager.ViewModels.Pages;
 
 namespace StarModsManager.Views.Pages;
@@ -21,7 +20,7 @@ public partial class ProofreadPageView : UserControl
 
     private void ComboBox_SelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
-        var viewModel = ServiceLocator.Resolve<ProofreadPageViewModel>();
+        var viewModel = ViewModelService.Resolve<ProofreadPageViewModel>();
         ProofreadDataGrid.ItemsSource = viewModel.ModLangsView;
     }
 
@@ -30,7 +29,7 @@ public partial class ProofreadPageView : UserControl
         if (e.EditAction != DataGridEditAction.Commit) return;
         var dataGrid = (DataGrid)sender!;
         var item = (ModLang)dataGrid.SelectedItem!;
-        ServiceLocator.Resolve<ProofreadPageViewModel>().AddEditedLang(item);
+        ViewModelService.Resolve<ProofreadPageViewModel>().AddEditedLang(item);
     }
 
     private static void DisableDefaultScrolling(DataGrid dataGrid)
@@ -61,6 +60,9 @@ public partial class ProofreadPageView : UserControl
     private void ProofreadDataGrid_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
         e.Handled = true;
-        ((DataGrid)sender!).InvalidateVisual();
+        var proofreadDataGrid = (DataGrid)sender!;
+        
+        proofreadDataGrid.ScrollIntoView(proofreadDataGrid.SelectedItem, proofreadDataGrid.Columns[0]);
+        proofreadDataGrid.InvalidateVisual();
     }
 }

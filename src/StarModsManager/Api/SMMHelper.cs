@@ -1,16 +1,17 @@
 ﻿using System.Collections;
 using System.IO.Compression;
 using System.Text;
+using StardewModdingAPI;
 using StardewModdingAPI.Toolkit;
-using StarModsManager.Common.Mods;
-using StarModsManager.Common.Trans;
+using StarModsManager.Mods;
+using StarModsManager.Trans;
 
 namespace StarModsManager.Api;
 
 public static class SMMHelper
 {
     public static readonly ModToolkit Toolkit = new();
-    
+
     public static readonly Dictionary<string, string> LanguageMap = new(StringComparer.OrdinalIgnoreCase)
     {
         ["中文"] = "zh",
@@ -45,6 +46,32 @@ public static class SMMHelper
         }
     }
     
+    private static SemaphoreSlim? _semaphore;
+    public static async Task ForEachAsync<T>(this IEnumerable<T> items, Func<T, Task> action, int maxConcurrent = 1)
+    {
+        _semaphore = new SemaphoreSlim(maxConcurrent);
+        var tasks = new List<Task>();
+
+        foreach (var item in items)
+        {
+            await _semaphore.WaitAsync();
+            
+            tasks.Add(Task.Run(async () =>
+            {
+                try
+                {
+                    await action(item);
+                }
+                finally
+                {
+                    _semaphore.Release();
+                }
+            }));
+        }
+
+        await Task.WhenAll(tasks);
+    }
+
     public static Dictionary<TKey, TValue> Sort<TKey, TValue>(
         this Dictionary<TKey, TValue> unsorted,
         Dictionary<TKey, TValue> reference) where TKey : notnull
@@ -56,7 +83,7 @@ public static class SMMHelper
 
         return sortedTarget;
     }
-    
+
     public static (Dictionary<string, string> defaultLang, Dictionary<string, string> targetLang) ReadMap(
         this LocalMod localMod,
         string? lang = null)
@@ -66,27 +93,41 @@ public static class SMMHelper
         var defaultLangFile = files.First(x => x.Contains("default"));
         var targetLangFile = files.FirstOrDefault(x => x.Contains(lang));
         var defaultLang = TranslationContext.GetMap(File.ReadAllText(defaultLangFile));
-        var targetLangTemp = targetLangFile is not null 
-            ? TranslationContext.GetMap(File.ReadAllText(targetLangFile)) : new Dictionary<string, string>();
+        var targetLangTemp = targetLangFile is not null
+            ? TranslationContext.GetMap(File.ReadAllText(targetLangFile))
+            : new Dictionary<string, string>();
         var targetLang = targetLangTemp.Sort(defaultLang);
         return (defaultLang, targetLang);
     }
+    
+    public static Dictionary<string, (string?, string?)> LoadLangMap(this LocalMod currentMod)
+    {
+        var (defaultLang, targetLang) = currentMod.ReadMap(Services.TransConfig.Language);
+        return defaultLang.Keys.Union(targetLang.Keys)
+            .ToDictionary(key => key, key => (defaultLang.GetValueOrDefault(key), targetLang.GetValueOrDefault(key)));
+    }
+    
+    public static bool? IsMisMatch(this string? sourceText, string? targetText) => sourceText?.IsMismatchedTokens(targetText);
 
     public static Dictionary<string, string> GetUntranslatedMap(this LocalMod localMod)
     {
         var (defaultLang, targetLang) = localMod.ReadMap();
         return defaultLang.Where(x => !targetLang.ContainsKey(x.Key)).ToDictionary(x => x.Key, x => x.Value);
     }
-    
+
     public static void CreateZipBackup(this string directoryPath, string zipFileName)
     {
-        var backupPath = Path.Combine(Environment.CurrentDirectory, "Backup");
+        var backupPath = Path.Combine(Environment.CurrentDirectory, "Backup", DateTime.Now.ToString("yyyyMMdd"));
         if (!Directory.Exists(backupPath)) Directory.CreateDirectory(backupPath);
         var zipFilePath = Path.Combine(backupPath, zipFileName);
+        if (File.Exists(zipFilePath))
+        {
+            zipFilePath = Path.Combine(backupPath, $"{zipFileName}_{Guid.NewGuid().ToString("N")[..6]}.zip");
+        }
         using var archive = ZipFile.Open(zipFilePath, ZipArchiveMode.Create);
         ZipDirectory(directoryPath, archive);
     }
-    
+
     private static void ZipDirectory(string directoryPath, ZipArchive archive, string entryRootPath = "")
     {
         foreach (var filePath in Directory.GetFiles(directoryPath))
@@ -102,7 +143,10 @@ public static class SMMHelper
         }
     }
 
-    public static string SanitizePath(this string path) => Path.GetInvalidFileNameChars().Aggregate(path, (current, c) => current.Replace(c, '_'));
+    public static string SanitizePath(this string path)
+    {
+        return Path.GetInvalidFileNameChars().Aggregate(path, (current, c) => current.Replace(c, '_'));
+    }
 
     private static string GetJsonString(this string directoryPath, string fileName)
     {
@@ -112,11 +156,26 @@ public static class SMMHelper
         return File.Exists(filePath) ? File.ReadAllText(filePath, Encoding.UTF8) : string.Empty;
     }
 
-    public static Dictionary<string, string> GetTargetLang(this string path, string fileName) => TranslationContext.GetMap(path.GetJsonString(fileName));
+    public static Dictionary<string, string> GetTargetLang(this string path, string fileName)
+    {
+        return TranslationContext.GetMap(path.GetJsonString(fileName));
+    }
 
-    public static Dictionary<string, string> GetTargetLang(this string path) => GetTargetLang(path, Services.TransConfig.Language + ".json");
+    public static Dictionary<string, string> GetTargetLang(this string path)
+    {
+        return GetTargetLang(path, Services.TransConfig.Language + ".json");
+    }
 
-    public static Dictionary<string, string> GetDefaultLang(this string path) => TranslationContext.GetMap(path.GetJsonString("default.json"));
+    public static Dictionary<string, string> GetDefaultLang(this string path)
+    {
+        return TranslationContext.GetMap(path.GetJsonString("default.json"));
+    }
+    
+    public static bool CheckModDependency(this IEnumerable<LocalMod> mods, IManifestDependency dependency) => 
+        mods.Any(mod => mod.Manifest.UniqueID == dependency.UniqueID && !mod.Manifest.Version.IsOlderThan(dependency.MinimumVersion));
+
+    public static bool CheckModDependency(this IEnumerable<LocalMod> mods, IManifestContentPackFor manifestContentPackFor) =>
+        mods.Any(mod => mod.Manifest.ContentPackFor is not null && mod.Manifest.ContentPackFor.UniqueID == manifestContentPackFor.UniqueID && !mod.Manifest.Version.IsOlderThan(manifestContentPackFor.MinimumVersion));
 }
 
 public class KeyValuePairComparer<TKey, TValue>(
@@ -150,6 +209,6 @@ public class ModLangIsMatchComparer : IComparer
 
     private static int Compare(ModLang? x, ModLang? y)
     {
-        return x?.IsMatch.GetValueOrDefault() == y?.IsMatch.GetValueOrDefault() ? 0 : 1;
+        return x?.IsMisMatch.GetValueOrDefault() == y?.IsMisMatch.GetValueOrDefault() ? 0 : 1;
     }
 }

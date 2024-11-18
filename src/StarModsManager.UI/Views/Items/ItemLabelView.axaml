@@ -22,8 +22,18 @@
         BorderBrush="{Binding BorderColor, Converter={StaticResource ColorToBrush}}"
         BorderThickness="2"
         CornerRadius="6">
-        <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-            <TextBlock Text="{Binding Title}" />
-        </StackPanel>
+        <Panel HorizontalAlignment="Center">
+            <TextBlock
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                IsVisible="{Binding !IsEditing}"
+                Text="{Binding Title}" />
+            <TextBox
+                Name="MainTextBox"
+                MinWidth="0"
+                MinHeight="0"
+                IsVisible="{Binding IsEditing}"
+                Text="{Binding Title}" />
+        </Panel>
     </Border>
 </UserControl>

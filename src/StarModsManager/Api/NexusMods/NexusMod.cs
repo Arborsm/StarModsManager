@@ -1,4 +1,7 @@
 using HtmlAgilityPack;
+using Serilog;
+using StardewModdingAPI;
+using StardewModdingAPI.Toolkit;
 
 namespace StarModsManager.Api.NexusMods;
 
@@ -18,23 +21,30 @@ public class NexusMod
     private string ModUrl { get; }
     public required HtmlDocument Doc { get; init; }
 
-    public static async Task<NexusMod> Create(string modUrl, CancellationToken cancellationToken = default)
+    public static async Task<NexusMod> CreateAsync(string modUrl, CancellationToken cancellationToken = default)
     {
         var url = modUrl + "?tab=images";
         var mod = new NexusMod(modUrl)
         {
             Doc = await HttpHelper.Instance.FetchHtmlDocumentAsync(url, cancellationToken)
         };
-        mod.GetModVersionAsync();
         return mod;
     }
 
-    public string GetModVersionAsync()
+    public ISemanticVersion? GetModVersionAsync()
     {
         var versionNode = Doc.DocumentNode.SelectSingleNode(Version);
-        if (!int.TryParse(ModUrl.Split('/').Last(), out var result) || result < 1) return string.Empty;
-        SMMDebug.Info($"Getting Mod({result}) Version: {versionNode?.InnerText}");
-        return versionNode?.InnerText ?? string.Empty;
+        if (!int.TryParse(ModUrl.Split('/').Last(), out var result) || result < 1) return null;
+        Log.Information("Getting Mod({Result}) Version: {Version}", result, versionNode?.InnerText);
+        try
+        {
+            return versionNode is null ? null : new SemanticVersion(versionNode.InnerText, true);
+        }
+        catch (Exception)
+        {
+            // Ignore
+        }
+        return null;
     }
 
     public async Task<string> GetModPicUrlAsync(string picCode)
@@ -45,7 +55,7 @@ public class NexusMod
         if (picHeader is not []) return picHeader.FirstOrDefault(string.Empty);
         if (!int.TryParse(ModUrl.Split('/').Last(), out var result) || result < 1) return string.Empty;
         var picsByApi = await NexusManager.GetPicsAsync(result);
-        SMMDebug.Info($"Getting Pic by Mod: {result}");
+        Log.Information("Getting Pic by Mod: {Result}", result);
         return picsByApi?.ToString() ?? string.Empty;
     }
 

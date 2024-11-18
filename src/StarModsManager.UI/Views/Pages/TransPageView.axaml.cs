@@ -1,6 +1,5 @@
 using Avalonia.Interactivity;
 using FluentAvalonia.UI.Controls;
-using StarModsManager.Main;
 using StarModsManager.ViewModels.Customs;
 using StarModsManager.ViewModels.Pages;
 using StarModsManager.Views.Customs;
@@ -16,7 +15,7 @@ public partial class TransPageView : UserControl
 
     private void TransButton_OnClick(object? sender, RoutedEventArgs e)
     {
-        var vm = ServiceLocator.Resolve<TransPageViewModel>();
+        var vm = ViewModelService.Resolve<TransPageViewModel>();
         vm.CancellationTokenSource = new CancellationTokenSource();
         Content = new TranslatingView
         {

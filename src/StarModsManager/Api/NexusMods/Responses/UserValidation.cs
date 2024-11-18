@@ -1,4 +1,5 @@
 // ReSharper disable InconsistentNaming
+
 using System.Text.Json.Serialization;
 
 namespace StarModsManager.Api.NexusMods.Responses;

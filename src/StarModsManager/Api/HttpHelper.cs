@@ -3,6 +3,7 @@ using System.Net.Http.Headers;
 using HtmlAgilityPack;
 using Polly;
 using Polly.Retry;
+using Serilog;
 
 namespace StarModsManager.Api;
 
@@ -15,10 +16,10 @@ public class HttpHelper
     private readonly AsyncRetryPolicy<HttpResponseMessage> _policy;
     private readonly SemaphoreSlim _semaphore;
 
-    public HttpHelper(string referer = "https://www.nexusmods.com/stardewvalley/mods/")
+    private HttpHelper(string referer = "https://www.nexusmods.com/stardewvalley/mods/")
     {
         var client = new HttpClient();
-        client.Timeout = TimeSpan.FromSeconds(30);
+        client.Timeout = TimeSpan.FromSeconds(60);
         client.DefaultRequestHeaders.Accept.Clear();
         client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("*/*"));
         client.DefaultRequestHeaders.UserAgent.ParseAdd(
@@ -41,7 +42,7 @@ public class HttpHelper
                 retryAttempt =>
                 {
                     var seconds = Math.Pow(2, retryAttempt);
-                    var jitterSeconds = seconds * (0.5 + Jitter.NextDouble());
+                    var jitterSeconds = 10 + seconds * (0.5 + Jitter.NextDouble());
                     return TimeSpan.FromSeconds(jitterSeconds);
                 },
                 (outcome, timespan, retryAttempt, _) =>
@@ -49,8 +50,8 @@ public class HttpHelper
                     var message = outcome.Result is not null
                         ? $"HTTP Status Code: {outcome.Result.StatusCode}"
                         : outcome.Exception?.Message;
-                    SMMDebug.Trace(
-                        $"Retry {retryAttempt} after {timespan.TotalSeconds:0.00}s delay due to: {message}");
+                    Log.Verbose("Retry {retryAttempt} after {time}s delay due to: {message}",
+                        retryAttempt, timespan.TotalSeconds.ToString("F"), message);
                 }
             );
         _semaphore = new SemaphoreSlim(MaxConcurrentRequests, MaxConcurrentRequests);
@@ -59,6 +60,11 @@ public class HttpHelper
     public static HttpHelper Instance => LazyInstance.Value;
 
     public async Task<HttpResponseMessage> GetAsync(string uri, CancellationToken cancellationToken)
+    {
+        return await GetAsync(new Uri(uri), cancellationToken);
+    }
+
+    public async Task<HttpResponseMessage> GetAsync(Uri uri, CancellationToken cancellationToken)
     {
         await _semaphore.WaitAsync(cancellationToken);
         try

@@ -1,0 +1,47 @@
+<UserControl
+    x:Class="StarModsManager.Views.Customs.DownloadManagerView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:customs="clr-namespace:StarModsManager.ViewModels.Customs"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
+    x:DataType="customs:DownloadManagerViewModel"
+    mc:Ignorable="d">
+
+    <Design.DataContext>
+        <customs:DownloadManagerViewModel />
+    </Design.DataContext>
+
+    <Panel>
+        <StackPanel Width="400" Height="500">
+            <ui:CommandBar>
+                <TextBlock
+                    Margin="5,5,0,0"
+                    FontSize="28"
+                    Text="下载管理" />
+                <ui:CommandBar.SecondaryCommands>
+                    <ui:CommandBarButton
+                        Command="{Binding NewDownloadCommand}"
+                        IconSource="Add"
+                        Label="新增下载" />
+                    <ui:CommandBarButton
+                        Command="{Binding DeleteAllCommand}"
+                        IconSource="Delete"
+                        Label="清空下载" />
+                    <ui:CommandBarButton
+                        Command="{Binding OpenFolderCommand}"
+                        IconSource="Folder"
+                        Label="打开下载文件夹" />
+                </ui:CommandBar.SecondaryCommands>
+            </ui:CommandBar>
+            <ListBox ItemsSource="{Binding Downloads}">
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel />
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+            </ListBox>
+        </StackPanel>
+    </Panel>
+</UserControl>

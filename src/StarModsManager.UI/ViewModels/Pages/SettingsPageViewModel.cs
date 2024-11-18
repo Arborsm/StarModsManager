@@ -5,13 +5,17 @@ using Avalonia.Styling;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FluentAvalonia.Styling;
+using Serilog;
 using StarModsManager.Api;
-using StarModsManager.lib;
+using StarModsManager.Config;
+using StarModsManager.Lib;
 
 namespace StarModsManager.ViewModels.Pages;
 
 public partial class SettingsPageViewModel : MainPageViewModelBase
 {
+    public MainConfig MainConfig => Services.MainConfig;
+    
     private const string System = "System";
     private const string Dark = "Dark";
     private const string Light = "Light";
@@ -19,23 +23,17 @@ public partial class SettingsPageViewModel : MainPageViewModelBase
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CustomAccentColor))]
-    private string _currentAppTheme = System;
+    private string _currentAppTheme = null!;
 
     [ObservableProperty]
     private FlowDirection _currentFlowDirection;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ListBoxColor))]
-    private Color _customAccentColor = Colors.SlateBlue;
+    private Color _customAccentColor;
 
     [ObservableProperty]
     private Color? _listBoxColor;
-
-    [ObservableProperty]
-    private string _modDir;
-
-    [ObservableProperty]
-    private string _nexusApiKey = Services.MainConfig.NexusModsApiKey;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CustomAccentColor))]
@@ -44,9 +42,16 @@ public partial class SettingsPageViewModel : MainPageViewModelBase
 
     public SettingsPageViewModel()
     {
-        GetPredefColors();
         _faTheme = (FluentAvaloniaTheme)Application.Current!.Styles.First(it => it is FluentAvaloniaTheme);
-        _modDir = Services.MainConfig.DirectoryPath;
+        GetPredefColors();
+    }
+
+    public void Init()
+    {
+        CurrentAppTheme = MainConfig.AppTheme;
+        CurrentFlowDirection = AppFlowDirections[MainConfig.AppFlowDirections];
+        CustomAccentColor = Color.FromUInt32(MainConfig.AppAccentColor);
+        UseCustomAccentColor = MainConfig.UseCustomAccentColor;
     }
 
     public override string NavHeader => NavigationService.Settings;
@@ -57,11 +62,96 @@ public partial class SettingsPageViewModel : MainPageViewModelBase
 
     public List<Color> PredefinedColors { get; private set; } = [];
 
-    private static ThemeVariant GetThemeVariant(string value)
+    private static ThemeVariant GetThemeVariant(string value) => value switch { Light => ThemeVariant.Light, _ => ThemeVariant.Dark };
+
+    private void UpdateAppAccentColor(Color? color)
     {
-        return value switch { Light => ThemeVariant.Light, _ => ThemeVariant.Dark };
+        _faTheme.CustomAccentColor = color;
+        if (color is null) return;
+        MainConfig.AppAccentColor = color.Value.ToUInt32();
     }
 
+    partial void OnCurrentAppThemeChanged(string value)
+    {
+        var newTheme = GetThemeVariant(value);
+        MainConfig.AppTheme = value;
+        Application.Current!.RequestedThemeVariant = newTheme;
+        _faTheme.PreferSystemTheme = value == System;
+    }
+
+    partial void OnCurrentFlowDirectionChanged(FlowDirection value)
+    {
+        var lifetime = Application.Current!.ApplicationLifetime;
+        MainConfig.AppFlowDirections = (int)value;
+        switch (lifetime)
+        {
+            case IClassicDesktopStyleApplicationLifetime cdl when cdl.MainWindow!.FlowDirection == value:
+                return;
+            case IClassicDesktopStyleApplicationLifetime cdl:
+                cdl.MainWindow!.FlowDirection = value;
+                break;
+            case ISingleViewApplicationLifetime single:
+            {
+                var mainWindow = TopLevel.GetTopLevel(single.MainView);
+                if (mainWindow!.FlowDirection == value)
+                    return;
+                mainWindow.FlowDirection = value;
+                break;
+            }
+        }
+    }
+
+    partial void OnUseCustomAccentColorChanged(bool value)
+    {
+        MainConfig.UseCustomAccentColor = value;
+        if (value)
+        {
+            if (_faTheme.TryGetResource("SystemAccentColor", null, out var curColor))
+            {
+                CustomAccentColor = (Color)curColor;
+                ListBoxColor = CustomAccentColor;
+            }
+            else
+            {
+                // This should never happen, if it does, something bad has happened
+                throw new Exception("Unable to retrieve SystemAccentColor");
+            }
+        }
+        else
+        {
+            CustomAccentColor = default;
+            ListBoxColor = default;
+            UpdateAppAccentColor(null);
+        }
+    }
+
+    partial void OnCustomAccentColorChanged(Color value)
+    {
+        ListBoxColor = value;
+        UpdateAppAccentColor(value);
+    }
+
+    partial void OnListBoxColorChanged(Color? value)
+    {
+        if (value == null) return;
+        CustomAccentColor = value.Value;
+        UpdateAppAccentColor(value.Value);
+    }
+    
+    [RelayCommand]
+    private void OpenModDirectory()
+    {
+        PlatformHelper.OpenFileOrUrl(MainConfig.DirectoryPath);
+        Log.Information("Opened mods directory: {path}", MainConfig.DirectoryPath);
+    }
+
+    [RelayCommand]
+    private void AutoSelect()
+    {
+        MainConfig.DirectoryPath = Path.Combine(ModsHelper.Instance.GameFolders.First().FullName, "mods");
+        Log.Information("Auto selected mods directory: {path}", MainConfig.DirectoryPath);
+    }
+    
     private void GetPredefColors()
     {
         PredefinedColors =
@@ -115,93 +205,5 @@ public partial class SettingsPageViewModel : MainPageViewModelBase
             Color.FromRgb(132, 117, 69),
             Color.FromRgb(126, 115, 95)
         ];
-    }
-
-    private void UpdateAppAccentColor(Color? color)
-    {
-        _faTheme.CustomAccentColor = color;
-    }
-
-    partial void OnCurrentAppThemeChanged(string value)
-    {
-        var newTheme = GetThemeVariant(value);
-        Application.Current!.RequestedThemeVariant = newTheme;
-        _faTheme.PreferSystemTheme = value == System;
-    }
-
-    partial void OnCurrentFlowDirectionChanged(FlowDirection value)
-    {
-        var lifetime = Application.Current!.ApplicationLifetime;
-        switch (lifetime)
-        {
-            case IClassicDesktopStyleApplicationLifetime cdl when cdl.MainWindow!.FlowDirection == value:
-                return;
-            case IClassicDesktopStyleApplicationLifetime cdl:
-                cdl.MainWindow!.FlowDirection = value;
-                break;
-            case ISingleViewApplicationLifetime single:
-            {
-                var mainWindow = TopLevel.GetTopLevel(single.MainView);
-                if (mainWindow!.FlowDirection == value)
-                    return;
-                mainWindow.FlowDirection = value;
-                break;
-            }
-        }
-    }
-
-    partial void OnUseCustomAccentColorChanged(bool value)
-    {
-        if (value)
-        {
-            if (_faTheme.TryGetResource("SystemAccentColor", null, out var curColor))
-            {
-                CustomAccentColor = (Color)curColor;
-                ListBoxColor = CustomAccentColor;
-            }
-            else
-            {
-                // This should never happen, if it does, something bad has happened
-                throw new Exception("Unable to retrieve SystemAccentColor");
-            }
-        }
-        else
-        {
-            CustomAccentColor = default;
-            ListBoxColor = default;
-            UpdateAppAccentColor(null);
-        }
-    }
-
-    partial void OnCustomAccentColorChanged(Color value)
-    {
-        ListBoxColor = value;
-        UpdateAppAccentColor(value);
-    }
-
-    partial void OnListBoxColorChanged(Color? value)
-    {
-        if (value == null) return;
-        CustomAccentColor = value.Value;
-        UpdateAppAccentColor(value.Value);
-    }
-
-    partial void OnModDirChanged(string? oldValue, string newValue)
-    {
-        if (oldValue == null) return;
-        Services.MainConfig.DirectoryPath = newValue;
-        Services.Notification.Show("需要重启使得改动生效", "注意", Severity.Warning);
-    }
-
-    partial void OnNexusApiKeyChanged(string? oldValue, string newValue)
-    {
-        if (oldValue == null) return;
-        Services.MainConfig.NexusModsApiKey = newValue;
-    }
-    
-    [RelayCommand]
-    private void OpenModDirectory()
-    {
-        PlatformHelper.OpenFileOrUrl(ModDir);
     }
 }

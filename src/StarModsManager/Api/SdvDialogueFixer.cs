@@ -10,34 +10,39 @@ public static class SdvDialogueFixer
     private const string BracketTokenStart = "{{";
     private const string BracketTokenEnd = "}}";
 
-    public static bool IsMismatchedTokens(this Dictionary<string, string> defaultLang,
+    public static bool? IsMismatchedTokens(this Dictionary<string, string> defaultLang,
         Dictionary<string, string> targetLang)
     {
-        return defaultLang.Keys.Any(key =>
+        var hasNullResult = false;
+    
+        foreach (var key in defaultLang.Keys)
         {
             targetLang.TryGetValue(key, out var value);
-            return defaultLang[key].IsMismatchedTokens(value);
-        });
+            var result = defaultLang[key].IsMismatchedTokens(value);
+        
+            if (result == null)
+            {
+                hasNullResult = true;
+                continue;
+            }
+        
+            if (result == true)
+                return true;
+        }
+    
+        return hasNullResult ? null : false;
     }
 
-    public static bool IsMismatchedTokens(this string originalText, string? translatedText,
-        bool isCheckDefaultLang = true)
+    public static bool? IsMismatchedTokens(this string? originalText, string? translatedText,
+        bool isCheckDefaultLang = false)
     {
-        if (string.IsNullOrEmpty(translatedText)) return false;
+        if (string.IsNullOrEmpty(translatedText)||string.IsNullOrEmpty(originalText)) return null;
         var originalTokens = originalText.Split(SeparatorToken);
         var translatedTokens = translatedText.Split(SeparatorToken);
 
-        if (isCheckDefaultLang && originalText.Contains("##"))
-        {
-            Console.WriteLine(@"Found ## in default lang file.");
-            return true;
-        }
+        if (isCheckDefaultLang && originalText.Contains("##")) return true;
 
-        if (originalTokens.Length != translatedTokens.Length)
-        {
-            Console.WriteLine(@"Mismatched tokens found.");
-            return true;
-        }
+        if (originalTokens.Length != translatedTokens.Length) return true;
 
         for (var i = 0; i < originalTokens.Length; i++)
         {
@@ -48,8 +53,6 @@ public static class SdvDialogueFixer
             var translatedSymbolOrder = CacheSymbolOrder(translatedToken);
 
             if (AreOrdersEqual(originalSymbolOrder, translatedSymbolOrder)) continue;
-            Console.WriteLine(
-                @$"Token index: {i}, Original order: {string.Join(", ", originalSymbolOrder)}, Translated order: {string.Join(", ", translatedSymbolOrder)}");
             return true;
         }
 

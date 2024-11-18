@@ -3,11 +3,23 @@
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:fluent="clr-namespace:FluentIcons.Avalonia.Fluent;assembly=FluentIcons.Avalonia.Fluent"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:primitives="clr-namespace:FluentAvalonia.UI.Controls.Primitives;assembly=FluentAvalonia"
     xmlns:ui="using:FluentAvalonia.UI.Controls"
-    d:DesignHeight="450"
-    d:DesignWidth="800"
+    xmlns:viewModels="clr-namespace:StarModsManager.ViewModels"
+    d:DesignHeight="700"
+    d:DesignWidth="1000"
+    x:DataType="viewModels:MainViewModel"
     mc:Ignorable="d">
+
+    <UserControl.Styles>
+        <Style Selector="SplitView:closed ui|NavigationViewItem.Footer primitives|NavigationViewItemPresenter /template/ ContentPresenter#InfoBadgePresenter">
+            <Setter Property="Margin" Value="-42, -14, 0, 0" />
+            <Setter Property="Width" Value="16" />
+        </Style>
+    </UserControl.Styles>
+
     <Panel>
         <ExperimentalAcrylicBorder IsHitTestVisible="False">
             <ExperimentalAcrylicBorder.Material>
@@ -26,6 +38,63 @@
             OpenPaneLength="250"
             PaneDisplayMode="Left">
             <ui:NavigationView.IsPaneOpen>False</ui:NavigationView.IsPaneOpen>
+            <ui:NavigationView.MenuItems>
+                <ui:NavigationViewItem Content="主页" Tag="Main">
+                    <ui:NavigationViewItem.IconSource>
+                        <fluent:SymbolIconSource Symbol="Home" />
+                    </ui:NavigationViewItem.IconSource>
+                    <ui:NavigationViewItem.InfoBadge>
+                        <!--  ReSharper disable once Xaml.StyleClassNotFound  -->
+                        <ui:InfoBadge
+                            VerticalAlignment="Center"
+                            Classes="Caution"
+                            IsVisible="{Binding MissingDependencyModsCount}"
+                            Value="{Binding MissingDependencyModsCount}" />
+                    </ui:NavigationViewItem.InfoBadge>
+                </ui:NavigationViewItem>
+                <ui:NavigationViewItem Content="N网" Tag="Download">
+                    <ui:NavigationViewItem.IconSource>
+                        <fluent:SymbolIconSource Symbol="GlobeSearch" />
+                    </ui:NavigationViewItem.IconSource>
+                </ui:NavigationViewItem>
+                <ui:NavigationViewItem Content="更新" Tag="Update">
+                    <ui:NavigationViewItem.IconSource>
+                        <fluent:SymbolIconSource Symbol="BoxArrowUp" />
+                    </ui:NavigationViewItem.IconSource>
+                    <ui:NavigationViewItem.InfoBadge>
+                        <ui:InfoBadge
+                            Background="CornflowerBlue"
+                            IsVisible="{Binding ToUpdateModsCount}"
+                            Value="{Binding ToUpdateModsCount}" />
+                    </ui:NavigationViewItem.InfoBadge>
+                </ui:NavigationViewItem>
+                <ui:NavigationViewItem Content="翻译" Tag="Trans">
+                    <ui:NavigationViewItem.IconSource>
+                        <fluent:SymbolIconSource Symbol="Translate" />
+                    </ui:NavigationViewItem.IconSource>
+                </ui:NavigationViewItem>
+                <ui:NavigationViewItem Content="校对" Tag="Check">
+                    <ui:NavigationViewItem.IconSource>
+                        <fluent:SymbolIconSource Symbol="TextProofingTools" />
+                    </ui:NavigationViewItem.IconSource>
+                </ui:NavigationViewItem>
+            </ui:NavigationView.MenuItems>
+            <ui:NavigationView.PaneFooter>
+                <ui:NavigationViewItem
+                    Name="DownloadItem"
+                    Classes="Footer"
+                    Content="下载">
+                    <ui:NavigationViewItem.IconSource>
+                        <ui:SymbolIconSource Symbol="Download" />
+                    </ui:NavigationViewItem.IconSource>
+                    <ui:NavigationViewItem.InfoBadge>
+                        <ui:InfoBadge
+                            Background="Pink"
+                            IsVisible="{Binding DownloadItemsCount}"
+                            Value="{Binding DownloadItemsCount}" />
+                    </ui:NavigationViewItem.InfoBadge>
+                </ui:NavigationViewItem>
+            </ui:NavigationView.PaneFooter>
             <ui:Frame Name="FrameView" />
         </ui:NavigationView>
         <ui:InfoBar Name="MainInfoBar" Margin="60,40" />

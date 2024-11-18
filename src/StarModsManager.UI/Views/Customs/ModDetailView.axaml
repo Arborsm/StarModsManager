@@ -9,5 +9,12 @@
     d:DesignWidth="800"
     x:DataType="customs:ModDetailViewModel"
     mc:Ignorable="d">
-    <TextBlock Text="{Binding Mod}" />
+    <StackPanel Spacing="10">
+        <TextBox IsReadOnly="True" Text="{Binding Mod}" />
+        <TextBox
+            Foreground="IndianRed"
+            IsReadOnly="True"
+            IsVisible="{Binding !!Addition}"
+            Text="{Binding Addition}" />
+    </StackPanel>
 </UserControl>

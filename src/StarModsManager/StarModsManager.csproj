@@ -7,30 +7,44 @@
         <LangVersion>preview</LangVersion>
         <OutputType>Library</OutputType>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <AssemblyName>StarModsManager.Common</AssemblyName>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2" />
-      <PackageReference Include="HtmlAgilityPack" Version="1.11.69" />
-      <PackageReference Include="NLog" Version="5.3.4" />
-      <PackageReference Include="OllamaSharp" Version="4.0.1" />
-      <PackageReference Include="OpenAI-DotNet" Version="8.3.0" />
-      <PackageReference Include="Polly" Version="8.4.2" />
-      <PackageReference Include="RestEase" Version="1.6.4" />
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2"/>
+        <PackageReference Include="HtmlAgilityPack" Version="1.11.71" />
+        <PackageReference Include="Octokit" Version="13.0.1" />
+        <PackageReference Include="OllamaSharp" Version="4.0.6" />
+        <PackageReference Include="OpenAI-DotNet" Version="8.3.0"/>
+        <PackageReference Include="Pathoschild.Http.FluentClient" Version="4.4.1"/>
+        <PackageReference Include="Polly" Version="8.5.0" />
+        <PackageReference Include="RestEase" Version="1.6.4"/>
+        <PackageReference Include="RestEase.SourceGenerator" Version="1.6.4">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Serilog" Version="4.1.0" />
+        <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
+        <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
+        <PackageReference Include="System.Private.Uri" Version="4.3.2" />
+        <PackageReference Include="VdfConverter" Version="1.0.3" />
     </ItemGroup>
 
     <ItemGroup>
-      <AvaloniaResource Include="Api\Lang\Strings.Designer.cs" />
-      <AvaloniaResource Include="Api\Lang\Strings.resx" />
-      <AvaloniaResource Include="Api\Lang\Strings.zh.resx" />
+        <AvaloniaResource Include="Assets\Strings.Designer.cs" />
+        <AvaloniaResource Include="Assets\Strings.resx" />
+        <AvaloniaResource Include="Assets\Strings.zh.resx" />
     </ItemGroup>
 
     <ItemGroup>
+      <Reference Include="Avalonia.Base">
+        <HintPath>..\StarModsManager.UI\bin\Debug\net9.0\Avalonia.Base.dll</HintPath>
+      </Reference>
       <Reference Include="SMAPI.Toolkit">
-        <HintPath>Dll\SMAPI.Toolkit.dll</HintPath>
+        <HintPath>Assets\Dll\SMAPI.Toolkit.dll</HintPath>
       </Reference>
       <Reference Include="SMAPI.Toolkit.CoreInterfaces">
-        <HintPath>Dll\SMAPI.Toolkit.CoreInterfaces.dll</HintPath>
+        <HintPath>Assets\Dll\SMAPI.Toolkit.CoreInterfaces.dll</HintPath>
       </Reference>
     </ItemGroup>
 
