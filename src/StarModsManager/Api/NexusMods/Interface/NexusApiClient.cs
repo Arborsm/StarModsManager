@@ -29,27 +29,57 @@ public class NexusApiClient
         NexusWebClient.Instance.Init(apiKey, userAgent);
     }
 
-    public Task<List<ModUpdate>> GetUpdatedMods(string period) => _api.GetUpdatedMods(_gameDomainName, period);
+    public Task<List<ModUpdate>> GetUpdatedMods(string period)
+    {
+        return _api.GetUpdatedMods(_gameDomainName, period);
+    }
 
     //public Task<List<Changelog>> GetModChangelogs(int modId) => _api.GetModChangelogs(gameDomainName, modId);
 
-    public Task<List<ModInfo>> GetLatestAddedMods() => _api.GetLatestAddedMods(_gameDomainName);
+    public Task<List<ModInfo>> GetLatestAddedMods()
+    {
+        return _api.GetLatestAddedMods(_gameDomainName);
+    }
 
-    public Task<List<ModInfo>> GetLatestUpdatedMods() => _api.GetLatestUpdatedMods(_gameDomainName);
+    public Task<List<ModInfo>> GetLatestUpdatedMods()
+    {
+        return _api.GetLatestUpdatedMods(_gameDomainName);
+    }
 
-    public Task<List<ModInfo>> GetTrendingMods() => _api.GetTrendingMods(_gameDomainName);
+    public Task<List<ModInfo>> GetTrendingMods()
+    {
+        return _api.GetTrendingMods(_gameDomainName);
+    }
 
-    public Task<ModInfo?> GetMod(int id) => _api.GetMod(_gameDomainName, id);
+    public Task<ModInfo?> GetMod(int id)
+    {
+        return _api.GetMod(_gameDomainName, id);
+    }
 
-    public Task<ModHashResult> SearchModByMd5(string md5Hash) => _api.SearchModByMd5(_gameDomainName, md5Hash);
+    public Task<ModHashResult> SearchModByMd5(string md5Hash)
+    {
+        return _api.SearchModByMd5(_gameDomainName, md5Hash);
+    }
 
-    public Task EndorseMod(int id) => _api.EndorseMod(_gameDomainName, id);
+    public Task EndorseMod(int id)
+    {
+        return _api.EndorseMod(_gameDomainName, id);
+    }
 
-    public Task AbstainFromEndorsingMod(int id) => _api.AbstainFromEndorsingMod(_gameDomainName, id);
+    public Task AbstainFromEndorsingMod(int id)
+    {
+        return _api.AbstainFromEndorsingMod(_gameDomainName, id);
+    }
 
-    public Task<ModFileList?> GetModFiles(int modId) => _api.GetModFiles(_gameDomainName, modId);
+    public Task<ModFileList?> GetModFiles(int modId)
+    {
+        return _api.GetModFiles(_gameDomainName, modId);
+    }
 
-    public Task<ModFile> GetModFile(int modId, int fileId) => _api.GetModFile(_gameDomainName, modId, fileId);
+    public Task<ModFile> GetModFile(int modId, int fileId)
+    {
+        return _api.GetModFile(_gameDomainName, modId, fileId);
+    }
 
     public Task<ModFileDownloadLink[]?> GetModFileDownloadLink(int modId, int id)
     {
@@ -57,30 +87,52 @@ public class NexusApiClient
         return _api.GetModFileDownloadLink(_gameDomainName, modId, id);
     }
 
-    public Task<List<Game>> GetGames(bool includeUnapproved = false) => _api.GetGames(includeUnapproved);
+    public Task<List<Game>> GetGames(bool includeUnapproved = false)
+    {
+        return _api.GetGames(includeUnapproved);
+    }
 
-    public Task<Game> GetGame() => _api.GetGame(_gameDomainName);
+    public Task<Game> GetGame()
+    {
+        return _api.GetGame(_gameDomainName);
+    }
 
-    public Task<UserValidation> ValidateUser() => _api.ValidateUser();
+    public Task<UserValidation> ValidateUser()
+    {
+        return _api.ValidateUser();
+    }
 
-    public Task<List<TrackedMod>> GetTrackedMods() => _api.GetTrackedMods();
+    public Task<List<TrackedMod>> GetTrackedMods()
+    {
+        return _api.GetTrackedMods();
+    }
 
-    public Task TrackMod(string domainName, string modId) =>
-        _api.TrackMod(domainName, new Dictionary<string, object> { ["mod_id"] = modId });
+    public Task TrackMod(string domainName, string modId)
+    {
+        return _api.TrackMod(domainName, new Dictionary<string, object> { ["mod_id"] = modId });
+    }
 
-    public Task UntrackMod(string domainName, string modId) =>
-        _api.UntrackMod(domainName, new Dictionary<string, object> { ["mod_id"] = modId });
+    public Task UntrackMod(string domainName, string modId)
+    {
+        return _api.UntrackMod(domainName, new Dictionary<string, object> { ["mod_id"] = modId });
+    }
 
-    public Task<List<UserEndorsement>> GetEndorsements() => _api.GetUserEndorsements();
+    public Task<List<UserEndorsement>> GetEndorsements()
+    {
+        return _api.GetUserEndorsements();
+    }
 
-    public Task<List<ColourScheme>> GetColourSchemes() => _api.GetColourSchemes();
+    public Task<List<ColourScheme>> GetColourSchemes()
+    {
+        return _api.GetColourSchemes();
+    }
 }
 
 public class NexusWebClient
 {
-    public static NexusWebClient Instance { get; } = new();
     private INexusApi? _api;
     private HttpClient? _httpClient;
+    public static NexusWebClient Instance { get; } = new();
 
     public void Init(string apiKey, string userAgent)
     {
@@ -94,12 +146,9 @@ public class NexusWebClient
             BaseAddress = new Uri("https://www.nexusmods.com/"),
             Timeout = TimeSpan.FromSeconds(30)
         };
-        
-        if (!string.IsNullOrEmpty(Services.MainConfig.NexusModsCookie))
-        {
-            SetCookie(Services.MainConfig.NexusModsCookie);
-        }
-        
+
+        if (!string.IsNullOrEmpty(Services.MainConfig.NexusModsCookie)) SetCookie(Services.MainConfig.NexusModsCookie);
+
         var restClient = new RestClient(_httpClient)
         {
             RequestBodySerializer = new SystemTextJsonRequestBodySerializer(),

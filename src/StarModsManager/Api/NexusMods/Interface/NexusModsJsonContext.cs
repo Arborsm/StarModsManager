@@ -96,7 +96,8 @@ internal class SystemTextJsonResponseDeserializer : ResponseDeserializer
             catch (Exception ex)
             {
                 throw new InvalidOperationException(
-                    $"The response includes unexpected {name} value: '{value}' can't be converted to {typeof(T1).FullName}.", ex);
+                    $"The response includes unexpected {name} value: '{value}' can't be converted to {typeof(T1).FullName}.",
+                    ex);
             }
         }
     }

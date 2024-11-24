@@ -8,13 +8,14 @@
     xmlns:lib="clr-namespace:StarModsManager.Lib"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="using:FluentAvalonia.UI.Controls"
+    xmlns:assets="clr-namespace:StarModsManager.Assets;assembly=StarModsManager.Common"
     x:DataType="items:DownloadItemViewModel"
     mc:Ignorable="d">
 
     <UserControl.Resources>
         <lib:ClipRectConverter x:Key="ClipRectConverter" />
         <MenuFlyout x:Key="ItemMenu">
-            <MenuItem Command="{Binding OpenFileCommand}" Header="Open File" />
+            <MenuItem Command="{Binding OpenFileCommand}" Header="{x:Static assets:Lang.OpenFile}" />
         </MenuFlyout>
     </UserControl.Resources>
 

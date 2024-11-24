@@ -1,5 +1,6 @@
 using Avalonia.Interactivity;
 using FluentAvalonia.UI.Controls;
+using Serilog;
 using StarModsManager.ViewModels.Customs;
 using StarModsManager.ViewModels.Pages;
 using StarModsManager.Views.Customs;
@@ -25,19 +26,26 @@ public partial class TransPageView : UserControl
 
     private async void SettingButton_OnClick(object? sender, RoutedEventArgs e)
     {
-        var vm = new TransSettingViewModel();
-        var dialog = new ContentDialog
+        try
         {
-            Title = "Translating Settings",
-            Content = new TransSettingView
+            var vm = new TransSettingViewModel();
+            var dialog = new ContentDialog
             {
-                DataContext = vm
-            },
-            PrimaryButtonText = "Save",
-            PrimaryButtonCommand = vm.SaveCommand,
-            CloseButtonText = "Close"
-        };
+                Title = "Translating Settings",
+                Content = new TransSettingView
+                {
+                    DataContext = vm
+                },
+                PrimaryButtonText = "Save",
+                PrimaryButtonCommand = vm.SaveCommand,
+                CloseButtonText = "Close"
+            };
 
-        await dialog.ShowAsync();
+            await dialog.ShowAsync();
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Error in ApiSettingButton Click");
+        }
     }
 }

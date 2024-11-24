@@ -1,3 +1,4 @@
+using System.Drawing;
 using Avalonia.Input;
 using Avalonia.Platform.Storage;
 using FluentAvalonia.UI.Controls;
@@ -11,12 +12,13 @@ public partial class MainWindow : Window
 {
     public MainWindow()
     {
-        if (Services.MainConfig.ClientSize != System.Drawing.Size.Empty)
+        if (Services.MainConfig.ClientSize != Size.Empty)
         {
             WindowState = WindowState.Normal;
             Width = Services.MainConfig.ClientSize.Width;
             Height = Services.MainConfig.ClientSize.Height;
         }
+
         InitializeComponent();
         Services.Dialog = new Dialog(GetTopLevel(this)!);
         DragDrop.SetAllowDrop(this, true);
@@ -60,9 +62,10 @@ public partial class MainWindow : Window
         {
             DataContext = installModViewModel
         };
+        if (installModViewModel.Files.Count == 0) return;
         var dialog = new ContentDialog
         {
-            Title = "Installing Mod",
+            Title = "Installing Mods",
             Content = installModView,
             PrimaryButtonText = "OK",
             PrimaryButtonCommand = installModViewModel.InstallCommand,
@@ -75,7 +78,8 @@ public partial class MainWindow : Window
 
 public class Dialog(TopLevel topLevel) : IDialog
 {
-    public async Task<IReadOnlyList<IStorageFile>> ShowPickupFilesDialogAsync(string title, bool allowMultiple, IReadOnlyList<FilePickerFileType>? fileTypeFilter)
+    public async Task<IReadOnlyList<IStorageFile>> ShowPickupFilesDialogAsync(string title, bool allowMultiple,
+        IReadOnlyList<FilePickerFileType>? fileTypeFilter)
     {
         return await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
         {

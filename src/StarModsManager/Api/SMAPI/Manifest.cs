@@ -38,7 +38,8 @@ public class Manifest : IManifest
 
     public string UniqueID { get; set; } = string.Empty;
 
-    [JsonExtensionData] public IDictionary<string, object> ExtraFields { get; set; } = new Dictionary<string, object>();
+    [JsonExtensionData]
+    public IDictionary<string, object> ExtraFields { get; set; } = new Dictionary<string, object>();
 }
 
 internal class UpdateKeysConverter : JsonConverter<string[]>
@@ -171,13 +172,9 @@ public class SemanticVersionConverter : JsonConverter<ISemanticVersion>
     public override void Write(Utf8JsonWriter writer, ISemanticVersion? value, JsonSerializerOptions options)
     {
         if (value == null)
-        {
             writer.WriteNullValue();
-        }
         else
-        {
             writer.WriteStringValue(value.ToString());
-        }
     }
 
     public static ISemanticVersion? Parse(string? versionString)

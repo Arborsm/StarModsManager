@@ -1,5 +1,4 @@
 using System.Collections.ObjectModel;
-using System.Text.Json;
 using Avalonia.Collections;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -15,30 +14,13 @@ namespace StarModsManager.ViewModels.Pages;
 
 public partial class ProofreadPageViewModel : MainPageViewModelBase
 {
-    public ProofreadConfig ProofreadConfig => Services.ProofreadConfig;
     private static Dictionary<string, (string?, string?)> _langMap = null!;
     private readonly Dictionary<string, (string?, string?)> _langEditedCache = [];
 
-    [ObservableProperty]
-    private bool _isLoading = true;
+    private int _filterIndex;
+    private List<ModLang> _filterList = [];
 
-    [ObservableProperty]
-    private LocalMod? _currentMod;
-
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(ShowMods))]
-    private bool _isFilter = Services.ProofreadConfig.IsFilter;
-
-    [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(SaveCommand))]
-    private bool _isNotSave;
-
-    [ObservableProperty]
-    private ModLang? _selectedItem;
-
-    [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(SearchCommand))]
-    private string? _searchText;
+    private IReadOnlyList<ModLang> _langList = [];
 
     public ProofreadPageViewModel()
     {
@@ -54,13 +36,35 @@ public partial class ProofreadPageViewModel : MainPageViewModelBase
         }
     }
 
-    public override string NavHeader => NavigationService.Check;
+    public ProofreadConfig ProofreadConfig => Services.ProofreadConfig;
 
-    private IReadOnlyList<ModLang> _langList = [];
+    [ObservableProperty]
+    public partial bool IsLoading { get; set; } = true;
+
+    [ObservableProperty]
+    public partial LocalMod? CurrentMod { get; set; }
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowMods))]
+    public partial bool IsFilter { get; set; } = Services.ProofreadConfig.IsFilter;
+
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(SaveCommand))]
+    public partial bool IsNotSave { get; set; }
+
+    [ObservableProperty]
+    public partial ModLang? SelectedItem { get; set; }
+
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(SearchCommand))]
+    public partial string? SearchText { get; set; }
+
+    public override string NavHeader => NavigationService.Check;
     public DataGridCollectionView ModLangsView => new(_langList);
     private static IEnumerable<LocalMod> I18NMods => ModsHelper.Instance.I18LocalMods.OrderBy(it => it.Manifest.Name);
     private static IEnumerable<LocalMod> MisMatchMods => I18NMods.Where(it => it.LazyIsMisMatch.Value is true or null);
     public ObservableCollection<LocalMod> ShowMods => new(IsFilter ? MisMatchMods : I18NMods);
+    private bool IsSearchTextNotNull => !string.IsNullOrEmpty(SearchText);
 
     public void AddEditedLang(ModLang item)
     {
@@ -80,24 +84,16 @@ public partial class ProofreadPageViewModel : MainPageViewModelBase
         Dispatcher.UIThread.Invoke(() =>
         {
             if (Services.ProofreadConfig.IsFilter)
-            {
                 ModLangsView.Filter = item =>
                 {
                     var modLang = (ModLang)item;
                     return modLang.IsMisMatch is true or null;
                 };
-            }
             else
-            {
                 ModLangsView.Filter = _ => true;
-            }
         });
     }
-    
-    private int _filterIndex;
-    private List<ModLang> _filterList = [];
-    private bool IsSearchTextNotNull => !string.IsNullOrEmpty(SearchText);
-    
+
     [RelayCommand(CanExecute = nameof(IsSearchTextNotNull))]
     private void Search()
     {
@@ -133,7 +129,7 @@ public partial class ProofreadPageViewModel : MainPageViewModelBase
     [RelayCommand]
     private async Task TranslateAsync()
     {
-        if (SelectedItem?.SourceLang is not null)
+        if (SelectedItem?.SourceLang != null)
         {
             var result = await Translator.Instance.TranslateTextAsync(SelectedItem.SourceLang);
             if (string.IsNullOrEmpty(result)) return;
@@ -157,7 +153,7 @@ public partial class ProofreadPageViewModel : MainPageViewModelBase
         try
         {
             await File.WriteAllTextAsync(CurrentMod.PathS + "\\i18n\\" + $"{Services.TransConfig.Language}.json",
-                JsonSerializer.Serialize(targetLang, TranslationContext.Default.DictionaryStringString));
+                TranslationContext.GetJson(targetLang));
         }
         catch (Exception? e)
         {

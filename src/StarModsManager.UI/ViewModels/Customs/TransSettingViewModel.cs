@@ -9,29 +9,30 @@ public partial class TransSettingViewModel : ViewModelBase
 {
     private const string OpenAI = "OpenAI";
 
-    [ObservableProperty]
-    private int _delayMs = Services.TransConfig.DelayMs;
+    private string SelectedLang { get; set; } = Services.TransConfig.Language;
 
     [ObservableProperty]
-    private bool _isTurbo = Services.TransConfig.IsTurbo;
+    public partial int DelayMs { get; set; } = Services.TransConfig.DelayMs;
 
     [ObservableProperty]
-    private string _promptText = Services.TransConfig.PromptText;
+    public partial bool IsTurbo { get; set; } = Services.TransConfig.IsTurbo;
+
+    [ObservableProperty]
+    public partial string PromptText { get; set; } = Services.TransConfig.PromptText;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CanTurboEnabled))]
-    private string _selectedApi = Services.TransConfig.ApiSelected;
+    public partial string SelectedApi { get; set; } = Services.TransConfig.ApiSelected;
 
     [ObservableProperty]
-    private string _showLang = SMMHelper.SwitchLanguage(Services.TransConfig.Language);
+    public partial string ShowLang { get; set; } = SMMHelper.SwitchLanguage(Services.TransConfig.Language);
 
     public List<string> Apis { get; } = Translator.Instance.Apis.Select(it => it.Name).ToList();
     public List<string> Langs { get; } = SMMHelper.LanguageMap.Keys.ToList();
     public bool CanTurboEnabled => SelectedApi == OpenAI;
-    private string SelectedLang { get; set; } = Services.TransConfig.Language;
     public bool IsBackup { get; set; } = Services.TransConfig.IsBackup;
 
-    partial void OnShowLangChanged(string? oldValue, string newValue)
+    partial void OnShowLangChanged(string oldValue, string newValue)
     {
         var lang = SMMHelper.SwitchLanguage(newValue);
         if (string.IsNullOrEmpty(PromptText) && lang == "zh")
@@ -49,7 +50,7 @@ public partial class TransSettingViewModel : ViewModelBase
         SelectedLang = lang;
     }
 
-    partial void OnSelectedApiChanged(string? oldValue, string newValue)
+    partial void OnSelectedApiChanged(string oldValue, string newValue)
     {
         if (newValue != oldValue) Services.TransConfig.ApiSelected = newValue;
         if (newValue != OpenAI) IsTurbo = false;

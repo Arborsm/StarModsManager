@@ -9,11 +9,11 @@ namespace StarModsManager.Api;
 public class ModsHelper
 {
     public static readonly ModsHelper Instance = new();
+    public readonly IEnumerable<DirectoryInfo> GameFolders = new GameScanner().Scan();
     public readonly List<LocalMod> I18LocalMods = [];
     public bool IsMismatchedTokens = false;
     public Dictionary<string, LocalMod> LocalModsMap = []; // Id/UniqueId -> mod
     public Dictionary<string, OnlineMod> OnlineModsMap = []; // UniqueId -> mod
-    public readonly IEnumerable<DirectoryInfo> GameFolders = new GameScanner().Scan();
 
     private ModsHelper()
     {
@@ -23,7 +23,7 @@ public class ModsHelper
     {
         var path = Services.MainConfig.DirectoryPath;
         Log.Information("Searching Mods in Dir: {Path}", path);
-        if (!Directory.Exists(path)) Console.WriteLine(Strings.ErrorFoldersMsg);
+        if (!Directory.Exists(path)) Console.WriteLine(Lang.ErrorFoldersMsg);
         OnlineModsMap = (await LoadCachedAsync()).ToDictionary(mod => mod.ModId, mod => mod);
         LocalModsMap = new Dictionary<string, LocalMod>();
         var manifestFiles = new List<string>();
@@ -49,7 +49,7 @@ public class ModsHelper
 
                 await using var fs = File.OpenRead(file);
                 var mod = await LoadCachedAsync(fs);
-                if (mod is not null) results.Add(mod);
+                if (mod != null) results.Add(mod);
             }
             catch (Exception)
             {
@@ -87,8 +87,7 @@ public class ModsHelper
         }
         catch (Exception ex)
         {
-            Console.WriteLine(Strings.ErrorOccurred);
-            Console.WriteLine(ex.Message);
+            Log.Error(ex, Lang.ErrorOccurred);
         }
     }
 }

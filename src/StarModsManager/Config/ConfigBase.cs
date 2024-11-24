@@ -10,10 +10,9 @@ namespace StarModsManager.Config;
 
 public abstract class ConfigBase : ObservableObject
 {
+    private bool _isSaving;
     protected string? AdditionName = null;
     protected bool IsLoaded;
-    
-    private bool _isSaving;
 
     protected ConfigBase()
     {
@@ -25,13 +24,10 @@ public abstract class ConfigBase : ObservableObject
     private string GetConfigFilePath()
     {
         var additionName = string.Empty;
-        if (this is TransApiConfig)
-        {
-            additionName = "_" + AdditionName;
-        }
+        if (this is TransApiConfig) additionName = "_" + AdditionName;
         return Path.Combine(Services.AppSavingPath, GetType().Name + additionName + ".json");
     }
-    
+
     private void Save(object? sender, PropertyChangedEventArgs e)
     {
         if (_isSaving) return;
@@ -58,7 +54,6 @@ public abstract class ConfigBase : ObservableObject
             typeof(T).Name + (additionName == null ? "" : $"_{additionName}") + ".json");
 
         if (File.Exists(filePath))
-        {
             try
             {
                 var json = File.ReadAllText(filePath);
@@ -68,13 +63,13 @@ public abstract class ConfigBase : ObservableObject
             {
                 Log.Error(ex, "Failed to load config file: {FilePath}", filePath);
             }
-        }
 
         return null;
     }
 }
 
-[JsonSourceGenerationOptions(WriteIndented = true, PropertyNameCaseInsensitive = true, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull)]
+[JsonSourceGenerationOptions(WriteIndented = true, PropertyNameCaseInsensitive = true,
+    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull)]
 [JsonSerializable(typeof(MainConfig))]
 [JsonSerializable(typeof(ProofreadConfig))]
 [JsonSerializable(typeof(TransApiConfig))]

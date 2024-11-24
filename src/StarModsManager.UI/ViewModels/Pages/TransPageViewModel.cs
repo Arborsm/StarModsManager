@@ -3,6 +3,7 @@ using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using StarModsManager.Api;
+using StarModsManager.Assets;
 using StarModsManager.Lib;
 using StarModsManager.Mods;
 using StarModsManager.Trans;
@@ -11,18 +12,6 @@ namespace StarModsManager.ViewModels.Pages;
 
 public partial class TransPageViewModel : MainPageViewModelBase, IProgress
 {
-    [ObservableProperty]
-    private bool _isFinished;
-
-    [ObservableProperty]
-    private bool _isIndeterminate;
-
-    [ObservableProperty]
-    private int _maxProgress;
-
-    [ObservableProperty]
-    private int _progress;
-
     public TransPageViewModel()
     {
         Services.Progress = this;
@@ -32,10 +21,29 @@ public partial class TransPageViewModel : MainPageViewModelBase, IProgress
         Mods = new ObservableCollection<ToTansMod>(mods);
     }
 
+    [ObservableProperty]
+    public partial bool IsFinished { get; set; }
+
     public override string NavHeader => NavigationService.Trans;
     public ObservableCollection<ToTansMod> Mods { get; }
     public ObservableCollection<TansDoneMod> DoneMods { get; } = [];
     public CancellationTokenSource CancellationTokenSource { get; set; } = null!;
+
+    [ObservableProperty]
+    public partial bool IsIndeterminate { get; set; }
+
+    [ObservableProperty]
+    public partial int MaxProgress { get; set; }
+
+    [ObservableProperty]
+    public partial int Progress { get; set; }
+
+    public Progress<int> ProgressBar { get; set; } = new();
+
+    public void AddDoneMods(TansDoneMod tansDoneMod)
+    {
+        Dispatcher.UIThread.Invoke(() => DoneMods.Add(tansDoneMod));
+    }
 
     [RelayCommand]
     private async Task ReloadAsync()
@@ -59,7 +67,7 @@ public partial class TransPageViewModel : MainPageViewModelBase, IProgress
         }
         catch (OperationCanceledException)
         {
-            Services.Notification.Show("操作已取消");
+            Services.Notification.Show(Lang.OperationCanceled);
         }
         catch (Exception? e)
         {
@@ -72,7 +80,7 @@ public partial class TransPageViewModel : MainPageViewModelBase, IProgress
             Progress = 0;
         }
 
-        if (ModsHelper.Instance.IsMismatchedTokens) Services.Notification.Show("发现符号匹配错误，建议到校对页面修复");
+        if (ModsHelper.Instance.IsMismatchedTokens) Services.Notification.Show(Lang.SymbolError);
     }
 
     public void Clear()
@@ -105,12 +113,6 @@ public partial class TransPageViewModel : MainPageViewModelBase, IProgress
             var newPath = file.Replace(i18NFolderPath, backupPath);
             File.Copy(file, newPath, true);
         }
-    }
-
-    public Progress<int> ProgressBar { get; set; } = new();
-    public void AddDoneMods(TansDoneMod tansDoneMod)
-    {
-        Dispatcher.UIThread.Invoke(() => DoneMods.Add(tansDoneMod));
     }
 }
 

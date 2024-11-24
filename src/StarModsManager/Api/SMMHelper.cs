@@ -27,6 +27,8 @@ public static class SMMHelper
         ["Türkçe"] = "tr"
     };
 
+    private static SemaphoreSlim? _semaphore;
+
     public static string SwitchLanguage(string input)
     {
         if (LanguageMap.TryGetValue(input, out var code)) return code;
@@ -45,8 +47,7 @@ public static class SMMHelper
             action(item);
         }
     }
-    
-    private static SemaphoreSlim? _semaphore;
+
     public static async Task ForEachAsync<T>(this IEnumerable<T> items, Func<T, Task> action, int maxConcurrent = 1)
     {
         _semaphore = new SemaphoreSlim(maxConcurrent);
@@ -55,7 +56,7 @@ public static class SMMHelper
         foreach (var item in items)
         {
             await _semaphore.WaitAsync();
-            
+
             tasks.Add(Task.Run(async () =>
             {
                 try
@@ -93,21 +94,24 @@ public static class SMMHelper
         var defaultLangFile = files.First(x => x.Contains("default"));
         var targetLangFile = files.FirstOrDefault(x => x.Contains(lang));
         var defaultLang = TranslationContext.GetMap(File.ReadAllText(defaultLangFile));
-        var targetLangTemp = targetLangFile is not null
+        var targetLangTemp = targetLangFile != null
             ? TranslationContext.GetMap(File.ReadAllText(targetLangFile))
             : new Dictionary<string, string>();
         var targetLang = targetLangTemp.Sort(defaultLang);
         return (defaultLang, targetLang);
     }
-    
+
     public static Dictionary<string, (string?, string?)> LoadLangMap(this LocalMod currentMod)
     {
         var (defaultLang, targetLang) = currentMod.ReadMap(Services.TransConfig.Language);
         return defaultLang.Keys.Union(targetLang.Keys)
             .ToDictionary(key => key, key => (defaultLang.GetValueOrDefault(key), targetLang.GetValueOrDefault(key)));
     }
-    
-    public static bool? IsMisMatch(this string? sourceText, string? targetText) => sourceText?.IsMismatchedTokens(targetText);
+
+    public static bool? IsMisMatch(this string? sourceText, string? targetText)
+    {
+        return sourceText?.IsMismatchedTokens(targetText);
+    }
 
     public static Dictionary<string, string> GetUntranslatedMap(this LocalMod localMod)
     {
@@ -121,9 +125,7 @@ public static class SMMHelper
         if (!Directory.Exists(backupPath)) Directory.CreateDirectory(backupPath);
         var zipFilePath = Path.Combine(backupPath, zipFileName);
         if (File.Exists(zipFilePath))
-        {
             zipFilePath = Path.Combine(backupPath, $"{zipFileName}_{Guid.NewGuid().ToString("N")[..6]}.zip");
-        }
         using var archive = ZipFile.Open(zipFilePath, ZipArchiveMode.Create);
         ZipDirectory(directoryPath, archive);
     }
@@ -170,12 +172,22 @@ public static class SMMHelper
     {
         return TranslationContext.GetMap(path.GetJsonString("default.json"));
     }
-    
-    public static bool CheckModDependency(this IEnumerable<LocalMod> mods, IManifestDependency dependency) => 
-        mods.Any(mod => mod.Manifest.UniqueID == dependency.UniqueID && !mod.Manifest.Version.IsOlderThan(dependency.MinimumVersion));
 
-    public static bool CheckModDependency(this IEnumerable<LocalMod> mods, IManifestContentPackFor manifestContentPackFor) =>
-        mods.Any(mod => mod.Manifest.ContentPackFor is not null && mod.Manifest.ContentPackFor.UniqueID == manifestContentPackFor.UniqueID && !mod.Manifest.Version.IsOlderThan(manifestContentPackFor.MinimumVersion));
+    public static bool CheckModDependency(this IEnumerable<LocalMod> mods, IManifestDependency dependency)
+    {
+        return mods.Any(mod =>
+            mod.Manifest.UniqueID == dependency.UniqueID &&
+            !mod.Manifest.Version.IsOlderThan(dependency.MinimumVersion));
+    }
+
+    public static bool CheckModDependency(this IEnumerable<LocalMod> mods,
+        IManifestContentPackFor manifestContentPackFor)
+    {
+        return mods.Any(mod =>
+            mod.Manifest.ContentPackFor != null &&
+            mod.Manifest.ContentPackFor.UniqueID == manifestContentPackFor.UniqueID &&
+            !mod.Manifest.Version.IsOlderThan(manifestContentPackFor.MinimumVersion));
+    }
 }
 
 public class KeyValuePairComparer<TKey, TValue>(
@@ -193,8 +205,8 @@ public class KeyValuePairComparer<TKey, TValue>(
 
     public int GetHashCode(KeyValuePair<TKey, TValue> obj)
     {
-        var keyHashCode = obj.Key is not null ? _keyComparer.GetHashCode(obj.Key) : 0;
-        var valueHashCode = obj.Value is not null ? _valueComparer.GetHashCode(obj.Value) : 0;
+        var keyHashCode = obj.Key != null ? _keyComparer.GetHashCode(obj.Key) : 0;
+        var valueHashCode = obj.Value != null ? _valueComparer.GetHashCode(obj.Value) : 0;
 
         return (keyHashCode * 397) ^ valueHashCode;
     }

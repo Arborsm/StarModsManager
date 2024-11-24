@@ -6,10 +6,10 @@ public partial class ModLang(string key, string? sourceLang, string? targetLang,
     : ObservableObject
 {
     [ObservableProperty]
-    private bool? _isMisMatch = isMisMatch;
+    public partial bool? IsMisMatch { get; set; } = isMisMatch;
 
     [ObservableProperty]
-    private string? _targetLang = targetLang;
+    public partial string? TargetLang { get; set; } = targetLang;
 
     public string Key { get; } = key;
     public string? SourceLang { get; } = sourceLang;

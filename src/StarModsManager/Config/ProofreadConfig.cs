@@ -38,7 +38,7 @@ public class ProofreadConfig : ConfigBase
     {
         return ConfigContent.Default.ProofreadConfig;
     }
-    
+
     public static ProofreadConfig LoadOrCreate()
     {
         var config = Load<ProofreadConfig>(ConfigContent.Default.ProofreadConfig);

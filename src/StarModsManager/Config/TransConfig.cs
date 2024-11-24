@@ -44,7 +44,7 @@ public class TransConfig : ConfigBase
     {
         return ConfigContent.Default.TransConfig;
     }
-    
+
     public static TransConfig LoadOrCreate()
     {
         var config = Load<TransConfig>(ConfigContent.Default.TransConfig);

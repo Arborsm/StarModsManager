@@ -6,6 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:pages="clr-namespace:StarModsManager.ViewModels.Pages"
+    xmlns:assets="clr-namespace:StarModsManager.Assets;assembly=StarModsManager.Common"
     d:DesignHeight="450"
     d:DesignWidth="800"
     x:DataType="pages:UpdatePageViewModel"
@@ -20,18 +21,20 @@
                     <DataGrid.Columns>
                         <DataGridCheckBoxColumn
                             Binding="{Binding IsChecked}"
-                            Header="选择"
+                            Header="{x:Static assets:Lang.Select}"
                             IsReadOnly="False" />
                         <DataGridTextColumn
                             Width="*"
                             Binding="{Binding Name}"
-                            Header="Mod 名称" />
-                        <DataGridTextColumn Binding="{Binding CurrentVersion}" Header="当前版本" />
-                        <DataGridTextColumn Binding="{Binding LatestVersion}" Header="最新版本" />
-                        <DataGridTemplateColumn Header="打开下载页面">
+                            Header="{x:Static assets:Lang.ModName}" />
+                        <DataGridTextColumn Binding="{Binding CurrentVersion}"
+                                            Header="{x:Static assets:Lang.CurrentVersion}" />
+                        <DataGridTextColumn Binding="{Binding LatestVersion}"
+                                            Header="{x:Static assets:Lang.LatestVersion}" />
+                        <DataGridTemplateColumn Header="{x:Static assets:Lang.OpenDownloadPage}">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Button Content="浏览" />
+                                    <Button Content="{x:Static assets:Lang.Browse}" />
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
@@ -47,7 +50,7 @@
                 VerticalAlignment="Center"
                 FontSize="24"
                 IsVisible="{Binding ShowNull}"
-                Text="未检测到可更新Mod" />
+                Text="{x:Static assets:Lang.NoModToUpdate}" />
         </Panel>
         <StackPanel
             Grid.Row="1"
@@ -55,8 +58,8 @@
             HorizontalAlignment="Center"
             Orientation="Horizontal"
             Spacing="20">
-            <Button Command="{Binding RefreshCommand}" Content="刷新" />
-            <Button Command="{Binding DownloadCommand}" Content="更新" />
+            <Button Command="{Binding RefreshCommand}" Content="{x:Static assets:Lang.Refresh}" />
+            <Button Command="{Binding DownloadCommand}" Content="{x:Static assets:Lang.Update}" />
         </StackPanel>
     </Grid>
 </UserControl>

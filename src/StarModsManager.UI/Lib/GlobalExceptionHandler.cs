@@ -1,7 +1,7 @@
 ﻿using Avalonia;
-using Avalonia.Threading;
 using Serilog;
 using StarModsManager.Api;
+using StarModsManager.Assets;
 
 namespace StarModsManager.Lib;
 
@@ -15,16 +15,10 @@ public static class GlobalExceptionHandler
         return builder;
     }
 
-    private static void OnUIThreadUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
-    {
-        Log.Error(e.Exception, "UnhandledException");
-        e.Handled = true;
-    }
-
     private static void OnTaskSchedulerUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
     {
         Log.Error(e.Exception, "UnobservedTaskException");
-        Services.Notification.Show("线程内错误", e.Exception.Message, Severity.Error);
+        Services.Notification.Show(Lang.ThreadInternalError, e.Exception.Message, Severity.Error);
         e.SetObserved();
     }
 
@@ -33,6 +27,10 @@ public static class GlobalExceptionHandler
         try
         {
             if (e.ExceptionObject is Exception exception) Log.Fatal(exception, "UnhandledException");
+        }
+        catch (Exception ex)
+        {
+            Log.Fatal(ex, "UnhandledException");
         }
         finally
         {

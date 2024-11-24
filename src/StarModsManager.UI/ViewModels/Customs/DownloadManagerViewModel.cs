@@ -17,11 +17,21 @@ public partial class DownloadManagerViewModel : ViewModelBase, IDisposable
     {
         Downloads.CollectionChanged += OnDownloadsOnCollectionChanged;
     }
-    
-    private void OnDownloadsOnCollectionChanged(object? o, NotifyCollectionChangedEventArgs args) => 
-        Dispatcher.UIThread.Invoke(() => ViewModelService.Resolve<MainViewModel>().DownloadItemsCount = Downloads.Count);
 
     public ObservableCollection<DownloadItemViewModel> Downloads { get; } = [];
+
+    public void Dispose()
+    {
+        Downloads.ForEach(x => x.Dispose());
+        Downloads.CollectionChanged -= OnDownloadsOnCollectionChanged;
+        GC.SuppressFinalize(this);
+    }
+
+    private void OnDownloadsOnCollectionChanged(object? o, NotifyCollectionChangedEventArgs args)
+    {
+        Dispatcher.UIThread.Invoke(() =>
+            ViewModelService.Resolve<MainViewModel>().DownloadItemsCount = Downloads.Count);
+    }
 
     [RelayCommand]
     private async Task NewDownload()
@@ -30,7 +40,10 @@ public partial class DownloadManagerViewModel : ViewModelBase, IDisposable
         if (!string.IsNullOrEmpty(url)) AddDownload(url);
     }
 
-    public void AddDownload(string url) => _ = Task.Run(() => AddDownloadAsync(url));
+    public void AddDownload(string url)
+    {
+        _ = Task.Run(() => AddDownloadAsync(url));
+    }
 
     private async Task AddDownloadAsync(string url)
     {
@@ -61,7 +74,7 @@ public partial class DownloadManagerViewModel : ViewModelBase, IDisposable
             throw;
         }
     }
-    
+
     [RelayCommand]
     private void OpenFolder()
     {
@@ -73,19 +86,10 @@ public partial class DownloadManagerViewModel : ViewModelBase, IDisposable
     {
         foreach (var download in Downloads)
         {
-            if (download.IsDownloading)
-            {
-                download.PauseResumeCommand.Execute(null);
-            }
+            if (download.IsDownloading) download.PauseResumeCommand.Execute(null);
             download.DeleteCommand.Execute(null);
         }
-        Downloads.Clear();
-    }
 
-    public void Dispose()
-    {
-        Downloads.ForEach(x => x.Dispose());
-        Downloads.CollectionChanged -= OnDownloadsOnCollectionChanged;
-        GC.SuppressFinalize(this);
+        Downloads.Clear();
     }
 }

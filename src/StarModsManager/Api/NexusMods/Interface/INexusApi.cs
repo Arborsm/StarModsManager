@@ -5,9 +5,11 @@ namespace StarModsManager.Api.NexusMods.Interface;
 
 public interface INexusApi
 {
-    [Header("apikey")] string ApiKey { get; set; }
+    [Header("apikey")]
+    string ApiKey { get; set; }
 
-    [Header("User-Agent")] string UserAgent { get; set; }
+    [Header("User-Agent")]
+    string UserAgent { get; set; }
 
     #region Colour Schemes
 
@@ -58,9 +60,10 @@ public interface INexusApi
 
     [Get("v1/games/{gameDomainName}/mods/{modId}/files/{id}/download_link.json")]
     Task<ModFileDownloadLink[]?> GetModFileDownloadLink([Path] string gameDomainName, [Path] int modId, [Path] int id);
-    
+
     [Post("/Core/Libs/Common/Managers/Downloads?GenerateDownloadUrl")]
-    Task<DownloadResponse?> GetDownloadUrlAsync([Body(BodySerializationMethod.UrlEncoded)] Dictionary<string, object> request);
+    Task<DownloadResponse?> GetDownloadUrlAsync(
+        [Body(BodySerializationMethod.UrlEncoded)] Dictionary<string, object> request);
 
     #endregion
 

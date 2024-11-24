@@ -7,12 +7,9 @@ public class TransApiConfig : ConfigBase
 {
     public TransApiConfig(string additionName)
     {
-        if (!string.IsNullOrEmpty(additionName))
-        {
-            AdditionNameJson = AdditionName = additionName;
-        }
+        if (!string.IsNullOrEmpty(additionName)) AdditionNameJson = AdditionName = additionName;
     }
-    
+
     [JsonConstructor]
     public TransApiConfig() : this(string.Empty)
     {
@@ -49,7 +46,7 @@ public class TransApiConfig : ConfigBase
     {
         return ConfigContent.Default.TransApiConfig;
     }
-    
+
     public static TransApiConfig LoadOrCreate(string additionName)
     {
         var config = Load<TransApiConfig>(ConfigContent.Default.TransApiConfig, additionName);

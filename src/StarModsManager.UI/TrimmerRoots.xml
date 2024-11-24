@@ -1,3 +1,3 @@
 <linker>
-    <assembly fullname="FluentIcons.Avalonia" preserve="All" />
+    <assembly fullname="FluentIcons.Avalonia" preserve="All"/>
 </linker>

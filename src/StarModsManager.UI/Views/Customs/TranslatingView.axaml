@@ -6,6 +6,7 @@
     xmlns:lib="clr-namespace:StarModsManager.Lib"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:pages="clr-namespace:StarModsManager.ViewModels.Pages"
+    xmlns:assets="clr-namespace:StarModsManager.Assets;assembly=StarModsManager.Common"
     d:DesignHeight="450"
     d:DesignWidth="800"
     x:DataType="pages:TransPageViewModel"
@@ -17,7 +18,7 @@
             <TextBlock
                 Margin="10"
                 HorizontalAlignment="Center"
-                Text="总进度" />
+                Text="{x:Static assets:Lang.OverallProgress}" />
             <ProgressBar
                 Height="20"
                 Maximum="{Binding MaxProgress}"
@@ -36,12 +37,12 @@
                     <DataGridTextColumn
                         Width="*"
                         Binding="{Binding SourceText}"
-                        Header="原文"
+                        Header="{x:Static assets:Lang.SourceText}"
                         IsReadOnly="True" />
                     <DataGridTextColumn
                         Width="*"
                         Binding="{Binding TargetText}"
-                        Header="译文"
+                        Header="{x:Static assets:Lang.TargetLang}"
                         IsReadOnly="True" />
                 </DataGrid.Columns>
             </DataGrid>
@@ -54,11 +55,11 @@
                 Margin="0,10,0,20"
                 HorizontalAlignment="Center"
                 Click="CancelButton_OnClick"
-                Content="取消" />
+                Content="{x:Static assets:Lang.Cancel}" />
             <Button
                 Margin="20,10,0,20"
                 Click="CancelButton_OnClick"
-                Content="确定"
+                Content="{x:Static assets:Lang.OK}"
                 IsEnabled="{Binding IsFinished}" />
         </StackPanel>
     </Grid>

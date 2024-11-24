@@ -7,6 +7,7 @@
     xmlns:lib="clr-namespace:StarModsManager.Lib"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:pages="clr-namespace:StarModsManager.ViewModels.Pages"
+    xmlns:assets="clr-namespace:StarModsManager.Assets;assembly=StarModsManager.Common"
     d:DesignHeight="450"
     d:DesignWidth="800"
     x:DataType="pages:DownloadPageViewModel"
@@ -18,7 +19,7 @@
 
     <UserControl.Resources>
         <MenuFlyout x:Key="ContextMenu">
-            <MenuItem Command="{Binding RefreshCommand}" Header="刷新" />
+            <MenuItem Command="{Binding RefreshCommand}" Header="{x:Static assets:Lang.Refresh}" />
         </MenuFlyout>
     </UserControl.Resources>
 
@@ -40,7 +41,7 @@
     <DockPanel Margin="20,40,20,20" ContextFlyout="{StaticResource ContextMenu}">
         <StackPanel DockPanel.Dock="Top">
             <Grid ColumnDefinitions="*, Auto, Auto">
-                <TextBox Text="{Binding SearchText}" Watermark="Search for OnlineMod...." />
+                <TextBox Text="{Binding SearchText}" Watermark="{x:Static assets:Lang.SearchModText}" />
                 <ComboBox
                     Grid.Column="1"
                     Width="160"
@@ -60,11 +61,13 @@
             <ProgressBar IsIndeterminate="True" IsVisible="{Binding IsBusy}" />
         </StackPanel>
         <ListBox
+            AutoScrollToSelectedItem="False"
+            SelectionMode="Multiple"
             Margin="0,15"
             lib:ListBoxBehavior.LoadMoreCommand="{Binding LoadMoreModsCommand}"
             Background="Transparent"
             ItemsSource="{Binding SearchResults}"
-            SelectedItem="{Binding SelectedMod}">
+            SelectedItems="{Binding SelectedMods, Mode=TwoWay}">
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
                     <WrapPanel />

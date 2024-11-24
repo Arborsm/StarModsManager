@@ -20,12 +20,12 @@ public static class NexusManager
         _throttle = new Throttle(30, TimeSpan.FromSeconds(1));
         _ = Task.Run(Init);
     }
-    
+
     private static async Task<object?> Init()
     {
         var retryPolicy = Policy.Handle<Exception>()
             .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
-        try 
+        try
         {
             var result = await retryPolicy.ExecuteAsync(async () =>
             {
@@ -40,11 +40,12 @@ public static class NexusManager
                         Log.Warning("Invalid Api Key");
                         return null;
                     }
+
                     Log.Warning(e, "Error in Get Api Limits");
                     return null;
                 }
             });
-            
+
             await RateLimits.PrintRemaining();
             return result;
         }
@@ -55,13 +56,25 @@ public static class NexusManager
         }
     }
 
-    public static async Task<ModInfo?> GetModAsync(int modId) => await ExecuteThrottledRequestAsync(() => _api.GetMod(modId));
-    public static async Task<ModFileList?> GetModFilesAsync(int modId) => await ExecuteThrottledRequestAsync(() => _api.GetModFiles(modId));
-    
-    public static async Task<Uri?> GetPicsAsync(int modId) => await GetModAsync(modId).ContinueWith(mod => mod.Result?.PictureUrl);
+    public static async Task<ModInfo?> GetModAsync(int modId)
+    {
+        return await ExecuteThrottledRequestAsync(() => _api.GetMod(modId));
+    }
 
-    public static async Task<ModFileDownloadLink[]?> GetModFileDownloadLinkAsync(int modId, int fileId) => 
-        await ExecuteThrottledRequestAsync(() => _api.GetModFileDownloadLink(modId, fileId));
+    public static async Task<ModFileList?> GetModFilesAsync(int modId)
+    {
+        return await ExecuteThrottledRequestAsync(() => _api.GetModFiles(modId));
+    }
+
+    public static async Task<Uri?> GetPicsAsync(int modId)
+    {
+        return await GetModAsync(modId).ContinueWith(mod => mod.Result?.PictureUrl);
+    }
+
+    public static async Task<ModFileDownloadLink[]?> GetModFileDownloadLinkAsync(int modId, int fileId)
+    {
+        return await ExecuteThrottledRequestAsync(() => _api.GetModFileDownloadLink(modId, fileId));
+    }
 
     public static async Task<Uri?> GetModFileAsync(int fileId)
     {
@@ -80,10 +93,7 @@ public static class NexusManager
         }
         catch (ApiException exception)
         {
-            if (exception.StatusCode == HttpStatusCode.Forbidden)
-            {
-                throw new NotPremiumException();
-            }
+            if (exception.StatusCode == HttpStatusCode.Forbidden) throw new NotPremiumException();
         }
         catch (JsonException ex)
         {
@@ -94,6 +104,7 @@ public static class NexusManager
         {
             Log.Error(e, "Error in NexusManager");
         }
+
         return default;
     }
 }

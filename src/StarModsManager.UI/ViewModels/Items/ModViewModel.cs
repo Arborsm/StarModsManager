@@ -6,6 +6,7 @@ using FluentAvalonia.UI.Controls;
 using StarModsManager.Api;
 using StarModsManager.Api.NexusMods;
 using StarModsManager.Api.SMAPI;
+using StarModsManager.Assets;
 using StarModsManager.Mods;
 using StarModsManager.ViewModels.Customs;
 using StarModsManager.Views.Customs;
@@ -14,18 +15,7 @@ namespace StarModsManager.ViewModels.Items;
 
 public partial class ModViewModel : ViewModelBase
 {
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsDependencyMissing))]
-    [NotifyPropertyChangedFor(nameof(IsDisabledOrDependencyMissing))]
-    private bool _isDisabled;
-
     private string? _localModPath;
-
-    [ObservableProperty]
-    private Bitmap? _pic;
-    
-    public bool IsDependencyMissing => IsLocal && LocalMod!.IsDependencyMissing && !IsDisabled;
-    public bool IsDisabledOrDependencyMissing => IsDisabled || IsLocal && IsDependencyMissing;
 
     public ModViewModel(OnlineMod onlineMod, LocalMod? localMod = default)
     {
@@ -35,7 +25,7 @@ public partial class ModViewModel : ViewModelBase
         {
             Task.Run(OnlineMod.SaveAsync);
         }
-        else if (localMod is not null)
+        else if (localMod != null)
         {
             IsDisabled = Path.GetFileName(localMod.PathS).StartsWith('.');
             _localModPath = localMod.PathS;
@@ -50,16 +40,27 @@ public partial class ModViewModel : ViewModelBase
             "D:\\Users\\26537\\AppData\\Roaming\\StarModsManager\\Cache\\14070\\14070-1665488527-1800567611.bmp");
         IsDisabled = true;
     }
-    
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsDependencyMissing))]
+    [NotifyPropertyChangedFor(nameof(IsDisabledOrDependencyMissing))]
+    public partial bool IsDisabled { get; set; }
+
+    [ObservableProperty]
+    public partial Bitmap? Pic { get; set; }
+
+    public bool IsDependencyMissing => IsLocal && LocalMod!.IsDependencyMissing && !IsDisabled;
+    public bool IsDisabledOrDependencyMissing => IsDisabled || (IsLocal && IsDependencyMissing);
+
     public OnlineMod OnlineMod { get; }
     public LocalMod? LocalMod { get; }
 
-    private bool IsLocal => LocalMod is not null;
+    private bool IsLocal => LocalMod != null;
 
     [RelayCommand]
     private async Task DownloadAsync()
     {
-        Services.Notification.Show("正在获取模组下载链接...");
+        Services.Notification.Show(Lang.GetDownloadUrl);
         await new NexusDownload(OnlineMod.Url).GetModDownloadUrlAsync();
         Services.PopUp.ShowDownloadManager();
     }
@@ -67,19 +68,32 @@ public partial class ModViewModel : ViewModelBase
     [RelayCommand]
     private async Task GetDetailAsync()
     {
-        object? content = null;
-        if (LocalMod is not null)
+        ModDetailView? content;
+        if (LocalMod != null)
         {
             var manifest = await File.ReadAllTextAsync(Path.Combine(LocalMod!.PathS, "manifest.json"));
             var mod = JsonSerializer.Deserialize(manifest, ManifestContent.Default.Manifest)!;
-            content = new ModDetailViewModel(mod, LocalMod!.MissingDependencies);
+            content = new ModDetailView
+            {
+                DataContext = new ModDetailViewModel(mod, LocalMod!.MissingDependencies)
+            };
         }
-        
+        else
+        {
+            await OnlineMod.LoadDetailAsync();
+            content = new ModDetailView
+            {
+                DataContext = new ModDetailViewModel(OnlineMod)
+            };
+        }
+
         var flyout = new Flyout
         {
-            Content = content!,
+            Content = content,
             Placement = PlacementMode.Center
         };
+
+        content.StackPanel.LostFocus += (_, _) => flyout.Hide();
 
         Services.PopUp.ShowFlyout(flyout);
     }
@@ -145,15 +159,31 @@ public partial class ModViewModel : ViewModelBase
 
     public async Task LoadCoverAsync(bool refresh = false, CancellationToken cancellationToken = default)
     {
-        if (LocalMod is not null && File.Exists(LocalMod.InfoPicturePath))
+        if (LocalMod != null && File.Exists(LocalMod.InfoPicturePath))
         {
-            Pic = await Task.Run(() => new Bitmap(LocalMod.InfoPicturePath), cancellationToken);
-            return;
+            if (refresh)
+            {
+                File.Delete(LocalMod.InfoPicturePath);
+            }
+            else
+            {
+                await using var stream = File.OpenRead(LocalMod.InfoPicturePath);
+                Pic = await Task.Run(() => Bitmap.DecodeToWidth(stream, 400), cancellationToken);
+                return;
+            }
         }
 
         await using var imageStream = await OnlineMod.LoadPicBitmapAsync(refresh, cancellationToken);
-        if (imageStream is not null && await IsValidImageFileAsync(imageStream))
+        if (imageStream != null && await IsValidImageFileAsync(imageStream))
+        {
             Pic = await Task.Run(() => Bitmap.DecodeToWidth(imageStream, 400), cancellationToken);
+            if (LocalMod != null)
+            {
+                imageStream.Position = 0;
+                var file = File.Create(LocalMod.InfoPicturePath);
+                await imageStream.CopyToAsync(file, cancellationToken);
+            }
+        }
     }
 
     private static async Task<bool> IsValidImageFileAsync(Stream stream)

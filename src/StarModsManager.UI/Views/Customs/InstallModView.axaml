@@ -10,10 +10,6 @@
     x:DataType="customs:InstallModViewModel"
     mc:Ignorable="d">
 
-    <Design.DataContext>
-        <customs:InstallModViewModel />
-    </Design.DataContext>
-
     <TreeDataGrid
         Height="400"
         MinWidth="400"

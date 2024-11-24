@@ -8,8 +8,12 @@ namespace StarModsManager.Mods;
 
 public sealed class LocalMod
 {
-    public LocalMod() : 
-        this(@"E:\SteamLibrary\steamapps\common\Stardew Valley\mods\Romanceable Rasmodius Redux Revamp\Romanceable Rasmodius Redux Revamp\[CP] RRRR\manifest.json")
+    private bool? _isDependencyMissing;
+    public string? MissingDependencies;
+
+    public LocalMod() :
+        this(
+            @"E:\SteamLibrary\steamapps\common\Stardew Valley\mods\Romanceable Rasmodius Redux Revamp\Romanceable Rasmodius Redux Revamp\[CP] RRRR\manifest.json")
     {
     }
 
@@ -37,17 +41,17 @@ public sealed class LocalMod
             picUrl = Path.Combine(Services.MainConfig.CachePath, numberPart + ".bmp");
 
         OnlineMod = ModsHelper.Instance.OnlineModsMap.TryGetValue(numberPart, out var onlineMod)
-            ? onlineMod : new OnlineMod(modUrl, Manifest.Name, picUrl);
-        
+            ? onlineMod
+            : new OnlineMod(modUrl, Manifest.Name, picUrl);
+
         if (Lang.Count < 1) return;
-        LazyIsMisMatch = new (() =>
+        LazyIsMisMatch = new(() =>
         {
             var t = this.ReadMap();
             return t.defaultLang.IsMismatchedTokens(t.targetLang);
         });
     }
 
-    private bool? _isDependencyMissing;
     public bool IsDependencyMissing => _isDependencyMissing ??= CheckDependencies();
     public Manifest Manifest { get; }
     public string InfoPicturePath => Path.Combine(Services.ModPicsPath, $"{Manifest.UniqueID}.bmp");
@@ -55,16 +59,15 @@ public sealed class LocalMod
     public string PathS { get; }
     public List<string> Lang { get; }
     public Lazy<bool?> LazyIsMisMatch { get; } = new(() => false);
-    public string? MissingDependencies;
 
     private bool CheckDependencies()
     {
         var isDependencyMissing = false;
         var sb = new StringBuilder("Missing: ");
         var mods = ModsHelper.Instance.LocalModsMap.Values;
-        if (Manifest.ContentPackFor is not null && !mods.CheckModDependency(Manifest.ContentPackFor))
+        if (Manifest.ContentPackFor != null && !mods.CheckModDependency(Manifest.ContentPackFor))
         {
-            Log.Warning("{Name} is a content pack for {UniqueID}, but the pack is not installed.", 
+            Log.Warning("{Name} is a content pack for {UniqueID}, but the pack is not installed.",
                 Manifest.Name, Manifest.ContentPackFor.UniqueID);
             sb.AppendLine(Manifest.ContentPackFor.UniqueID.Split('.').Last());
             isDependencyMissing = true;
@@ -73,12 +76,12 @@ public sealed class LocalMod
         foreach (var requiredDependency in Manifest.Dependencies.Where(it => it.IsRequired))
         {
             if (mods.CheckModDependency(requiredDependency)) continue;
-            Log.Warning("{Name} requires {UniqueID}, but the mod is not installed.", 
+            Log.Warning("{Name} requires {UniqueID}, but the mod is not installed.",
                 Manifest.Name, requiredDependency.UniqueID);
             sb.AppendLine(requiredDependency.UniqueID.Split('.').Last());
             isDependencyMissing = true;
         }
-        
+
         if (isDependencyMissing) MissingDependencies = sb.Remove(sb.Length - 2, 2).ToString();
         return isDependencyMissing;
     }

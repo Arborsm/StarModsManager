@@ -13,7 +13,7 @@ public partial class SettingsPageView : UserControl
         InitializeComponent();
     }
 
-    private async void OpenModFolderButton_OnClick(object? sender, RoutedEventArgs e)
+    private async void SelectModFolderButton_OnClick(object? sender, RoutedEventArgs e)
     {
         try
         {

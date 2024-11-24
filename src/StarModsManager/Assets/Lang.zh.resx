@@ -1,0 +1,585 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+    <!-- 
+      Microsoft ResX Schema 
+      
+      Version 2.0
+      
+      The primary goals of this format is to allow a simple XML format 
+      that is mostly human readable. The generation and parsing of the 
+      various data types are done through the TypeConverter classes 
+      associated with the data types.
+      
+      Example:
+      
+      ... ado.net/XML headers & schema ...
+      <resheader name="resmimetype">text/microsoft-resx</resheader>
+      <resheader name="version">2.0</resheader>
+      <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+      <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+      <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+      <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+      <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+          <value>[base64 mime encoded serialized .NET Framework object]</value>
+      </data>
+      <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+          <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+          <comment>This is a comment</comment>
+      </data>
+                  
+      There are any number of "resheader" rows that contain simple 
+      name/value pairs.
+      
+      Each data row contains a name, and value. The row also contains a 
+      type or mimetype. Type corresponds to a .NET class that support 
+      text/value conversion through the TypeConverter architecture. 
+      Classes that don't support this are serialized and stored with the 
+      mimetype set.
+      
+      The mimetype is used for serialized objects, and tells the 
+      ResXResourceReader how to depersist the object. This is currently not 
+      extensible. For a given mimetype the value must be set accordingly:
+      
+      Note - application/x-microsoft.net.object.binary.base64 is the format 
+      that the ResXResourceWriter will generate, however the reader can 
+      read any of the formats listed below.
+      
+      mimetype: application/x-microsoft.net.object.binary.base64
+      value   : The object must be serialized with 
+              : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+              : and then encoded with base64 encoding.
+      
+      mimetype: application/x-microsoft.net.object.soap.base64
+      value   : The object must be serialized with 
+              : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+              : and then encoded with base64 encoding.
+  
+      mimetype: application/x-microsoft.net.object.bytearray.base64
+      value   : The object must be serialized into a byte array 
+              : using a System.ComponentModel.TypeConverter
+              : and then encoded with base64 encoding.
+      -->
+    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata"
+                id="root"
+                xmlns="">
+        <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+        <xsd:element name="root" msdata:IsDataSet="true">
+            <xsd:complexType>
+                <xsd:choice maxOccurs="unbounded">
+                    <xsd:element name="metadata">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
+                            </xsd:sequence>
+                            <xsd:attribute name="name" use="required" type="xsd:string"/>
+                            <xsd:attribute name="type" type="xsd:string"/>
+                            <xsd:attribute name="mimetype" type="xsd:string"/>
+                            <xsd:attribute ref="xml:space"/>
+                        </xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="assembly">
+                        <xsd:complexType>
+                            <xsd:attribute name="alias" type="xsd:string"/>
+                            <xsd:attribute name="name" type="xsd:string"/>
+                        </xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="data">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
+                            </xsd:sequence>
+                            <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
+                            <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+                            <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+                            <xsd:attribute ref="xml:space"/>
+                        </xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="resheader">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                            </xsd:sequence>
+                            <xsd:attribute name="name" type="xsd:string" use="required"/>
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:choice>
+            </xsd:complexType>
+        </xsd:element>
+    </xsd:schema>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>2.0</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <data name="ErrorOccurred" xml:space="preserve">
+    <value>发生错误：</value>
+  </data>
+    <data name="Save" xml:space="preserve">
+    <value>保存</value>
+  </data>
+    <data name="SelectFolderButton" xml:space="preserve">
+    <value>选择文件夹</value>
+  </data>
+    <data name="SettingsButton" xml:space="preserve">
+    <value>设置</value>
+  </data>
+    <data name="Translating" xml:space="preserve">
+    <value>翻译中...</value>
+  </data>
+    <data name="TranslationMismatch" xml:space="preserve">
+    <value>找到符号不对应的文本，是否打开校对窗口</value>
+  </data>
+    <data name="Warning" xml:space="preserve">
+    <value>警告</value>
+  </data>
+    <data name="TranslationStopped" xml:space="preserve">
+    <value>翻译停止</value>
+  </data>
+    <data name="UnableTrans" xml:space="preserve">
+    <value>无法翻译</value>
+  </data>
+    <data name="SourceText" xml:space="preserve">
+        <value>原文</value>
+    </data>
+    <data name="Unavailable" xml:space="preserve">
+    <value>不可用</value>
+  </data>
+    <data name="UrlLabel" xml:space="preserve">
+        <value>Url：</value>
+    </data>
+    <data name="TargetLang" xml:space="preserve">
+    <value>目标语言</value>
+  </data>
+    <data name="ErrorFoldersMsg" xml:space="preserve">
+    <value>无法在目标文件夹找到符合要求的模组</value>
+  </data>
+    <data name="TranslationPrompt" xml:space="preserve">
+    <value>翻译提示文本：</value>
+  </data>
+    <data name="MainPageLabel" xml:space="preserve">
+        <value>主页</value>
+    </data>
+    <data name="DownloadPageLabel" xml:space="preserve">
+        <value>N网</value>
+    </data>
+    <data name="UpdatePageLabel" xml:space="preserve">
+        <value>更新</value>
+    </data>
+    <data name="TranslatePageLabel" xml:space="preserve">
+        <value>翻译</value>
+    </data>
+    <data name="ProofreadPageLabel" xml:space="preserve">
+        <value>校对</value>
+    </data>
+    <data name="DownloadManagerLabel" xml:space="preserve">
+        <value>下载</value>
+    </data>
+    <data name="ApiLabel" xml:space="preserve">
+        <value>Api：</value>
+    </data>
+    <data name="ModelsLabel" xml:space="preserve">
+        <value>可用模型:</value>
+    </data>
+    <data name="DownloadManager" xml:space="preserve">
+        <value>下载管理</value>
+    </data>
+    <data name="NewDownload" xml:space="preserve">
+        <value>新增下载</value>
+    </data>
+    <data name="DeleteAll" xml:space="preserve">
+        <value>清空下载</value>
+    </data>
+    <data name="OpenFolder" xml:space="preserve">
+        <value>打开下载文件夹</value>
+    </data>
+    <data name="NoPics" xml:space="preserve">
+        <value>在Mod页面无可用图片</value>
+    </data>
+    <data name="OverallProgress" xml:space="preserve">
+        <value>总进度</value>
+    </data>
+    <data name="TargetText" xml:space="preserve">
+        <value>译文</value>
+    </data>
+    <data name="Cancel" xml:space="preserve">
+        <value>取消</value>
+    </data>
+    <data name="OK" xml:space="preserve">
+        <value>确定</value>
+    </data>
+    <data name="Language" xml:space="preserve">
+        <value>语言</value>
+    </data>
+    <data name="PromptText" xml:space="preserve">
+        <value>提示文本：</value>
+    </data>
+    <data name="Delay" xml:space="preserve">
+        <value>内置延时</value>
+    </data>
+    <data name="TurboMode" xml:space="preserve">
+        <value>极速模式</value>
+    </data>
+    <data name="AutoBackup" xml:space="preserve">
+        <value>自动备份</value>
+    </data>
+    <data name="OpenFile" xml:space="preserve">
+        <value>打开文件</value>
+    </data>
+    <data name="AddToTag" xml:space="preserve">
+        <value>添加到标签</value>
+    </data>
+    <data name="RemoveFromTag" xml:space="preserve">
+        <value>从标签中删除</value>
+    </data>
+    <data name="ChangePic" xml:space="preserve">
+        <value>更改图片</value>
+    </data>
+    <data name="Detail" xml:space="preserve">
+        <value>查看详情</value>
+    </data>
+    <data name="OpenUrl" xml:space="preserve">
+        <value>访问Mod网页</value>
+    </data>
+    <data name="Refresh" xml:space="preserve">
+        <value>刷新</value>
+    </data>
+    <data name="DownloadLatestVersion" xml:space="preserve">
+        <value>下载最新版本</value>
+    </data>
+    <data name="Enable" xml:space="preserve">
+        <value>启用</value>
+    </data>
+    <data name="Disable" xml:space="preserve">
+        <value>禁用</value>
+    </data>
+    <data name="Disabled" xml:space="preserve">
+        <value>已禁用</value>
+    </data>
+    <data name="DependencyMissing" xml:space="preserve">
+        <value>依赖项丢失</value>
+    </data>
+    <data name="SearchModText" xml:space="preserve">
+        <value>搜索模组....</value>
+    </data>
+    <data name="SwitchLabelMods" xml:space="preserve">
+        <value>切换Mod状态</value>
+    </data>
+    <data name="Add" xml:space="preserve">
+        <value>添加</value>
+    </data>
+    <data name="Remove" xml:space="preserve">
+        <value>删除</value>
+    </data>
+    <data name="ChangeColor" xml:space="preserve">
+        <value>更改颜色</value>
+    </data>
+    <data name="Rename" xml:space="preserve">
+        <value>重命名</value>
+    </data>
+    <data name="Search" xml:space="preserve">
+        <value>搜索</value>
+    </data>
+    <data name="Filter" xml:space="preserve">
+        <value>过滤</value>
+    </data>
+    <data name="Lines" xml:space="preserve">
+        <value>边框</value>
+    </data>
+    <data name="Header" xml:space="preserve">
+        <value>标头</value>
+    </data>
+    <data name="Sort" xml:space="preserve">
+        <value>排序</value>
+    </data>
+    <data name="Resize" xml:space="preserve">
+        <value>调整大小</value>
+    </data>
+    <data name="LangKey" xml:space="preserve">
+        <value>语言键</value>
+    </data>
+    <data name="Symbol" xml:space="preserve">
+        <value>符号</value>
+    </data>
+    <data name="Unsaved" xml:space="preserve">
+        <value>未保存</value>
+    </data>
+    <data name="Close" xml:space="preserve">
+        <value>关闭</value>
+    </data>
+    <data name="UnsavedTip" xml:space="preserve">
+        <value>您有未保存的更改。是否要保存更改?</value>
+    </data>
+    <data name="SettingDirDes" xml:space="preserve">
+        <value>选择模组存储目录</value>
+    </data>
+    <data name="SettingDir" xml:space="preserve">
+        <value>模组文件夹</value>
+    </data>
+    <data name="Browse" xml:space="preserve">
+        <value>浏览</value>
+    </data>
+    <data name="AutoSelect" xml:space="preserve">
+        <value>自动选择</value>
+    </data>
+    <data name="SettingNexusApiKeyDes" xml:space="preserve">
+        <value>这用于从N网下载模组</value>
+    </data>
+    <data name="SettingNexusApi" xml:space="preserve">
+        <value>N网Api</value>
+    </data>
+    <data name="SettingNexusApiKey" xml:space="preserve">
+        <value>Api Key：</value>
+    </data>
+    <data name="SettingNexusCookie" xml:space="preserve">
+        <value>Cookie：</value>
+    </data>
+    <data name="Others" xml:space="preserve">
+        <value>其他</value>
+    </data>
+    <data name="DebugMode" xml:space="preserve">
+        <value>调试模式：</value>
+    </data>
+    <data name="AutoCheckUpdates" xml:space="preserve">
+        <value>自动检查更新：</value>
+    </data>
+    <data name="SettingThemeDes" xml:space="preserve">
+        <value>更改当前应用主题</value>
+    </data>
+    <data name="AppTheme" xml:space="preserve">
+        <value>应用主题</value>
+    </data>
+    <data name="SettingFlowDirectionDes" xml:space="preserve">
+        <value>更改当前应用程序方向</value>
+    </data>
+    <data name="SettingFlowDirection" xml:space="preserve">
+        <value>应用方向</value>
+    </data>
+    <data name="SettingWindowSizeDes" xml:space="preserve">
+        <value>保存当前应用程序窗口大小</value>
+    </data>
+    <data name="SettingWindowSize" xml:space="preserve">
+        <value>窗口大小</value>
+    </data>
+    <data name="Clear" xml:space="preserve">
+        <value>清空</value>
+    </data>
+    <data name="SaveCurrentSize" xml:space="preserve">
+        <value>保存当前大小</value>
+    </data>
+    <data name="SettingAppAccentColorDes" xml:space="preserve">
+        <value>为应用程序设置自定义强调色</value>
+    </data>
+    <data name="SettingAppAccentColor" xml:space="preserve">
+        <value>应用强调色</value>
+    </data>
+    <data name="Preview" xml:space="preserve">
+        <value>预览</value>
+    </data>
+    <data name="SystemAccentColor" xml:space="preserve">
+        <value>系统强调色</value>
+    </data>
+    <data name="Light1" xml:space="preserve">
+        <value>亮色1</value>
+    </data>
+    <data name="Light2" xml:space="preserve">
+        <value>亮色2</value>
+    </data>
+    <data name="Light3" xml:space="preserve">
+        <value>亮色3</value>
+    </data>
+    <data name="Dark1" xml:space="preserve">
+        <value>暗色1</value>
+    </data>
+    <data name="Dark2" xml:space="preserve">
+        <value>暗色2</value>
+    </data>
+    <data name="Dark3" xml:space="preserve">
+        <value>暗色3</value>
+    </data>
+    <data name="UseCustomAccentColorDes" xml:space="preserve">
+        <value>是否启用自定义强调色?</value>
+    </data>
+    <data name="PreSetColors" xml:space="preserve">
+        <value>预设颜色</value>
+    </data>
+    <data name="CustomColor" xml:space="preserve">
+        <value>自定义颜色</value>
+    </data>
+    <data name="About" xml:space="preserve">
+        <value>关于</value>
+    </data>
+    <data name="SourceCode" xml:space="preserve">
+        <value>源码</value>
+    </data>
+    <data name="Select" xml:space="preserve">
+        <value>选择</value>
+    </data>
+    <data name="ModName" xml:space="preserve">
+        <value>Mod 名称</value>
+    </data>
+    <data name="UnTransCounts" xml:space="preserve">
+        <value>未翻译条目</value>
+    </data>
+    <data name="CurrentVersion" xml:space="preserve">
+        <value>当前版本</value>
+    </data>
+    <data name="LatestVersion" xml:space="preserve">
+        <value>最新版本</value>
+    </data>
+    <data name="OpenDownloadPage" xml:space="preserve">
+        <value>打开下载页面</value>
+    </data>
+    <data name="NoModToUpdate" xml:space="preserve">
+        <value>未检测到可更新Mod</value>
+    </data>
+    <data name="Update" xml:space="preserve">
+        <value>更新</value>
+    </data>
+    <data name="ThreadInternalError" xml:space="preserve">
+        <value>线程内错误</value>
+    </data>
+    <data name="GetDownloadUrl" xml:space="preserve">
+        <value>正在获取模组下载链接...</value>
+    </data>
+    <data name="NetworkErrorMsg" xml:space="preserve">
+        <value>网络链接错误, 请检查网络设置</value>
+    </data>
+    <data name="OperationCanceled" xml:space="preserve">
+        <value>操作已取消</value>
+    </data>
+    <data name="SymbolError" xml:space="preserve">
+        <value>发现符号匹配错误，建议到校对页面修复</value>
+    </data>
+    <data name="Installing" xml:space="preserve">
+        <value>正在安装...</value>
+    </data>
+    <data name="ToInstall" xml:space="preserve">
+        <value>正在尝试安装{0}</value>
+    </data>
+    <data name="TranslationError" xml:space="preserve">
+        <value>翻译失败</value>
+    </data>
+    <data name="TranslationErrorMsg" xml:space="preserve">
+        <value>请检查你的API是否正确。</value>
+    </data>
+    <data name="FetchingModLink" xml:space="preserve">
+        <value>正在获取模组下载链接...</value>
+    </data>
+    <data name="NexusPremiumRequired" xml:space="preserve">
+        <value>需要Nexus会员才能直接下载模组，请使用网页下载</value>
+    </data>
+    <data name="ModFileNotFound" xml:space="preserve">
+        <value>未找到/无法下载符合的Mod文件</value>
+    </data>
+    <data name="NotModArchive" xml:space="preserve">
+        <value>非Mod压缩包</value>
+    </data>
+    <data name="ManifestFileNotFound" xml:space="preserve">
+        <value>未找到manifest.json文件</value>
+    </data>
+    <data name="ModInstallSuccess" xml:space="preserve">
+        <value>Mod 安装成功</value>
+    </data>
+    <data name="InstalledModWithVersion" xml:space="preserve">
+        <value>已安装 {0}({1})</value>
+    </data>
+    <data name="Notice" xml:space="preserve">
+        <value>注意</value>
+    </data>
+    <data name="RestartRequired" xml:space="preserve">
+        <value>需要重启使得改动生效</value>
+    </data>
+    <data name="ModUniqueId" xml:space="preserve">
+        <value>唯一ID</value>
+    </data>
+    <data name="ModDescription" xml:space="preserve">
+        <value>描述</value>
+    </data>
+    <data name="ModAuthor" xml:space="preserve">
+        <value>作者</value>
+    </data>
+    <data name="ModVersion" xml:space="preserve">
+        <value>版本</value>
+    </data>
+    <data name="ModUpdateKeys" xml:space="preserve">
+        <value>更新代码</value>
+    </data>
+    <data name="IsContentPackFor" xml:space="preserve">
+        <value>是{0}的内容包</value>
+    </data>
+    <data name="Dependencies" xml:space="preserve">
+        <value>依赖</value>
+    </data>
+    <data name="DependencyIsRequired" xml:space="preserve">
+        <value>是否必须</value>
+    </data>
+    <data name="DependencyMinVersion" xml:space="preserve">
+        <value>最小版本</value>
+    </data>
+    <data name="Yes" xml:space="preserve">
+        <value>是</value>
+    </data>
+    <data name="No" xml:space="preserve">
+        <value>否</value>
+    </data>
+    <data name="ModNexusId" xml:space="preserve">
+        <value>N网ID</value>
+    </data>
+    <data name="ModLatestVersion" xml:space="preserve">
+        <value>最新版本</value>
+    </data>
+    <data name="Date" xml:space="preserve">
+        <value>日期</value>
+    </data>
+    <data name="Endorsements" xml:space="preserve">
+        <value>点赞数</value>
+    </data>
+    <data name="Downloads" xml:space="preserve">
+        <value>下载量</value>
+    </data>
+    <data name="UniqueDownloads" xml:space="preserve">
+        <value>独立下载量</value>
+    </data>
+    <data name="LatestUpdated" xml:space="preserve">
+        <value>最近更新</value>
+    </data>
+    <data name="FileName" xml:space="preserve">
+        <value>文件名</value>
+    </data>
+    <data name="Size" xml:space="preserve">
+        <value>大小</value>
+    </data>
+    <data name="Trending" xml:space="preserve">
+        <value>热门</value>
+    </data>
+    <data name="LastComment" xml:space="preserve">
+        <value>最近评论</value>
+    </data>
+    <data name="Random" xml:space="preserve">
+        <value>随机</value>
+    </data>
+    <data name="ToInstallI18N" xml:space="preserve">
+        <value>正在安装模组汉化包, 安装位置：{0}</value>
+    </data>
+    <data name="I18NInstallSuccess" xml:space="preserve">
+        <value>已安装汉化包: {0}</value>
+    </data>
+    <data name="I18NInstallFailed" xml:space="preserve">
+        <value>尝试安装汉化包失败</value>
+    </data>
+    <data name="I18NInstallNotFound" xml:space="preserve">
+        <value>无法找到汉化包对应的Mod: {0}</value>
+    </data>
+</root>

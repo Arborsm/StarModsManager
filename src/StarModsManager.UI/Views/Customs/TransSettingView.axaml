@@ -6,6 +6,7 @@
     xmlns:customs="clr-namespace:StarModsManager.ViewModels.Customs"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:assets="clr-namespace:StarModsManager.Assets;assembly=StarModsManager.Common"
     d:DesignHeight="450"
     d:DesignWidth="800"
     x:DataType="customs:TransSettingViewModel"
@@ -21,7 +22,7 @@
                 Grid.Column="0"
                 Margin="5"
                 VerticalAlignment="Center"
-                Content="Language" />
+                Content="{x:Static assets:Lang.Language}" />
             <ComboBox
                 Grid.Row="0"
                 Grid.Column="1"
@@ -34,7 +35,7 @@
                 Grid.Column="0"
                 Margin="5"
                 VerticalAlignment="Center"
-                Content="API" />
+                Content="{x:Static assets:Lang.ApiLabel}" />
             <ComboBox
                 Grid.Row="1"
                 Grid.Column="1"
@@ -46,7 +47,7 @@
                 Grid.Row="2"
                 Grid.Column="0"
                 Margin="5"
-                Content="Prompt Text:" />
+                Content="{x:Static assets:Lang.PromptText}" />
             <Button
                 Grid.Row="2"
                 Grid.Column="1"
@@ -65,7 +66,7 @@
             <Label
                 Margin="5"
                 VerticalAlignment="Center"
-                Content="内置延时" />
+                Content="{x:Static assets:Lang.Delay}" />
             <controls:NumberBox
                 Margin="10"
                 HorizontalAlignment="Right"
@@ -76,7 +77,7 @@
             <Label
                 Margin="5"
                 VerticalAlignment="Center"
-                Content="Turbo Mode" />
+                Content="{x:Static assets:Lang.TurboMode}" />
             <ToggleSwitch
                 HorizontalAlignment="Right"
                 IsChecked="{Binding IsTurbo}"
@@ -88,7 +89,7 @@
             <Label
                 Margin="5"
                 VerticalAlignment="Center"
-                Content="Auto Backup" />
+                Content="{x:Static assets:Lang.AutoBackup}" />
             <ToggleSwitch
                 HorizontalAlignment="Right"
                 IsChecked="{Binding IsBackup}"

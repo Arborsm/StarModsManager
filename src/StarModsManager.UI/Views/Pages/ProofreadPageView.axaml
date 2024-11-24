@@ -9,6 +9,7 @@
     xmlns:mods="using:StarModsManager.Mods"
     xmlns:pages="using:StarModsManager.ViewModels.Pages"
     xmlns:ui="using:FluentAvalonia.UI.Controls"
+    xmlns:assets="clr-namespace:StarModsManager.Assets;assembly=StarModsManager.Common"
     d:DesignHeight="800"
     d:DesignWidth="1200"
     x:DataType="pages:ProofreadPageViewModel"
@@ -18,7 +19,7 @@
         <lib:NullableBoolToColorConverter x:Key="NullableBoolToColorConverter" />
         <api:ModLangIsMatchComparer x:Key="ModLangIsMatchComparer" />
         <MenuFlyout x:Key="ContextMenu">
-            <MenuItem Command="{Binding TranslateCommand}" Header="翻译" />
+            <MenuItem Command="{Binding TranslateCommand}" Header="{x:Static assets:Lang.TranslatePageLabel}" />
         </MenuFlyout>
     </Control.Resources>
 
@@ -30,23 +31,33 @@
                         HorizontalAlignment="Right"
                         Command="{Binding SaveCommand}"
                         IconSource="Save"
-                        Label="Save" />
-                    <ui:CommandBarButton IconSource="Find" Label="Search">
+                        Label="{x:Static assets:Lang.Save}" />
+                    <ui:CommandBarButton IconSource="Find" Label="{x:Static assets:Lang.Search}">
+                        <ui:CommandBarButton.Styles>
+                            <Style Selector="ui|CommandBarButton:flyout /template/ ui|FontIcon#SubItemChevron">
+                                <Setter Property="IsVisible" Value="False" />
+                            </Style>
+                        </ui:CommandBarButton.Styles>
                         <ui:CommandBarButton.Flyout>
-                            <Flyout>
+                            <Flyout Placement="BottomEdgeAlignedRight">
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBox Text="{Binding SearchText}" />
+                                    <StackPanel.Styles>
+                                        <Style Selector="Button">
+                                            <Setter Property="BorderThickness" Value="0" />
+                                        </Style>
+                                    </StackPanel.Styles>
+                                    <TextBox Text="{Binding SearchText}" Width="200" />
                                     <Button
                                         Command="{Binding SearchCommand}">
                                         <ui:SymbolIcon Symbol="Find" />
                                     </Button>
                                     <Button
-                                        Command="{Binding NextSearchCommand}">
-                                        <ui:SymbolIcon Symbol="Next" />
-                                    </Button>
-                                    <Button
                                         Command="{Binding PrevSearchCommand}">
                                         <ui:SymbolIcon Symbol="Previous" />
+                                    </Button>
+                                    <Button
+                                        Command="{Binding NextSearchCommand}">
+                                        <ui:SymbolIcon Symbol="Next" />
                                     </Button>
                                 </StackPanel>
                             </Flyout>
@@ -55,25 +66,25 @@
                     <ui:CommandBarToggleButton
                         IconSource="Filter"
                         IsChecked="{Binding IsFilter}"
-                        Label="Filter" />
+                        Label="{x:Static assets:Lang.Filter}" />
                 </ui:CommandBar.PrimaryCommands>
                 <ui:CommandBar.SecondaryCommands>
                     <ui:CommandBarToggleButton
                         IconSource="Stop"
                         IsChecked="{Binding ProofreadConfig.HasBorder}"
-                        Label="Lines" />
+                        Label="{x:Static assets:Lang.Lines}" />
                     <ui:CommandBarToggleButton
                         IconSource="Comment"
                         IsChecked="{Binding ProofreadConfig.IsVisibleHeader}"
-                        Label="Header" />
+                        Label="{x:Static assets:Lang.Header}" />
                     <ui:CommandBarToggleButton
                         IconSource="Sort"
                         IsChecked="{Binding ProofreadConfig.CanSort}"
-                        Label="Sort" />
+                        Label="{x:Static assets:Lang.Sort}" />
                     <ui:CommandBarToggleButton
                         IconSource="Switch"
                         IsChecked="{Binding ProofreadConfig.EnableHeaderResizing}"
-                        Label="Resize" />
+                        Label="{x:Static assets:Lang.Resize}" />
                 </ui:CommandBar.SecondaryCommands>
             </ui:CommandBar>
 
@@ -126,22 +137,22 @@
                     <DataGridTextColumn
                         Width="0.18*"
                         Binding="{Binding Path=Key, DataType=mods:ModLang}"
-                        Header="语言键" />
+                        Header="{x:Static assets:Lang.LangKey}" />
                     <DataGridTextColumn
                         Width="0.37*"
                         Binding="{Binding Path=SourceLang, DataType=mods:ModLang}"
-                        Header="默认语言"
+                        Header="{x:Static assets:Lang.SourceText}"
                         Tag="SourceLang" />
                     <DataGridTextColumn
                         Width="0.37*"
                         Binding="{Binding Path=TargetLang, DataType=mods:ModLang}"
-                        Header="目标语言"
+                        Header="{x:Static assets:Lang.TargetText}"
                         IsReadOnly="False"
                         Tag="TargetLang" />
                     <DataGridTemplateColumn
                         CanUserSort="True"
                         CustomSortComparer="{StaticResource ModLangIsMatchComparer}"
-                        Header="符号">
+                        Header="{x:Static assets:Lang.Symbol}">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <Ellipse
@@ -156,12 +167,12 @@
 
             <ui:TeachingTip
                 Name="UnSavedTip"
-                Title="未保存"
+                Title="{x:Static assets:Lang.Unsaved}"
                 ActionButtonCommand="{Binding SaveCommand}"
-                ActionButtonContent="保存"
-                CloseButtonContent="关闭"
+                ActionButtonContent="{x:Static assets:Lang.Save}"
+                CloseButtonContent="{x:Static assets:Lang.Close}"
                 IsOpen="{Binding IsNotSave}"
-                Subtitle="您有未保存的更改。是否要保存更改?" />
+                Subtitle="{x:Static assets:Lang.UnsavedTip}" />
         </Panel>
     </Grid>
 </UserControl>

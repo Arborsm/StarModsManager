@@ -18,20 +18,38 @@ namespace StarModsManager.ViewModels.Pages;
 
 public partial class MainPageViewModel : MainPageViewModelBase, IDisposable
 {
-    [ObservableProperty]
-    private bool _isLoading = true;
-
     private List<ModViewModel> AllMods { get; set; } = [];
+
+    [ObservableProperty]
+    public partial bool IsLoading { get; set; } = true;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ModLabels))]
     [NotifyPropertyChangedFor(nameof(IsSelectedLabel))]
     [NotifyPropertyChangedFor(nameof(ExpanderListMods))]
     [NotifyCanExecuteChangedFor(nameof(RmFromLabelCommand))]
-    private ItemLabelViewModel? _selectedLabel;
+    public partial ItemLabelViewModel? SelectedLabel { get; set; }
 
     public List<ModViewModel> SelectedMods { get; set; } = [];
     public List<ModViewModel> SelectedInLabelMods { get; set; } = [];
+
+    public override string NavHeader => NavigationService.Main;
+    public ObservableCollection<ModViewModel> Mods { get; } = [];
+    public ObservableCollection<ItemLabelViewModel>? ModLabels { get; set; }
+
+    public bool IsHiddenLabel => SelectedLabel?.Title == ItemLabelViewModel.Hidden;
+
+    public ObservableCollection<ModViewModel> ExpanderListMods => SelectedLabel?.Items ?? [];
+
+    public bool IsSelectedLabel =>
+        SelectedLabel != null &&
+        (SelectedInLabelMods.Count > 0 ? SelectedInLabelMods : SelectedMods).All(SelectedLabel.Items.Contains);
+
+    public void Dispose()
+    {
+        if (ModLabels != null) ModLabels.CollectionChanged -= ModLabelsOnCollectionChanged;
+        GC.SuppressFinalize(this);
+    }
 
     public async Task LoadModsAsync()
     {
@@ -46,7 +64,8 @@ public partial class MainPageViewModel : MainPageViewModelBase, IDisposable
             .ToList();
         await Dispatcher.UIThread.InvokeAsync(() =>
         {
-            ViewModelService.Resolve<MainViewModel>().MissingDependencyModsCount = AllMods.Count(it => it.IsDependencyMissing);
+            ViewModelService.Resolve<MainViewModel>().MissingDependencyModsCount =
+                AllMods.Count(it => it.IsDependencyMissing);
             AllMods.ForEach(Mods.Add);
         });
         IsLoading = false;
@@ -55,26 +74,14 @@ public partial class MainPageViewModel : MainPageViewModelBase, IDisposable
         _ = Task.WhenAll(Mods.AsParallel().Select(async mod => await mod.LoadCoverAsync()));
         InitLabels();
     }
-    
-    public void Dispose()
-    {
-        if (ModLabels is not null) ModLabels.CollectionChanged -= ModLabelsOnCollectionChanged;
-        GC.SuppressFinalize(this);
-    }
-
-    public override string NavHeader => NavigationService.Main;
-    public ObservableCollection<ModViewModel> Mods { get; } = [];
-    public ObservableCollection<ItemLabelViewModel>? ModLabels { get; set; }
-
-    public bool IsHiddenLabel => SelectedLabel?.Title == ItemLabelViewModel.Hidden;
-
-    public ObservableCollection<ModViewModel> ExpanderListMods => SelectedLabel?.Items ?? [];
 
     private void InitLabels()
     {
         List<ItemLabelViewModel>? list = null;
-        if (File.Exists(GetFilePath())) list = JsonSerializer
-                .Deserialize<List<TitleOnlyViewModel>>(File.ReadAllText(GetFilePath()), TitleOnlyContext.Default.ListTitleOnlyViewModel)?
+        if (File.Exists(GetFilePath()))
+            list = JsonSerializer
+                .Deserialize<List<TitleOnlyViewModel>>(File.ReadAllText(GetFilePath()),
+                    TitleOnlyContext.Default.ListTitleOnlyViewModel)?
                 .Select(model => new ItemLabelViewModel(model.Title, AllMods, Colors.LightBlue))
                 .ToList();
         Dispatcher.UIThread.Invoke(() =>
@@ -113,18 +120,21 @@ public partial class MainPageViewModel : MainPageViewModelBase, IDisposable
     }
 
     [RelayCommand]
-    private void SwitchAllMod() => SelectedLabel!.Items.ForEach(it => it.SwitchModCommand.Execute(null));
+    private void SwitchAllMod()
+    {
+        SelectedLabel!.Items.ForEach(it => it.SwitchModCommand.Execute(null));
+    }
 
     [RelayCommand]
-    private void AddToLabel(string label) => SelectedMods.ToArray().ForEach(mod =>
+    private void AddToLabel(string label)
     {
-        var mods = ModLabels?.First(it => it.Title == label).Items ?? [];
-        if (!mods.Contains(mod)) mods.Add(mod);
-        if (label == ItemLabelViewModel.Hidden) Mods.Remove(mod);
-    });
-
-    public bool IsSelectedLabel => 
-        SelectedLabel is not null && (SelectedInLabelMods.Count > 0 ? SelectedInLabelMods : SelectedMods).All(SelectedLabel.Items.Contains);
+        SelectedMods.ToArray().ForEach(mod =>
+        {
+            var mods = ModLabels?.First(it => it.Title == label).Items ?? [];
+            if (!mods.Contains(mod)) mods.Add(mod);
+            if (label == ItemLabelViewModel.Hidden) Mods.Remove(mod);
+        });
+    }
 
     [RelayCommand(CanExecute = nameof(IsSelectedLabel))]
     private void RmFromLabel()
@@ -137,7 +147,7 @@ public partial class MainPageViewModel : MainPageViewModelBase, IDisposable
             if (label == ItemLabelViewModel.Hidden) Mods.Add(mod);
         });
     }
-    
+
     [RelayCommand]
     private void Rename()
     {
@@ -148,13 +158,13 @@ public partial class MainPageViewModel : MainPageViewModelBase, IDisposable
     [RelayCommand]
     private async Task AddModAsync()
     {
-        var files = 
+        var files =
             await Services.Dialog.ShowPickupFilesDialogAsync("Select Mods to Add", true);
-        files
+        var localPaths = files
             .Select(it => it.TryGetLocalPath())
             .Where(s => !string.IsNullOrEmpty(s))
-            .Cast<string>()
-            .ForEach(SmapiModInstaller.Install);
+            .Cast<string>();
+        SmapiModInstaller.Install(localPaths);
     }
 
     [RelayCommand]

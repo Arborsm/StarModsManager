@@ -14,31 +14,10 @@ namespace StarModsManager.ViewModels.Pages;
 
 public partial class SettingsPageViewModel : MainPageViewModelBase
 {
-    public MainConfig MainConfig => Services.MainConfig;
-    
     private const string System = "System";
     private const string Dark = "Dark";
     private const string Light = "Light";
     private readonly FluentAvaloniaTheme _faTheme;
-
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(CustomAccentColor))]
-    private string _currentAppTheme = null!;
-
-    [ObservableProperty]
-    private FlowDirection _currentFlowDirection;
-
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(ListBoxColor))]
-    private Color _customAccentColor;
-
-    [ObservableProperty]
-    private Color? _listBoxColor;
-
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(CustomAccentColor))]
-    [NotifyPropertyChangedFor(nameof(ListBoxColor))]
-    private bool _useCustomAccentColor;
 
     public SettingsPageViewModel()
     {
@@ -46,13 +25,26 @@ public partial class SettingsPageViewModel : MainPageViewModelBase
         GetPredefColors();
     }
 
-    public void Init()
-    {
-        CurrentAppTheme = MainConfig.AppTheme;
-        CurrentFlowDirection = AppFlowDirections[MainConfig.AppFlowDirections];
-        CustomAccentColor = Color.FromUInt32(MainConfig.AppAccentColor);
-        UseCustomAccentColor = MainConfig.UseCustomAccentColor;
-    }
+    public MainConfig MainConfig => Services.MainConfig;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CustomAccentColor))]
+    public partial string CurrentAppTheme { get; set; } = null!;
+
+    [ObservableProperty]
+    public partial FlowDirection CurrentFlowDirection { get; set; }
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ListBoxColor))]
+    public partial Color CustomAccentColor { get; set; }
+
+    [ObservableProperty]
+    public partial Color? ListBoxColor { get; set; }
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CustomAccentColor))]
+    [NotifyPropertyChangedFor(nameof(ListBoxColor))]
+    public partial bool UseCustomAccentColor { get; set; }
 
     public override string NavHeader => NavigationService.Settings;
 
@@ -62,7 +54,18 @@ public partial class SettingsPageViewModel : MainPageViewModelBase
 
     public List<Color> PredefinedColors { get; private set; } = [];
 
-    private static ThemeVariant GetThemeVariant(string value) => value switch { Light => ThemeVariant.Light, _ => ThemeVariant.Dark };
+    public void Init()
+    {
+        CurrentAppTheme = MainConfig.AppTheme;
+        CurrentFlowDirection = AppFlowDirections[MainConfig.AppFlowDirections];
+        CustomAccentColor = Color.FromUInt32(MainConfig.AppAccentColor);
+        UseCustomAccentColor = MainConfig.UseCustomAccentColor;
+    }
+
+    private static ThemeVariant GetThemeVariant(string value)
+    {
+        return value switch { Light => ThemeVariant.Light, _ => ThemeVariant.Dark };
+    }
 
     private void UpdateAppAccentColor(Color? color)
     {
@@ -137,7 +140,7 @@ public partial class SettingsPageViewModel : MainPageViewModelBase
         CustomAccentColor = value.Value;
         UpdateAppAccentColor(value.Value);
     }
-    
+
     [RelayCommand]
     private void OpenModDirectory()
     {
@@ -151,7 +154,7 @@ public partial class SettingsPageViewModel : MainPageViewModelBase
         MainConfig.DirectoryPath = Path.Combine(ModsHelper.Instance.GameFolders.First().FullName, "mods");
         Log.Information("Auto selected mods directory: {path}", MainConfig.DirectoryPath);
     }
-    
+
     private void GetPredefColors()
     {
         PredefinedColors =

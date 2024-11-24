@@ -8,9 +8,20 @@ public static class ViewModelService
 {
     private static readonly Dictionary<Type, Lazy<object>> LazyFactories = new();
 
+    private static bool? _isInDesignMode;
+
     static ViewModelService()
     {
         RegisterAllViewModels();
+    }
+
+    public static bool IsInDesignMode
+    {
+        get
+        {
+            _isInDesignMode ??= Design.IsDesignMode;
+            return _isInDesignMode.Value;
+        }
     }
 
     private static void RegisterAllViewModels()
@@ -44,15 +55,8 @@ public static class ViewModelService
         throw new InvalidOperationException($"Service of type {type} is not registered.");
     }
 
-    public static T Resolve<T>() where T : class => (T)Resolve(typeof(T));
-
-    private static bool? _isInDesignMode;
-    public static bool IsInDesignMode
+    public static T Resolve<T>() where T : class
     {
-        get
-        {
-            _isInDesignMode ??= Design.IsDesignMode;
-            return _isInDesignMode.Value;
-        }
+        return (T)Resolve(typeof(T));
     }
 }

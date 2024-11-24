@@ -9,6 +9,7 @@ using StarModsManager.Api;
 using StarModsManager.Api.NexusMods;
 using StarModsManager.Api.NexusMods.Interface;
 using StarModsManager.Api.SMAPI;
+using StarModsManager.Assets;
 using StarModsManager.Lib;
 using StarModsManager.Mods;
 
@@ -19,11 +20,17 @@ public partial class UpdatePageViewModel : MainPageViewModelBase
     private static readonly string SaveFile = Path.Combine(Services.AppSavingPath, "CanUpdateMods.json");
     private readonly TimeSpan _cacheTimeout = TimeSpan.FromMinutes(10);
 
+    public UpdatePageViewModel()
+    {
+        if (!Services.MainConfig.AutoCheckUpdates) Init();
+    }
+
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(NotEmpty))]
+    [NotifyPropertyChangedFor(nameof(ShowNull))]
     [NotifyCanExecuteChangedFor(nameof(RefreshCommand))]
     [NotifyCanExecuteChangedFor(nameof(DownloadCommand))]
-    private bool _isLoading = true;
+    public partial bool IsLoading { get; set; } = true;
 
     public override string NavHeader => NavigationService.Update;
     public ObservableCollection<ToUpdateMod> Mods { get; set; } = [];
@@ -37,7 +44,7 @@ public partial class UpdatePageViewModel : MainPageViewModelBase
             var json = File.ReadAllText(SaveFile);
             var cacheData = JsonSerializer.Deserialize<CacheData<ToUpdateModJson>>(json,
                 ToUpdateModJsonContent.Default.CacheDataToUpdateModJson);
-            if (cacheData is not null && DateTime.Now - cacheData.Timestamp < _cacheTimeout)
+            if (cacheData != null && DateTime.Now - cacheData.Timestamp < _cacheTimeout)
             {
                 foreach (var it in cacheData.Data)
                 {
@@ -47,6 +54,7 @@ public partial class UpdatePageViewModel : MainPageViewModelBase
                         LatestVersion = it.LatestVersion
                     });
                 }
+
                 FinishInit();
             }
         }
@@ -82,11 +90,14 @@ public partial class UpdatePageViewModel : MainPageViewModelBase
         });
     }
 
-    private void FinishInit() => Dispatcher.UIThread.Invoke(() =>
+    private void FinishInit()
     {
-        ViewModelService.Resolve<MainViewModel>().ToUpdateModsCount = Mods.Count(it => it.CanUpdate);
-        IsLoading = false;
-    });
+        Dispatcher.UIThread.Invoke(() =>
+        {
+            ViewModelService.Resolve<MainViewModel>().ToUpdateModsCount = Mods.Count(it => it.CanUpdate);
+            IsLoading = false;
+        });
+    }
 
     [RelayCommand(CanExecute = nameof(NotEmpty))]
     private void Download()
@@ -96,12 +107,13 @@ public partial class UpdatePageViewModel : MainPageViewModelBase
             .Select(m => (m.LocalMod.OnlineMod.ModId, m.LatestVersion))
             .Select(g => Task.Run(async () => await NexusDownload.Create(g.ModId).GetModDownloadUrlAsync(g.Item2)))
             .ToList();
-        Services.Notification.Show("正在获取模组下载链接...");
+        Services.Notification.Show(Lang.FetchingModLink);
         Task.WhenAll(mod);
     }
 }
 
-[JsonSourceGenerationOptions(WriteIndented = true, Converters = [typeof(UnixDateTimeConverter), typeof(SemanticVersionConverter)])]
+[JsonSourceGenerationOptions(WriteIndented = true,
+    Converters = [typeof(UnixDateTimeConverter), typeof(SemanticVersionConverter)])]
 [JsonSerializable(typeof(CacheData<ToUpdateModJson>))]
 [JsonSerializable(typeof(List<ToUpdateModJson>))]
 [JsonSerializable(typeof(ToUpdateModJson))]
@@ -141,18 +153,23 @@ public class ToUpdateModJson
 
 public partial class ToUpdateMod(LocalMod localMod, bool isChecked = false) : ObservableObject
 {
-    public LocalMod LocalMod => localMod;
-    public bool CanUpdate => LocalMod.Manifest.Version.IsOlderThan(LatestVersion);
-
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CanUpdate))]
     private ISemanticVersion? _latestVersion;
 
+    public LocalMod LocalMod => localMod;
+    public bool CanUpdate => LocalMod.Manifest.Version.IsOlderThan(LatestVersion);
+
+    public bool IsChecked { get; set; } = isChecked;
+    public string Name { get; } = localMod.Manifest.Name;
+    public string UniqueID { get; } = localMod.Manifest.UniqueID;
+    public ISemanticVersion CurrentVersion { get; } = localMod.Manifest.Version;
+
     public async Task<ToUpdateMod> UpdateLatestVersionAsync()
     {
         await Task.Delay(Random.Shared.Next(50, 500));
-        LatestVersion = await NexusMod.CreateAsync(LocalMod.OnlineMod.Url)
-            .ContinueWith(t => t.Result.GetModVersionAsync());
+        LatestVersion = await NexusMod.CreateAsync(LocalMod.OnlineMod.Url, false)
+            .ContinueWith(t => t.Result.GetModVersion());
         return this;
     }
 
@@ -161,9 +178,4 @@ public partial class ToUpdateMod(LocalMod localMod, bool isChecked = false) : Ob
         if (newValue is null || newValue == oldValue) return;
         IsChecked = CanUpdate;
     }
-
-    public bool IsChecked { get; set; } = isChecked;
-    public string Name { get; } = localMod.Manifest.Name;
-    public string UniqueID { get; } = localMod.Manifest.UniqueID;
-    public ISemanticVersion CurrentVersion { get; } = localMod.Manifest.Version;
 }

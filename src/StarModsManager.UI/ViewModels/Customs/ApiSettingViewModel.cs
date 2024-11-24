@@ -9,28 +9,28 @@ namespace StarModsManager.ViewModels.Customs;
 public partial class ApiSettingViewModel(string selectedApi) : ViewModelBase
 {
     [ObservableProperty]
-    private string _apiKey = Services.TransApiConfigs[selectedApi].Api;
+    public partial string ApiKey { get; set; } = Services.TransApiConfigs[selectedApi].Api;
 
     [ObservableProperty]
-    private string _model = Services.TransApiConfigs[selectedApi].Model;
+    public partial string Model { get; set; } = Services.TransApiConfigs[selectedApi].Model;
 
     [ObservableProperty]
-    private string _url = Services.TransApiConfigs[selectedApi].Url;
+    public partial string Url { get; set; } = Services.TransApiConfigs[selectedApi].Url;
 
     public bool IsApiKeyEnabled => Translator.Instance.CurrentTranslator.NeedApi;
     public ObservableCollection<string> Models { get; set; } = new(Services.TransApiConfigs[selectedApi].Models);
 
-    partial void OnApiKeyChanged(string? oldValue, string newValue)
+    partial void OnApiKeyChanged(string oldValue, string newValue)
     {
         if (newValue != oldValue) Services.TransApiConfigs[selectedApi].Api = newValue;
     }
 
-    partial void OnUrlChanged(string? oldValue, string newValue)
+    partial void OnUrlChanged(string oldValue, string newValue)
     {
         if (newValue != oldValue) Services.TransApiConfigs[selectedApi].Url = newValue;
     }
 
-    partial void OnModelChanged(string? oldValue, string newValue)
+    partial void OnModelChanged(string oldValue, string newValue)
     {
         if (newValue != oldValue) Services.TransApiConfigs[selectedApi].Model = newValue;
     }

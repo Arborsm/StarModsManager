@@ -4,6 +4,7 @@ using HtmlAgilityPack;
 using Polly;
 using Polly.Retry;
 using Serilog;
+using StarModsManager.Assets;
 
 namespace StarModsManager.Api;
 
@@ -47,7 +48,7 @@ public class HttpHelper
                 },
                 (outcome, timespan, retryAttempt, _) =>
                 {
-                    var message = outcome.Result is not null
+                    var message = outcome.Result != null
                         ? $"HTTP Status Code: {outcome.Result.StatusCode}"
                         : outcome.Exception?.Message;
                     Log.Verbose("Retry {retryAttempt} after {time}s delay due to: {message}",
@@ -75,7 +76,7 @@ public class HttpHelper
         catch (HttpRequestException ex) when (ex.Message.Contains("The SSL connection could not be established",
                                                   StringComparison.OrdinalIgnoreCase))
         {
-            Services.Notification.Show("网络链接错误, 请检查网络设置");
+            Services.Notification.Show(Lang.NetworkErrorMsg);
             return new HttpResponseMessage();
         }
         finally

@@ -2,6 +2,7 @@
 using System.Text;
 using HtmlAgilityPack;
 using Serilog;
+using StarModsManager.Assets;
 using StarModsManager.Mods;
 
 namespace StarModsManager.Api.NexusMods;
@@ -12,29 +13,28 @@ public class NexusPage
 {
     public static readonly Dictionary<string, string> Types = new()
     {
-        ["Date"] = "date",
-        ["Endorsements"] = "OLD_endorsements",
-        ["Downloads"] = "OLD_downloads",
-        ["Unique Downloads"] = "OLD_u_downloads",
-        ["Latest Updated"] = "lastupdate",
-        ["Author"] = "author",
-        ["File Name"] = "name",
-        ["Size"] = "OLD_size",
-        ["Trending"] = "two_weeks_ratings",
-        ["Last Comment"] = "lastcomment",
-        ["Random"] = "RAND"
+        [Lang.Date] = "date",
+        [Lang.Endorsements] = "OLD_endorsements",
+        [Lang.Downloads] = "OLD_downloads",
+        [Lang.UniqueDownloads] = "OLD_u_downloads",
+        [Lang.LatestUpdated] = "lastupdate",
+        [Lang.ModAuthor] = "author",
+        [Lang.FileName] = "name",
+        [Lang.Size] = "OLD_size",
+        [Lang.Trending] = "two_weeks_ratings",
+        [Lang.LastComment] = "lastcomment",
+        [Lang.Random] = "RAND"
     };
 
     public bool Advfilt { get; set; } = true;
     public int GameId { get; set; } = 1303;
     public bool Home { get; set; } = false;
     public bool IncludeAdult { get; set; } = true;
-
     public bool Nav { get; set; } = true;
     public int Page { get; set; } = 1;
     public int PageSize { get; set; } = 20;
     public bool ShowGameFilter { get; set; } = false;
-    public string SortBy { get; set; } = Types["Date"];
+    public string SortBy { get; set; } = Types[Lang.Date];
     public int Type { get; set; } = 0;
     public int UserId { get; set; } = 0;
     public bool AscOrder { get; set; }
@@ -72,7 +72,7 @@ public class NexusPage
         }
         catch (Exception e)
         {
-            Log.Error(e, "请求失败，异常信息: {Msg}", e.Message);
+            Log.Error(e, "Request failed, exception message: {Msg}", e.Message);
 
             response = new HttpResponseMessage();
         }
@@ -81,14 +81,14 @@ public class NexusPage
         if (response.IsSuccessStatusCode)
             responseData = await response.Content.ReadAsStringAsync(cancellationToken);
         else
-            Log.Error("请求失败，状态码: {Response}", response.StatusCode);
+            Log.Error("Request failed, status code: {Response}", response.StatusCode);
 
         var document = new HtmlDocument();
         document.LoadHtml(responseData);
 
         var modTitles = document.DocumentNode.SelectNodes("//div[contains(@class, 'mod-tile')]");
 
-        if (modTitles is not null)
+        if (modTitles != null)
             return from mod in modTitles
                 let modNameNode = mod.SelectSingleNode(".//p[@class='tile-name']/a")
                 let modName = modNameNode?.InnerText.Trim()
@@ -96,9 +96,9 @@ public class NexusPage
                 let modPicNode = mod.SelectSingleNode(".//div[@class='fore_div_mods']//img[@class='fore']")
                 let modPicLink = modPicNode?.GetAttributeValue("src", string.Empty)
                 where !string.IsNullOrEmpty(modPicLink)
-                select new OnlineMod(modLink, modName!, modPicLink);
+                select new OnlineMod(modLink, modName!, modPicLink, true);
 
-        Log.Warning("未找到 mod 信息");
+        Log.Warning("No mod information found");
         return [];
     }
 }

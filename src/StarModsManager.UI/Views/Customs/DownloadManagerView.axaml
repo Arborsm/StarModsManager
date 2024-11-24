@@ -6,6 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
+    xmlns:assets="clr-namespace:StarModsManager.Assets;assembly=StarModsManager.Common"
     x:DataType="customs:DownloadManagerViewModel"
     mc:Ignorable="d">
 
@@ -19,20 +20,20 @@
                 <TextBlock
                     Margin="5,5,0,0"
                     FontSize="28"
-                    Text="下载管理" />
+                    Text="{x:Static assets:Lang.DownloadManager}" />
                 <ui:CommandBar.SecondaryCommands>
                     <ui:CommandBarButton
                         Command="{Binding NewDownloadCommand}"
                         IconSource="Add"
-                        Label="新增下载" />
+                        Label="{x:Static assets:Lang.NewDownload}" />
                     <ui:CommandBarButton
                         Command="{Binding DeleteAllCommand}"
                         IconSource="Delete"
-                        Label="清空下载" />
+                        Label="{x:Static assets:Lang.DeleteAll}" />
                     <ui:CommandBarButton
                         Command="{Binding OpenFolderCommand}"
                         IconSource="Folder"
-                        Label="打开下载文件夹" />
+                        Label="{x:Static assets:Lang.OpenFolder}" />
                 </ui:CommandBar.SecondaryCommands>
             </ui:CommandBar>
             <ListBox ItemsSource="{Binding Downloads}">

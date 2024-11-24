@@ -14,29 +14,29 @@ public static class SdvDialogueFixer
         Dictionary<string, string> targetLang)
     {
         var hasNullResult = false;
-    
+
         foreach (var key in defaultLang.Keys)
         {
             targetLang.TryGetValue(key, out var value);
             var result = defaultLang[key].IsMismatchedTokens(value);
-        
+
             if (result == null)
             {
                 hasNullResult = true;
                 continue;
             }
-        
+
             if (result == true)
                 return true;
         }
-    
+
         return hasNullResult ? null : false;
     }
 
     public static bool? IsMismatchedTokens(this string? originalText, string? translatedText,
         bool isCheckDefaultLang = false)
     {
-        if (string.IsNullOrEmpty(translatedText)||string.IsNullOrEmpty(originalText)) return null;
+        if (string.IsNullOrEmpty(translatedText) || string.IsNullOrEmpty(originalText)) return null;
         var originalTokens = originalText.Split(SeparatorToken);
         var translatedTokens = translatedText.Split(SeparatorToken);
 

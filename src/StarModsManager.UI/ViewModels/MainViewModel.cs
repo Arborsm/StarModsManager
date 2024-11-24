@@ -9,13 +9,13 @@ namespace StarModsManager.ViewModels;
 public partial class MainViewModel : ViewModelBase
 {
     [ObservableProperty]
-    private int _toUpdateModsCount;
+    public partial int DownloadItemsCount { get; set; }
 
     [ObservableProperty]
-    private int _missingDependencyModsCount;
+    public partial int MissingDependencyModsCount { get; set; }
 
     [ObservableProperty]
-    private int _downloadItemsCount;
+    public partial int ToUpdateModsCount { get; set; }
 
     public MainViewModel()
     {
@@ -27,34 +27,40 @@ public partial class MainViewModel : ViewModelBase
 
 public class NavigationFactory : INavigationPageFactory
 {
-    public Control GetPage(Type srcType) => null!;
-
-    public Control GetPageFromObject(object target) => (target as string) switch
+    public Control GetPage(Type srcType)
     {
-        NavigationService.Main => new MainPageView
+        return null!;
+    }
+
+    public Control GetPageFromObject(object target)
+    {
+        return (target as string) switch
         {
-            DataContext = ViewModelService.Resolve<MainPageViewModel>()
-        },
-        NavigationService.Download => new DownloadPageView
-        {
-            DataContext = ViewModelService.Resolve<DownloadPageViewModel>()
-        },
-        NavigationService.Update => new UpdatePageView
-        {
-            DataContext = ViewModelService.Resolve<UpdatePageViewModel>()
-        },
-        NavigationService.Trans => new TransPageView
-        {
-            DataContext = ViewModelService.Resolve<TransPageViewModel>()
-        },
-        NavigationService.Check => new ProofreadPageView
-        {
-            DataContext = ViewModelService.Resolve<ProofreadPageViewModel>()
-        },
-        NavigationService.Settings => new SettingsPageView
-        {
-            DataContext = ViewModelService.Resolve<SettingsPageViewModel>()
-        },
-        _ => throw new NotImplementedException($"Cannot get Page from source: {target}")
-    };
+            NavigationService.Main => new MainPageView
+            {
+                DataContext = ViewModelService.Resolve<MainPageViewModel>()
+            },
+            NavigationService.Download => new DownloadPageView
+            {
+                DataContext = ViewModelService.Resolve<DownloadPageViewModel>()
+            },
+            NavigationService.Update => new UpdatePageView
+            {
+                DataContext = ViewModelService.Resolve<UpdatePageViewModel>()
+            },
+            NavigationService.Trans => new TransPageView
+            {
+                DataContext = ViewModelService.Resolve<TransPageViewModel>()
+            },
+            NavigationService.Check => new ProofreadPageView
+            {
+                DataContext = ViewModelService.Resolve<ProofreadPageViewModel>()
+            },
+            NavigationService.Settings => new SettingsPageView
+            {
+                DataContext = ViewModelService.Resolve<SettingsPageViewModel>()
+            },
+            _ => throw new NotImplementedException($"Cannot get Page from source: {target}")
+        };
+    }
 }

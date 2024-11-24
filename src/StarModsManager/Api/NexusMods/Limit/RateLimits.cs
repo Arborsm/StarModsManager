@@ -22,7 +22,10 @@ public static class RateLimits
     // x-rl-hourly-offset
     public static DateTimeOffset HourlyReset;
 
-    public static bool IsBlocked() => DailyRemaining <= 0 && HourlyRemaining <= 0;
+    public static bool IsBlocked()
+    {
+        return DailyRemaining <= 0 && HourlyRemaining <= 0;
+    }
 
     public static Task PrintRemaining()
     {

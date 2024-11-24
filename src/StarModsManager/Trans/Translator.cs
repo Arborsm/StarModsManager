@@ -1,7 +1,9 @@
 ﻿using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
-using System.Text.Json;
+using System.Security.Authentication;
+using Serilog;
 using StarModsManager.Api;
+using StarModsManager.Assets;
 using StarModsManager.Mods;
 using TransConfig = StarModsManager.Config.TransConfig;
 
@@ -9,14 +11,15 @@ namespace StarModsManager.Trans;
 
 public class Translator
 {
-    public static Translator Instance { get; } = new();
-    public List<ITranslator> Apis { get; } = [new OllamaTrans(), new OpenAITrans()];
-
     private Translator()
     {
     }
 
-    [field: AllowNull, MaybeNull]
+    public static Translator Instance { get; } = new();
+    public List<ITranslator> Apis { get; } = [new OllamaTrans(), new OpenAITrans()];
+
+    [field: AllowNull]
+    [field: MaybeNull]
     public ITranslator CurrentTranslator
     {
         get
@@ -34,7 +37,7 @@ public class Translator
         var iProgress = Services.Progress;
         iProgress.MaxProgress = totalItems;
         iProgress.IsIndeterminate = true;
-        iProgress.ProgressBar = new Progress<int>(value => iProgress.Progress = value);
+        iProgress.ProgressBar = new Progress<int>();
 
         foreach (var mod in toTansMods)
         {
@@ -62,8 +65,7 @@ public class Translator
 
         combined.Sort(defaultLang);
 
-        var content =
-            JsonSerializer.Serialize(combined, TranslationContext.Default.DictionaryStringString);
+        var content = TranslationContext.GetJson(combined);
         await File.WriteAllTextAsync(savePath, content, token);
     }
 
@@ -110,11 +112,30 @@ public class Translator
         return processedMap.ToDictionary(k => k.Key, v => v.Value);
     }
 
-    public async Task<string?> TranslateTextAsync(string text) => 
-        ContainsChinese(text) ? text : await TranslateTextAsync(text, Services.TransConfig.PromptText);
+    public async Task<string?> TranslateTextAsync(string text)
+    {
+        return ContainsChinese(text) ? text : await TranslateTextAsync(text, Services.TransConfig.PromptText);
+    }
 
-    private async Task<string> TranslateTextAsync(string text, string role, CancellationToken token = default) =>
-        await CurrentTranslator.StreamCallWithMessageAsync(text, role, Services.TransApiConfigs[Services.TransConfig.ApiSelected], token);
+    private async Task<string> TranslateTextAsync(string text, string role, CancellationToken token = default)
+    {
+        try
+        {
+            return await CurrentTranslator.StreamCallWithMessageAsync(text, role,
+                Services.TransApiConfigs[Services.TransConfig.ApiSelected], token);
+        }
+        catch (InvalidCredentialException)
+        {
+            Log.Warning("Translate fail -- Invalid Credential");
+            Services.Notification.Show(Lang.TranslationError, Lang.TranslationErrorMsg, Severity.Warning);
+        }
+        catch (Exception e)
+        {
+            Log.Error(e, "Translate Failed: {0}", e);
+        }
+
+        return string.Empty;
+    }
 
     private static bool ContainsChinese(string str)
     {

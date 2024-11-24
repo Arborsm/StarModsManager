@@ -1,4 +1,5 @@
 using Avalonia.Interactivity;
+using Serilog;
 using StarModsManager.ViewModels.Pages;
 using StarModsManager.Views.Pages;
 
@@ -14,8 +15,15 @@ public partial class TranslatingView : UserControl
 
     private static async void OnInitialized(object? sender, EventArgs e)
     {
-        if (ViewModelService.IsInDesignMode) return;
-        await ViewModelService.Resolve<TransPageViewModel>().TranslateAsync();
+        try
+        {
+            if (ViewModelService.IsInDesignMode) return;
+            await ViewModelService.Resolve<TransPageViewModel>().TranslateAsync();
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Error in TranslatingView");
+        }
     }
 
     private void CancelButton_OnClick(object? sender, RoutedEventArgs e)

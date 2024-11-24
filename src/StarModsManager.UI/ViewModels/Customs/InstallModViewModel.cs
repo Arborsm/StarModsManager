@@ -1,17 +1,17 @@
 ﻿using System.Collections.ObjectModel;
-using System.IO.Compression;
 using Avalonia.Controls.Models.TreeDataGrid;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using SharpCompress.Archives;
 using StarModsManager.Api.SMAPI;
 
 namespace StarModsManager.ViewModels.Customs;
 
 public partial class InstallModViewModel : ViewModelBase
 {
-    private readonly List<string> _files = [];
+    public readonly List<string> Files = [];
     private readonly ObservableCollection<ModFile> _modFiles = [];
 
     public InstallModViewModel(IEnumerable<IStorageItem> files)
@@ -29,7 +29,7 @@ public partial class InstallModViewModel : ViewModelBase
                             MaxWidth = new GridLength(380),
                             TextWrapping = TextWrapping.WrapWithOverflow
                         }
-                    }, 
+                    },
                     file => file.Children,
                     isExpandedSelector: file => file.IsExpanded),
                 new TextColumn<ModFile, string>("Size", file => file.Size)
@@ -38,12 +38,12 @@ public partial class InstallModViewModel : ViewModelBase
 
         foreach (var file in files)
         {
-            if (!Path.GetExtension(file.Name).Equals(".zip", StringComparison.OrdinalIgnoreCase)) continue;
             var path = file.TryGetLocalPath();
-            if (path is not null) _files.Add(path);
+            if (path == null || !ArchiveFactory.IsArchive(path, out _)) continue;
+            Files.Add(path);
             _modFiles.Add(CreateModFileFromZip(file));
         }
-        
+
         ModFileSource.Items = _modFiles;
     }
 
@@ -52,29 +52,31 @@ public partial class InstallModViewModel : ViewModelBase
     [RelayCommand]
     private void Install()
     {
-        _files.ForEach(SmapiModInstaller.Install);
+        SmapiModInstaller.Install(Files);
     }
 
-    private static ModFile CreateModFileFromZip(IStorageItem zipFile)
+    private static ModFile CreateModFileFromZip(IStorageItem file)
     {
         var rootModFile = new ModFile
         {
-            Name = Path.GetFileNameWithoutExtension(zipFile.Name),
-            Size = FormatFileSize(zipFile.GetBasicPropertiesAsync().GetAwaiter().GetResult().Size)
+            Name = Path.GetFileNameWithoutExtension(file.Name),
+            Size = FormatFileSize(file.GetBasicPropertiesAsync().GetAwaiter().GetResult().Size)
         };
-
-        using var zipArchive = ZipFile.OpenRead(zipFile.TryGetLocalPath() ?? string.Empty);
-        foreach (var entry in zipArchive.Entries) AddEntryToModFile(rootModFile, entry);
-
+        
+        var path = file.TryGetLocalPath() ?? string.Empty;
+        using var archive = ArchiveFactory.Open(path);
+        foreach (var entry in archive.Entries) AddEntryToModFile(rootModFile, entry);
+        
         return rootModFile;
     }
 
-    private static void AddEntryToModFile(ModFile parent, ZipArchiveEntry entry)
+    private static void AddEntryToModFile(ModFile parent, IArchiveEntry entry)
     {
-        var pathParts = entry.FullName.Split('/');
+        if (entry.Key is null) return;
+        var pathParts = entry.Key.Split('/');
         var currentParent = parent;
         var processedNodes = new Dictionary<ModFile, ModFile>();
-        
+
         for (var i = 0; i < pathParts.Length; i++)
         {
             var part = pathParts[i];
@@ -86,7 +88,7 @@ public partial class InstallModViewModel : ViewModelBase
                 var newChild = new ModFile
                 {
                     Name = part,
-                    Size = i == pathParts.Length - 1 ? FormatFileSize((ulong?)entry.Length) : String.Empty
+                    Size = i == pathParts.Length - 1 ? FormatFileSize((ulong?)entry.Size) : string.Empty
                 };
                 currentParent.Children.Add(newChild);
                 processedNodes[newChild] = currentParent;
@@ -98,7 +100,7 @@ public partial class InstallModViewModel : ViewModelBase
                 currentParent = existingChild;
             }
         }
-        
+
         foreach (var node in processedNodes.Keys.Where(node => node.IsValidModFolder()))
         {
             node.IsModFolder = true;
@@ -125,7 +127,8 @@ public partial class InstallModViewModel : ViewModelBase
 public partial class ModFile : ObservableObject
 {
     [ObservableProperty]
-    private bool _isExpanded;
+    public partial bool IsExpanded { get; set; }
+
     public bool IsModFolder { get; set; }
     public required string Name { get; init; }
     public required string Size { get; init; }
@@ -134,6 +137,9 @@ public partial class ModFile : ObservableObject
 
 public static class ModFileExtensions
 {
-    public static bool IsValidModFolder(this ModFile folder) => string.IsNullOrEmpty(folder.Size) && folder.Children
-        .Any(child => child.Name.Equals("manifest.json", StringComparison.OrdinalIgnoreCase));
+    public static bool IsValidModFolder(this ModFile folder)
+    {
+        return string.IsNullOrEmpty(folder.Size) && folder.Children
+            .Any(child => child.Name.Equals("manifest.json", StringComparison.OrdinalIgnoreCase));
+    }
 }

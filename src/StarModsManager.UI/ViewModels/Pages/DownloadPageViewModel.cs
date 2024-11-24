@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using StarModsManager.Api.NexusMods;
 using StarModsManager.Api.NexusMods.Limit;
+using StarModsManager.Assets;
 using StarModsManager.Lib;
 using StarModsManager.ViewModels.Items;
 
@@ -12,26 +13,30 @@ namespace StarModsManager.ViewModels.Pages;
 public partial class DownloadPageViewModel : MainPageViewModelBase
 {
     private readonly Throttle _throttle = new(1, TimeSpan.FromSeconds(1));
-
-    [ObservableProperty]
-    private bool _asc;
-
     private CancellationTokenSource? _cts;
     private int _currentPage = 1;
 
     [ObservableProperty]
-    private bool _isBusy;
+    public partial bool Asc { get; set; }
 
     [ObservableProperty]
-    private string _searchText = string.Empty;
+    public partial bool IsBusy { get; set; }
 
     [ObservableProperty]
-    private ModViewModel? _selectedMod;
+    public partial string SearchText { get; set; } = string.Empty;
 
     [ObservableProperty]
-    private string? _sortBy = NexusPage.Types.Keys.First();
+    public partial List<ModViewModel?> SelectedMods { get; set; } = [];
+
+    [ObservableProperty]
+    public partial string? SortBy { get; set; } = NexusPage.Types.Keys.First();
 
     public override string NavHeader => NavigationService.Download;
+    public ObservableCollection<string> SortByList { get; } = [..NexusPage.Types.Keys];
+    public ObservableCollection<ModViewModel> SearchResults { get; } = [];
+
+    private string GetSort => NexusPage.Types[SortBy ?? Lang.Date];
+    private bool CanLoadMoreMods => SearchResults.Count > 0;
 
     private NexusPage NexusPage => new()
     {
@@ -39,14 +44,6 @@ public partial class DownloadPageViewModel : MainPageViewModelBase
         SortBy = GetSort,
         AscOrder = Asc
     };
-
-    private string GetSort => NexusPage.Types[SortBy ?? "Date"];
-
-    public ObservableCollection<string> SortByList { get; } = [..NexusPage.Types.Keys];
-
-    public ObservableCollection<ModViewModel> SearchResults { get; } = [];
-
-    private bool CanLoadMoreMods => SearchResults.Count > 0;
 
     partial void OnSearchTextChanged(string value)
     {
@@ -134,7 +131,7 @@ public partial class DownloadPageViewModel : MainPageViewModelBase
         IsBusy = true;
         _cts?.CancelAsync();
         _cts = new CancellationTokenSource();
-        
+
         SearchResults.Clear();
         var cancellationToken = _cts.Token;
         var mods = await NexusPage.GetModsAsync(s, cancellationToken);

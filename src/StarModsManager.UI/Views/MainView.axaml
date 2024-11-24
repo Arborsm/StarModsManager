@@ -8,13 +8,15 @@
     xmlns:primitives="clr-namespace:FluentAvalonia.UI.Controls.Primitives;assembly=FluentAvalonia"
     xmlns:ui="using:FluentAvalonia.UI.Controls"
     xmlns:viewModels="clr-namespace:StarModsManager.ViewModels"
+    xmlns:assets="clr-namespace:StarModsManager.Assets;assembly=StarModsManager.Common"
     d:DesignHeight="700"
     d:DesignWidth="1000"
     x:DataType="viewModels:MainViewModel"
     mc:Ignorable="d">
 
     <UserControl.Styles>
-        <Style Selector="SplitView:closed ui|NavigationViewItem.Footer primitives|NavigationViewItemPresenter /template/ ContentPresenter#InfoBadgePresenter">
+        <Style
+            Selector="SplitView:closed ui|NavigationViewItem.Footer primitives|NavigationViewItemPresenter /template/ ContentPresenter#InfoBadgePresenter">
             <Setter Property="Margin" Value="-42, -14, 0, 0" />
             <Setter Property="Width" Value="16" />
         </Style>
@@ -39,7 +41,7 @@
             PaneDisplayMode="Left">
             <ui:NavigationView.IsPaneOpen>False</ui:NavigationView.IsPaneOpen>
             <ui:NavigationView.MenuItems>
-                <ui:NavigationViewItem Content="主页" Tag="Main">
+                <ui:NavigationViewItem Content="{x:Static assets:Lang.MainPageLabel}" Tag="Main">
                     <ui:NavigationViewItem.IconSource>
                         <fluent:SymbolIconSource Symbol="Home" />
                     </ui:NavigationViewItem.IconSource>
@@ -52,12 +54,12 @@
                             Value="{Binding MissingDependencyModsCount}" />
                     </ui:NavigationViewItem.InfoBadge>
                 </ui:NavigationViewItem>
-                <ui:NavigationViewItem Content="N网" Tag="Download">
+                <ui:NavigationViewItem Content="{x:Static assets:Lang.DownloadPageLabel}" Tag="Download">
                     <ui:NavigationViewItem.IconSource>
                         <fluent:SymbolIconSource Symbol="GlobeSearch" />
                     </ui:NavigationViewItem.IconSource>
                 </ui:NavigationViewItem>
-                <ui:NavigationViewItem Content="更新" Tag="Update">
+                <ui:NavigationViewItem Content="{x:Static assets:Lang.UpdatePageLabel}" Tag="Update">
                     <ui:NavigationViewItem.IconSource>
                         <fluent:SymbolIconSource Symbol="BoxArrowUp" />
                     </ui:NavigationViewItem.IconSource>
@@ -68,12 +70,12 @@
                             Value="{Binding ToUpdateModsCount}" />
                     </ui:NavigationViewItem.InfoBadge>
                 </ui:NavigationViewItem>
-                <ui:NavigationViewItem Content="翻译" Tag="Trans">
+                <ui:NavigationViewItem Content="{x:Static assets:Lang.TranslatePageLabel}" Tag="Trans">
                     <ui:NavigationViewItem.IconSource>
                         <fluent:SymbolIconSource Symbol="Translate" />
                     </ui:NavigationViewItem.IconSource>
                 </ui:NavigationViewItem>
-                <ui:NavigationViewItem Content="校对" Tag="Check">
+                <ui:NavigationViewItem Content="{x:Static assets:Lang.ProofreadPageLabel}" Tag="Check">
                     <ui:NavigationViewItem.IconSource>
                         <fluent:SymbolIconSource Symbol="TextProofingTools" />
                     </ui:NavigationViewItem.IconSource>
@@ -83,7 +85,7 @@
                 <ui:NavigationViewItem
                     Name="DownloadItem"
                     Classes="Footer"
-                    Content="下载">
+                    Content="{x:Static assets:Lang.DownloadManagerLabel}">
                     <ui:NavigationViewItem.IconSource>
                         <ui:SymbolIconSource Symbol="Download" />
                     </ui:NavigationViewItem.IconSource>

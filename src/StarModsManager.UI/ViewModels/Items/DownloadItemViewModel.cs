@@ -6,41 +6,18 @@ using CommunityToolkit.Mvvm.Input;
 using Serilog;
 using StarModsManager.Api;
 using StarModsManager.Api.SMAPI;
+using StarModsManager.ViewModels.Customs;
 
 namespace StarModsManager.ViewModels.Items;
 
 public partial class DownloadItemViewModel : ViewModelBase, IDisposable
 {
-    [ObservableProperty]
-    private string _fileName;
-
-    [ObservableProperty]
-    private double _progress;
-
-    [ObservableProperty]
-    private bool _isDownloading;
-
-    [ObservableProperty]
-    private bool _isCompleted;
-
-    [ObservableProperty]
-    private string _status;
-
-    [ObservableProperty]
-    private string _downloadSpeed = "0 KB/s";
-
-    [ObservableProperty]
-    private string _fileSize = "Unknown";
-
-    [ObservableProperty]
-    private string _downloadedSize = "0 KB";
-
     private readonly string _fileUrl;
-    private CancellationTokenSource? _cancellationTokenSource;
     private readonly HttpClient _httpClient;
     private readonly Stopwatch _speedTimer = new();
-    private long _lastBytesRead;
+    private CancellationTokenSource? _cancellationTokenSource;
     private bool _disposed;
+    private long _lastBytesRead;
 
     public DownloadItemViewModel(string fileUrl)
     {
@@ -54,6 +31,36 @@ public partial class DownloadItemViewModel : ViewModelBase, IDisposable
         IsCompleted = false;
 
         StartDownload();
+    }
+
+    [ObservableProperty]
+    public partial string FileName { get; set; }
+
+    [ObservableProperty]
+    public partial double Progress { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsDownloading { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsCompleted { get; set; }
+
+    [ObservableProperty]
+    public partial string Status { get; set; }
+
+    [ObservableProperty]
+    private partial string DownloadSpeed { get; set; } = "0 KB/s";
+
+    [ObservableProperty]
+    private partial string FileSize { get; set; } = "Unknown";
+
+    [ObservableProperty]
+    private partial string DownloadedSize { get; set; } = "0 KB";
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
     }
 
     private async void StartDownload()
@@ -72,7 +79,7 @@ public partial class DownloadItemViewModel : ViewModelBase, IDisposable
             {
                 var fileInfo = new FileInfo(filePath);
                 resumePosition = fileInfo.Length;
-                
+
                 var headRequest = new HttpRequestMessage(HttpMethod.Head, _fileUrl);
                 using var headResponse = await _httpClient.SendAsync(headRequest);
                 headResponse.EnsureSuccessStatusCode();
@@ -90,10 +97,7 @@ public partial class DownloadItemViewModel : ViewModelBase, IDisposable
             }
 
             var request = new HttpRequestMessage(HttpMethod.Get, _fileUrl);
-            if (resumePosition > 0)
-            {
-                request.Headers.Range = new RangeHeaderValue(resumePosition, null);
-            }
+            if (resumePosition > 0) request.Headers.Range = new RangeHeaderValue(resumePosition, null);
 
             using var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
             response.EnsureSuccessStatusCode();
@@ -114,10 +118,7 @@ public partial class DownloadItemViewModel : ViewModelBase, IDisposable
                 await fileStream.WriteAsync(buffer.AsMemory(0, bytesRead), _cancellationTokenSource.Token);
                 totalBytesRead += bytesRead;
 
-                if (totalBytes.HasValue)
-                {
-                    Progress = (double)totalBytesRead / totalBytes.Value * 100;
-                }
+                if (totalBytes.HasValue) Progress = (double)totalBytesRead / totalBytes.Value * 100;
 
                 UpdateDownloadStats(totalBytesRead);
             }
@@ -209,8 +210,8 @@ public partial class DownloadItemViewModel : ViewModelBase, IDisposable
             Status = $"Delete failed: {ex.Message}";
         }
 
-        this.Dispose();
-        ViewModelService.Resolve<Customs.DownloadManagerViewModel>().Downloads.Remove(this);
+        Dispose();
+        ViewModelService.Resolve<DownloadManagerViewModel>().Downloads.Remove(this);
     }
 
     [RelayCommand]
@@ -226,17 +227,11 @@ public partial class DownloadItemViewModel : ViewModelBase, IDisposable
         var filePath = Path.Combine(Services.DownloadPath, FileName);
         if (File.Exists(filePath)) SmapiModInstaller.Install(filePath);
     }
-    
+
     [RelayCommand]
     private void OpenDownloadFolder()
     {
         PlatformHelper.OpenFileOrUrl(Services.DownloadPath);
-    }
-
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
     }
 
     private void Dispose(bool disposing)

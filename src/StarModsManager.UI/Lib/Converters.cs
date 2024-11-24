@@ -42,14 +42,12 @@ public class ClipRectConverter : IMultiValueConverter
     {
         if (values[0] is Rect bounds &&
             values[1] is double buttonWidth)
-        {
             return new RectangleGeometry(new Rect(
-                0, 
                 0,
-                bounds.Width - buttonWidth, 
+                0,
+                bounds.Width - buttonWidth,
                 bounds.Height
             ));
-        }
         return new BindingNotification(new InvalidCastException(), BindingErrorType.Error);
     }
 
@@ -63,10 +61,7 @@ public class ModViewModelToColorConverter : IValueConverter
 {
     public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        if (value is bool disable)
-        {
-            return disable ? Brushes.Red : Brushes.Yellow;
-        }
+        if (value is bool disable) return disable ? Brushes.Red : Brushes.Yellow;
 
         return Brushes.Yellow;
     }

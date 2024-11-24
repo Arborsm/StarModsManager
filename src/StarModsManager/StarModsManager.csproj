@@ -8,44 +8,59 @@
         <OutputType>Library</OutputType>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <AssemblyName>StarModsManager.Common</AssemblyName>
+        <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2"/>
-        <PackageReference Include="HtmlAgilityPack" Version="1.11.71" />
-        <PackageReference Include="Octokit" Version="13.0.1" />
-        <PackageReference Include="OllamaSharp" Version="4.0.6" />
-        <PackageReference Include="OpenAI-DotNet" Version="8.3.0"/>
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0-preview2"/>
+        <PackageReference Include="HtmlAgilityPack" Version="1.11.71"/>
+        <PackageReference Include="Octokit" Version="13.0.1"/>
+        <PackageReference Include="OllamaSharp" Version="4.0.7"/>
+        <PackageReference Include="OpenAI-DotNet" Version="8.4.1"/>
         <PackageReference Include="Pathoschild.Http.FluentClient" Version="4.4.1"/>
-        <PackageReference Include="Polly" Version="8.5.0" />
+        <PackageReference Include="Polly" Version="8.5.0"/>
         <PackageReference Include="RestEase" Version="1.6.4"/>
         <PackageReference Include="RestEase.SourceGenerator" Version="1.6.4">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Serilog" Version="4.1.0" />
-        <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
-        <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
-        <PackageReference Include="System.Private.Uri" Version="4.3.2" />
-        <PackageReference Include="VdfConverter" Version="1.0.3" />
+        <PackageReference Include="Serilog" Version="4.1.0"/>
+        <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0"/>
+        <PackageReference Include="Serilog.Sinks.File" Version="6.0.0"/>
+        <PackageReference Include="SharpCompress" Version="0.38.0" />
+        <PackageReference Include="System.Private.Uri" Version="4.3.2"/>
+        <PackageReference Include="VdfConverter" Version="1.0.3"/>
     </ItemGroup>
 
     <ItemGroup>
-        <AvaloniaResource Include="Assets\Strings.Designer.cs" />
-        <AvaloniaResource Include="Assets\Strings.resx" />
-        <AvaloniaResource Include="Assets\Strings.zh.resx" />
+        <EmbeddedResource Include="Assets\Lang.resx">
+            <Generator>PublicResXFileCodeGenerator</Generator>
+            <LastGenOutput>Lang.Designer.cs</LastGenOutput>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </EmbeddedResource>
+        <EmbeddedResource Include="Assets\Lang.zh.resx">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </EmbeddedResource>
     </ItemGroup>
 
     <ItemGroup>
-      <Reference Include="Avalonia.Base">
-        <HintPath>..\StarModsManager.UI\bin\Debug\net9.0\Avalonia.Base.dll</HintPath>
-      </Reference>
-      <Reference Include="SMAPI.Toolkit">
-        <HintPath>Assets\Dll\SMAPI.Toolkit.dll</HintPath>
-      </Reference>
-      <Reference Include="SMAPI.Toolkit.CoreInterfaces">
-        <HintPath>Assets\Dll\SMAPI.Toolkit.CoreInterfaces.dll</HintPath>
-      </Reference>
+        <Compile Update="Assets\Lang.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Lang.resx</DependentUpon>
+        </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Reference Include="Avalonia.Base">
+            <HintPath>..\StarModsManager.UI\bin\Debug\net9.0\Avalonia.Base.dll</HintPath>
+        </Reference>
+        <Reference Include="SMAPI.Toolkit">
+            <HintPath>Assets\Dll\SMAPI.Toolkit.dll</HintPath>
+        </Reference>
+        <Reference Include="SMAPI.Toolkit.CoreInterfaces">
+            <HintPath>Assets\Dll\SMAPI.Toolkit.CoreInterfaces.dll</HintPath>
+        </Reference>
     </ItemGroup>
 
 </Project>

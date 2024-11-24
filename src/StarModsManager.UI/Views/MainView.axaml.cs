@@ -10,13 +10,14 @@ using StarModsManager.Lib;
 using StarModsManager.ViewModels;
 using StarModsManager.ViewModels.Customs;
 using StarModsManager.Views.Customs;
+using INotification = StarModsManager.Api.INotification;
 
 namespace StarModsManager.Views;
 
 public partial class MainView : UserControl
 {
-    private bool _isDesktop;
     private readonly FlyoutBase _flyout;
+    private bool _isDesktop;
 
     public MainView()
     {
@@ -105,27 +106,42 @@ public partial class MainView : UserControl
 
 public class PopUp(Control control, Action downloadManager) : IPopUp
 {
-    public void ShowDownloadManager() => downloadManager();
-    public void AddDownload(string url) => ViewModelService.Resolve<DownloadManagerViewModel>().AddDownload(url);
-    public void ShowFlyout(object flyout) => (flyout as Flyout)?.ShowAt(control);
-}
-
-public class Notification(WindowNotificationManager manager) : Api.INotification
-{
-    public void Close(object? o)
-    { 
-        if (o is not null)
-        {
-            manager.Close(o);
-        }
+    public void ShowDownloadManager()
+    {
+        downloadManager();
     }
 
-    public void CloseAll() => manager.CloseAll();
+    public void AddDownload(string url)
+    {
+        ViewModelService.Resolve<DownloadManagerViewModel>().AddDownload(url);
+    }
 
-    public void Show(object content, Severity severity)
+    public void ShowFlyout(object flyout)
+    {
+        (flyout as Flyout)?.ShowAt(control);
+    }
+}
+
+public class Notification(WindowNotificationManager manager) : INotification
+{
+    public void Close(object? o)
+    {
+        if (o != null) manager.Close(o);
+    }
+
+    public void CloseAll()
+    {
+        manager.CloseAll();
+    }
+
+    public void Show(object content, Severity severity,
+        TimeSpan? expiration = null,
+        Action? onClick = null,
+        Action? onClose = null)
     {
         var type = GetInfoType(severity);
-        Dispatcher.UIThread.Invoke(() => manager.Show(content, type));
+        InitExpiration(severity, ref expiration);
+        Dispatcher.UIThread.Invoke(() => manager.Show(content, type, expiration, onClick, onClose));
     }
 
     public object Show(string title, string message, Severity severity,
@@ -134,23 +150,47 @@ public class Notification(WindowNotificationManager manager) : Api.INotification
         Action? onClose = null)
     {
         var type = GetInfoType(severity);
-        if (type == NotificationType.Error && expiration is null) expiration = TimeSpan.Zero;
+        InitExpiration(severity, ref expiration);
         var msg = new Avalonia.Controls.Notifications.Notification(title, message, type, expiration, onClick, onClose);
-        Dispatcher.UIThread.Invoke(() =>
-        {
-            manager.Show(msg);
-        });
+        Dispatcher.UIThread.Invoke(() => manager.Show(msg));
         return msg;
     }
 
-    public object Show(string message) => Show("Info", message, Severity.Informational);
-
-    private static NotificationType GetInfoType(Severity severity) => severity switch
+    private static void InitExpiration(Severity type, ref TimeSpan? expiration) => expiration ??= type switch
     {
-        Severity.Informational => NotificationType.Information,
-        Severity.Success => NotificationType.Success,
-        Severity.Warning => NotificationType.Warning,
-        Severity.Error => NotificationType.Error,
-        _ => throw new ArgumentOutOfRangeException(nameof(severity), severity, null)
+        Severity.Error => TimeSpan.Zero,
+        Severity.Warning => TimeSpan.FromSeconds(10),
+        _ => TimeSpan.FromSeconds(8)
     };
+
+    public object Show(string message)
+    {
+        return Show("Info", message, Severity.Informational);
+    }
+
+    public object ShowLongMsg(string title, string msg, Severity severity, 
+        TimeSpan? expiration = null,
+        Action? onClick = null, 
+        Action? onClose = null)
+    {
+        var vm = new CustomNotificationViewModel
+        {
+            Title = title,
+            Message = msg
+        };
+        Show(vm, severity, expiration, onClick, onClose);
+        return vm;
+    }
+
+    private static NotificationType GetInfoType(Severity severity)
+    {
+        return severity switch
+        {
+            Severity.Informational => NotificationType.Information,
+            Severity.Success => NotificationType.Success,
+            Severity.Warning => NotificationType.Warning,
+            Severity.Error => NotificationType.Error,
+            _ => throw new ArgumentOutOfRangeException(nameof(severity), severity, null)
+        };
+    }
 }

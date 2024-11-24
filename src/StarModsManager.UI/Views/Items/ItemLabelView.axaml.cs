@@ -9,7 +9,7 @@ public partial class ItemLabelView : UserControl
     public ItemLabelView()
     {
         InitializeComponent();
-        this.DoubleTapped += InputElement_OnDoubleTapped;
+        DoubleTapped += InputElement_OnDoubleTapped;
         MainTextBox.LostFocus += MainTextBoxOnLostFocus;
     }
 

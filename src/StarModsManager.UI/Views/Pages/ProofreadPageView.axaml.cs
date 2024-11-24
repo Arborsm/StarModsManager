@@ -61,7 +61,7 @@ public partial class ProofreadPageView : UserControl
     {
         e.Handled = true;
         var proofreadDataGrid = (DataGrid)sender!;
-        
+
         proofreadDataGrid.ScrollIntoView(proofreadDataGrid.SelectedItem, proofreadDataGrid.Columns[0]);
         proofreadDataGrid.InvalidateVisual();
     }

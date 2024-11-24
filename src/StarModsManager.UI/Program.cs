@@ -15,17 +15,13 @@ internal static class Program
     {
         using var manager = new SingleInstanceManager(Services.AppName);
         if (manager.IsFirstInstance)
-        {
             BuildAvaloniaApp()
                 .ExceptionHandler()
                 .InitializeDataBackground()
                 .With(CreateFontManagerOptions())
                 .StartWithClassicDesktopLifetime(args);
-        }
         else
-        {
             manager.NotifyFirstInstance();
-        }
     }
 
     private static AppBuilder InitializeDataBackground(this AppBuilder builder)
@@ -43,12 +39,14 @@ internal static class Program
         return builder;
     }
 
-    private static AppBuilder BuildAvaloniaApp() =>
-        AppBuilder.Configure<App>()
+    private static AppBuilder BuildAvaloniaApp()
+    {
+        return AppBuilder.Configure<App>()
             .UsePlatformDetect()
             .WithInterFont()
             .UseSegoeMetrics()
             .LogToTrace();
+    }
 
     private static FontManagerOptions CreateFontManagerOptions()
     {

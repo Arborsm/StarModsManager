@@ -5,6 +5,7 @@
     xmlns:customs="clr-namespace:StarModsManager.ViewModels.Customs"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ass="clr-namespace:StarModsManager.Assets;assembly=StarModsManager.Common"
     Width="500"
     Height="450"
     x:DataType="customs:PicsSelectViewModel"
@@ -33,7 +34,7 @@
             <TextBlock
                 FontSize="20"
                 IsVisible="{Binding IsListEmpty}"
-                Text="Cannot find any pictures in the mod page" />
+                Text="{x:Static ass:Lang.NoPics}" />
         </Panel>
     </DockPanel>
 </UserControl>

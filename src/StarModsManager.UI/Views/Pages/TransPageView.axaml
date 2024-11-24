@@ -5,6 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:pages="clr-namespace:StarModsManager.ViewModels.Pages"
+    xmlns:assets="clr-namespace:StarModsManager.Assets;assembly=StarModsManager.Common"
     d:DesignHeight="450"
     d:DesignWidth="800"
     x:DataType="pages:TransPageViewModel"
@@ -19,13 +20,13 @@
                 <DataGrid.Columns>
                     <DataGridCheckBoxColumn
                         Binding="{Binding IsChecked}"
-                        Header="选择"
+                        Header="{x:Static assets:Lang.Select}"
                         IsReadOnly="False" />
                     <DataGridTextColumn
                         Width="*"
                         Binding="{Binding Name}"
-                        Header="ModInfo 名称" />
-                    <DataGridTextColumn Binding="{Binding Keys}" Header="未翻译条目" />
+                        Header="{x:Static assets:Lang.ModName}" />
+                    <DataGridTextColumn Binding="{Binding Keys}" Header="{x:Static assets:Lang.UnTransCounts}" />
                 </DataGrid.Columns>
             </DataGrid>
         </Border>
@@ -36,15 +37,15 @@
             <Button
                 Margin="0,20,20,0"
                 Click="SettingButton_OnClick"
-                Content="设置" />
+                Content="{x:Static assets:Lang.SettingsButton}" />
             <Button
                 Margin="0,20,20,0"
                 Click="TransButton_OnClick"
-                Content="翻译" />
+                Content="{x:Static assets:Lang.TranslatePageLabel}" />
             <Button
                 Margin="0,20,20,0"
                 Command="{Binding ReloadCommand}"
-                Content="刷新" />
+                Content="{x:Static assets:Lang.Refresh}" />
         </StackPanel>
     </Grid>
 </UserControl>

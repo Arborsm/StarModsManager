@@ -14,6 +14,7 @@ public class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
+        //Lang.Culture = CultureInfo.GetCultureInfo("us-en");
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             var mainWindow = new MainWindow();

@@ -5,15 +5,19 @@
     xmlns:customs="clr-namespace:StarModsManager.ViewModels.Customs"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    d:DesignHeight="450"
-    d:DesignWidth="800"
     x:DataType="customs:ModDetailViewModel"
     mc:Ignorable="d">
-    <StackPanel Spacing="10">
-        <TextBox IsReadOnly="True" Text="{Binding Mod}" />
+    <StackPanel x:Name="StackPanel" Spacing="10">
+        <StackPanel.Styles>
+            <Style Selector="TextBox">
+                <Setter Property="Width" Value="400" />
+                <Setter Property="TextWrapping" Value="WrapWithOverflow" />
+                <Setter Property="IsReadOnly" Value="True" />
+            </Style>
+        </StackPanel.Styles>
+        <TextBox Text="{Binding Mod}" />
         <TextBox
             Foreground="IndianRed"
-            IsReadOnly="True"
             IsVisible="{Binding !!Addition}"
             Text="{Binding Addition}" />
     </StackPanel>

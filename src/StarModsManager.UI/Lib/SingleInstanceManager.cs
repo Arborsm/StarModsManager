@@ -7,11 +7,11 @@ namespace StarModsManager.Lib;
 
 public sealed class SingleInstanceManager : IDisposable
 {
-    private readonly string _pipeName;
-    private readonly Mutex _mutex;
     private readonly CancellationTokenSource _cts = new();
-    private bool _disposed;
+    private readonly Mutex _mutex;
     private readonly bool _ownsMutex;
+    private readonly string _pipeName;
+    private bool _disposed;
 
     public SingleInstanceManager(string appName)
     {
@@ -20,13 +20,16 @@ public sealed class SingleInstanceManager : IDisposable
         _mutex = new Mutex(true, mutexName, out _ownsMutex);
         IsFirstInstance = _ownsMutex;
 
-        if (IsFirstInstance)
-        {
-            Task.Run(ListenForOtherInstances, _cts.Token);
-        }
+        if (IsFirstInstance) Task.Run(ListenForOtherInstances, _cts.Token);
     }
 
     public bool IsFirstInstance { get; }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
 
     public void NotifyFirstInstance()
     {
@@ -52,10 +55,7 @@ public sealed class SingleInstanceManager : IDisposable
             await server.WaitForConnectionAsync(_cts.Token);
             using var reader = new StreamReader(server);
             var command = await reader.ReadLineAsync();
-            if (command == "ACTIVATE")
-            {
-                Dispatcher.UIThread.Post(ActivateMainWindow);
-            }
+            if (command == "ACTIVATE") Dispatcher.UIThread.Post(ActivateMainWindow);
         }
     }
 
@@ -71,24 +71,16 @@ public sealed class SingleInstanceManager : IDisposable
         }
     }
 
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
     private void Dispose(bool disposing)
     {
         if (_disposed) return;
         if (disposing)
         {
             _cts.Cancel();
-            if (_ownsMutex)
-            {
-                _mutex.ReleaseMutex();
-            }
+            if (_ownsMutex) _mutex.ReleaseMutex();
             _mutex.Dispose();
         }
+
         _disposed = true;
     }
 

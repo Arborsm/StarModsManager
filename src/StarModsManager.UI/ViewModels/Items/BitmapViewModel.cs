@@ -6,7 +6,7 @@ namespace StarModsManager.ViewModels.Items;
 public partial class BitmapViewModel(Bitmap bitmap, string filePath) : ViewModelBase
 {
     [ObservableProperty]
-    private Bitmap _pic = bitmap;
+    public partial Bitmap Pic { get; set; } = bitmap;
 
     public string FilePath { get; } = filePath;
 }

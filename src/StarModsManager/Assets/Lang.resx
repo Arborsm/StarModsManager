@@ -1,0 +1,585 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+    <!-- 
+      Microsoft ResX Schema 
+      
+      Version 2.0
+      
+      The primary goals of this format is to allow a simple XML format 
+      that is mostly human readable. The generation and parsing of the 
+      various data types are done through the TypeConverter classes 
+      associated with the data types.
+      
+      Example:
+      
+      ... ado.net/XML headers & schema ...
+      <resheader name="resmimetype">text/microsoft-resx</resheader>
+      <resheader name="version">2.0</resheader>
+      <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+      <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+      <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+      <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+      <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+          <value>[base64 mime encoded serialized .NET Framework object]</value>
+      </data>
+      <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+          <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+          <comment>This is a comment</comment>
+      </data>
+                  
+      There are any number of "resheader" rows that contain simple 
+      name/value pairs.
+      
+      Each data row contains a name, and value. The row also contains a 
+      type or mimetype. Type corresponds to a .NET class that support 
+      text/value conversion through the TypeConverter architecture. 
+      Classes that don't support this are serialized and stored with the 
+      mimetype set.
+      
+      The mimetype is used for serialized objects, and tells the 
+      ResXResourceReader how to depersist the object. This is currently not 
+      extensible. For a given mimetype the value must be set accordingly:
+      
+      Note - application/x-microsoft.net.object.binary.base64 is the format 
+      that the ResXResourceWriter will generate, however the reader can 
+      read any of the formats listed below.
+      
+      mimetype: application/x-microsoft.net.object.binary.base64
+      value   : The object must be serialized with 
+              : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+              : and then encoded with base64 encoding.
+      
+      mimetype: application/x-microsoft.net.object.soap.base64
+      value   : The object must be serialized with 
+              : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+              : and then encoded with base64 encoding.
+  
+      mimetype: application/x-microsoft.net.object.bytearray.base64
+      value   : The object must be serialized into a byte array 
+              : using a System.ComponentModel.TypeConverter
+              : and then encoded with base64 encoding.
+      -->
+    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata"
+                id="root"
+                xmlns="">
+        <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+        <xsd:element name="root" msdata:IsDataSet="true">
+            <xsd:complexType>
+                <xsd:choice maxOccurs="unbounded">
+                    <xsd:element name="metadata">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
+                            </xsd:sequence>
+                            <xsd:attribute name="name" use="required" type="xsd:string"/>
+                            <xsd:attribute name="type" type="xsd:string"/>
+                            <xsd:attribute name="mimetype" type="xsd:string"/>
+                            <xsd:attribute ref="xml:space"/>
+                        </xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="assembly">
+                        <xsd:complexType>
+                            <xsd:attribute name="alias" type="xsd:string"/>
+                            <xsd:attribute name="name" type="xsd:string"/>
+                        </xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="data">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
+                            </xsd:sequence>
+                            <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
+                            <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+                            <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+                            <xsd:attribute ref="xml:space"/>
+                        </xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="resheader">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                            </xsd:sequence>
+                            <xsd:attribute name="name" type="xsd:string" use="required"/>
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:choice>
+            </xsd:complexType>
+        </xsd:element>
+    </xsd:schema>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>2.0</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <data name="ErrorOccurred" xml:space="preserve">
+    <value>Error occurred:</value>
+  </data>
+    <data name="Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+    <data name="SelectFolderButton" xml:space="preserve">
+    <value>SelectFolder</value>
+  </data>
+    <data name="SettingsButton" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+    <data name="Translating" xml:space="preserve">
+    <value>Translating...</value>
+  </data>
+    <data name="TranslationMismatch" xml:space="preserve">
+    <value>Mismatch symbols found. Open proofreading window?</value>
+  </data>
+    <data name="Warning" xml:space="preserve">
+    <value>Warning</value>
+  </data>
+    <data name="TranslationStopped" xml:space="preserve">
+    <value>Translation Stopped</value>
+  </data>
+    <data name="UnableTrans" xml:space="preserve">
+    <value>Unable to translate</value>
+  </data>
+    <data name="SourceText" xml:space="preserve">
+        <value>Source Text</value>
+    </data>
+    <data name="Unavailable" xml:space="preserve">
+    <value>Unavailable</value>
+  </data>
+    <data name="UrlLabel" xml:space="preserve">
+    <value>Url:</value>
+  </data>
+    <data name="TargetLang" xml:space="preserve">
+    <value>Target Lang</value>
+  </data>
+    <data name="ErrorFoldersMsg" xml:space="preserve">
+    <value>Unable to find a mod folder that meets the requirements in the target folder</value>
+  </data>
+    <data name="TranslationPrompt" xml:space="preserve">
+    <value>Translation prompt text:</value>
+  </data>
+    <data name="MainPageLabel" xml:space="preserve">
+        <value>Main</value>
+    </data>
+    <data name="DownloadPageLabel" xml:space="preserve">
+        <value>NexusMods</value>
+    </data>
+    <data name="UpdatePageLabel" xml:space="preserve">
+        <value>Update</value>
+    </data>
+    <data name="TranslatePageLabel" xml:space="preserve">
+        <value>Translate</value>
+    </data>
+    <data name="ProofreadPageLabel" xml:space="preserve">
+        <value>Proofread</value>
+    </data>
+    <data name="DownloadManagerLabel" xml:space="preserve">
+        <value>Download</value>
+    </data>
+    <data name="ApiLabel" xml:space="preserve">
+        <value>Api:</value>
+    </data>
+    <data name="ModelsLabel" xml:space="preserve">
+        <value>Available Models:</value>
+    </data>
+    <data name="DownloadManager" xml:space="preserve">
+        <value>Download Manager</value>
+    </data>
+    <data name="NewDownload" xml:space="preserve">
+        <value>New Download</value>
+    </data>
+    <data name="DeleteAll" xml:space="preserve">
+        <value>Clear Download Items</value>
+    </data>
+    <data name="OpenFolder" xml:space="preserve">
+        <value>Open Download Folder</value>
+    </data>
+    <data name="NoPics" xml:space="preserve">
+        <value>Cannot find any pictures in the mod page</value>
+    </data>
+    <data name="OverallProgress" xml:space="preserve">
+        <value>Overall Progress</value>
+    </data>
+    <data name="TargetText" xml:space="preserve">
+        <value>Translated Text</value>
+    </data>
+    <data name="Cancel" xml:space="preserve">
+        <value>Cancel</value>
+    </data>
+    <data name="OK" xml:space="preserve">
+        <value>OK</value>
+    </data>
+    <data name="Language" xml:space="preserve">
+        <value>Language</value>
+    </data>
+    <data name="PromptText" xml:space="preserve">
+        <value>Prompt Text:</value>
+    </data>
+    <data name="Delay" xml:space="preserve">
+        <value>Inner Delay</value>
+    </data>
+    <data name="TurboMode" xml:space="preserve">
+        <value>Turbo Mode</value>
+    </data>
+    <data name="AutoBackup" xml:space="preserve">
+        <value>Auto Backup</value>
+    </data>
+    <data name="OpenFile" xml:space="preserve">
+        <value>Open File</value>
+    </data>
+    <data name="AddToTag" xml:space="preserve">
+        <value>Add To Tag</value>
+    </data>
+    <data name="RemoveFromTag" xml:space="preserve">
+        <value>Remove From Tag</value>
+    </data>
+    <data name="ChangePic" xml:space="preserve">
+        <value>Change Picture</value>
+    </data>
+    <data name="Detail" xml:space="preserve">
+        <value>Detail</value>
+    </data>
+    <data name="OpenUrl" xml:space="preserve">
+        <value>Visit Mod Webpage</value>
+    </data>
+    <data name="Refresh" xml:space="preserve">
+        <value>Refresh</value>
+    </data>
+    <data name="DownloadLatestVersion" xml:space="preserve">
+        <value>Download Latest Version</value>
+    </data>
+    <data name="Enable" xml:space="preserve">
+        <value>Enable</value>
+    </data>
+    <data name="Disable" xml:space="preserve">
+        <value>Disable</value>
+    </data>
+    <data name="Disabled" xml:space="preserve">
+        <value>Disabled</value>
+    </data>
+    <data name="DependencyMissing" xml:space="preserve">
+        <value>Dependency Missing</value>
+    </data>
+    <data name="SearchModText" xml:space="preserve">
+        <value>Search for Mod....</value>
+    </data>
+    <data name="SwitchLabelMods" xml:space="preserve">
+        <value>Switch All Mods</value>
+    </data>
+    <data name="Add" xml:space="preserve">
+        <value>Add</value>
+    </data>
+    <data name="Remove" xml:space="preserve">
+        <value>Remove</value>
+    </data>
+    <data name="ChangeColor" xml:space="preserve">
+        <value>Change Color</value>
+    </data>
+    <data name="Rename" xml:space="preserve">
+        <value>Rename</value>
+    </data>
+    <data name="Search" xml:space="preserve">
+        <value>Search</value>
+    </data>
+    <data name="Filter" xml:space="preserve">
+        <value>Filter</value>
+    </data>
+    <data name="Lines" xml:space="preserve">
+        <value>Lines</value>
+    </data>
+    <data name="Header" xml:space="preserve">
+        <value>Header</value>
+    </data>
+    <data name="Sort" xml:space="preserve">
+        <value>Sort</value>
+    </data>
+    <data name="Resize" xml:space="preserve">
+        <value>Resize</value>
+    </data>
+    <data name="LangKey" xml:space="preserve">
+        <value>Lang Key</value>
+    </data>
+    <data name="Symbol" xml:space="preserve">
+        <value>Symbol</value>
+    </data>
+    <data name="Unsaved" xml:space="preserve">
+        <value>Unsaved</value>
+    </data>
+    <data name="Close" xml:space="preserve">
+        <value>Close</value>
+    </data>
+    <data name="UnsavedTip" xml:space="preserve">
+        <value>You have unsaved changes. Would you like to save them?</value>
+    </data>
+    <data name="SettingDirDes" xml:space="preserve">
+        <value>Select the directory where your mods are stored</value>
+    </data>
+    <data name="SettingDir" xml:space="preserve">
+        <value>Mods Directory</value>
+    </data>
+    <data name="Browse" xml:space="preserve">
+        <value>Browse</value>
+    </data>
+    <data name="AutoSelect" xml:space="preserve">
+        <value>Auto Select</value>
+    </data>
+    <data name="SettingNexusApiKeyDes" xml:space="preserve">
+        <value>This is used to download the the mods from the Nexus Mods website</value>
+    </data>
+    <data name="SettingNexusApi" xml:space="preserve">
+        <value>Nexus Api</value>
+    </data>
+    <data name="SettingNexusApiKey" xml:space="preserve">
+        <value>Api Key:</value>
+    </data>
+    <data name="SettingNexusCookie" xml:space="preserve">
+        <value>Cookie:</value>
+    </data>
+    <data name="Others" xml:space="preserve">
+        <value>Others</value>
+    </data>
+    <data name="DebugMode" xml:space="preserve">
+        <value>Debug Mode:</value>
+    </data>
+    <data name="AutoCheckUpdates" xml:space="preserve">
+        <value>Auto Check Updates:</value>
+    </data>
+    <data name="SettingThemeDes" xml:space="preserve">
+        <value>Change the current app theme</value>
+    </data>
+    <data name="AppTheme" xml:space="preserve">
+        <value>App Theme</value>
+    </data>
+    <data name="SettingFlowDirectionDes" xml:space="preserve">
+        <value>Change the current app flow direction</value>
+    </data>
+    <data name="SettingFlowDirection" xml:space="preserve">
+        <value>Flow Direction</value>
+    </data>
+    <data name="SettingWindowSizeDes" xml:space="preserve">
+        <value>Save current app window size</value>
+    </data>
+    <data name="SettingWindowSize" xml:space="preserve">
+        <value>Window Size</value>
+    </data>
+    <data name="Clear" xml:space="preserve">
+        <value>Clear</value>
+    </data>
+    <data name="SaveCurrentSize" xml:space="preserve">
+        <value>Save Current Size</value>
+    </data>
+    <data name="SettingAppAccentColorDes" xml:space="preserve">
+        <value>Set a custom accent color for the App</value>
+    </data>
+    <data name="SettingAppAccentColor" xml:space="preserve">
+        <value>App Accent Color</value>
+    </data>
+    <data name="Preview" xml:space="preserve">
+        <value>Preview</value>
+    </data>
+    <data name="SystemAccentColor" xml:space="preserve">
+        <value>System Accent Color</value>
+    </data>
+    <data name="Light1" xml:space="preserve">
+        <value>Light1</value>
+    </data>
+    <data name="Light2" xml:space="preserve">
+        <value>Light2</value>
+    </data>
+    <data name="Light3" xml:space="preserve">
+        <value>Light3</value>
+    </data>
+    <data name="Dark1" xml:space="preserve">
+        <value>Dark1</value>
+    </data>
+    <data name="Dark2" xml:space="preserve">
+        <value>Dark2</value>
+    </data>
+    <data name="Dark3" xml:space="preserve">
+        <value>Dark3</value>
+    </data>
+    <data name="UseCustomAccentColorDes" xml:space="preserve">
+        <value>Use Custom Accent Color?</value>
+    </data>
+    <data name="PreSetColors" xml:space="preserve">
+        <value>Pre-set Colors</value>
+    </data>
+    <data name="CustomColor" xml:space="preserve">
+        <value>Custom Color</value>
+    </data>
+    <data name="About" xml:space="preserve">
+        <value>About</value>
+    </data>
+    <data name="SourceCode" xml:space="preserve">
+        <value>Source Code</value>
+    </data>
+    <data name="Select" xml:space="preserve">
+        <value>Select</value>
+    </data>
+    <data name="ModName" xml:space="preserve">
+        <value>Mod Name</value>
+    </data>
+    <data name="UnTransCounts" xml:space="preserve">
+        <value>Untranslated entries</value>
+    </data>
+    <data name="CurrentVersion" xml:space="preserve">
+        <value>Current Version</value>
+    </data>
+    <data name="LatestVersion" xml:space="preserve">
+        <value>Latest Version</value>
+    </data>
+    <data name="OpenDownloadPage" xml:space="preserve">
+        <value>Open Download Page</value>
+    </data>
+    <data name="NoModToUpdate" xml:space="preserve">
+        <value>All mods are up to date</value>
+    </data>
+    <data name="Update" xml:space="preserve">
+        <value>Update</value>
+    </data>
+    <data name="ThreadInternalError" xml:space="preserve">
+        <value>Thread Internal Error</value>
+    </data>
+    <data name="GetDownloadUrl" xml:space="preserve">
+        <value>Getting mod download links...</value>
+    </data>
+    <data name="NetworkErrorMsg" xml:space="preserve">
+        <value>Network connection error, please check network settings</value>
+    </data>
+    <data name="OperationCanceled" xml:space="preserve">
+        <value>Operation Canceled</value>
+    </data>
+    <data name="SymbolError" xml:space="preserve">
+        <value>Symbol matching error found, please fix on the proofreading page</value>
+    </data>
+    <data name="Installing" xml:space="preserve">
+        <value>Installing...</value>
+    </data>
+    <data name="ToInstall" xml:space="preserve">
+        <value>Attempting to install {0}</value>
+    </data>
+    <data name="TranslationError" xml:space="preserve">
+        <value>Translation failed</value>
+    </data>
+    <data name="TranslationErrorMsg" xml:space="preserve">
+        <value>Please check if your API is correct.</value>
+    </data>
+    <data name="FetchingModLink" xml:space="preserve">
+        <value>Fetching mod download link...</value>
+    </data>
+    <data name="NexusPremiumRequired" xml:space="preserve">
+        <value>Nexus Premium required for direct mod download. Please use web download</value>
+    </data>
+    <data name="ModFileNotFound" xml:space="preserve">
+        <value>Mod file not found or cannot be downloaded</value>
+    </data>
+    <data name="NotModArchive" xml:space="preserve">
+        <value>Not a mod archive/package</value>
+    </data>
+    <data name="ManifestFileNotFound" xml:space="preserve">
+        <value>manifest.json file not found</value>
+    </data>
+    <data name="ModInstallSuccess" xml:space="preserve">
+        <value>Mod installed successfully</value>
+    </data>
+    <data name="InstalledModWithVersion" xml:space="preserve">
+        <value>Installed {0}({1})"</value>
+    </data>
+    <data name="Notice" xml:space="preserve">
+        <value>Notice</value>
+    </data>
+    <data name="RestartRequired" xml:space="preserve">
+        <value>Restart required for changes to take effect</value>
+    </data>
+    <data name="ModUniqueId" xml:space="preserve">
+        <value>UniqueID</value>
+    </data>
+    <data name="ModDescription" xml:space="preserve">
+        <value>Description</value>
+    </data>
+    <data name="ModAuthor" xml:space="preserve">
+        <value>Author</value>
+    </data>
+    <data name="ModVersion" xml:space="preserve">
+        <value>Version</value>
+    </data>
+    <data name="ModUpdateKeys" xml:space="preserve">
+        <value>UpdateKeys</value>
+    </data>
+    <data name="IsContentPackFor" xml:space="preserve">
+        <value>Is ContentPack For {0}</value>
+    </data>
+    <data name="Dependencies" xml:space="preserve">
+        <value>Dependencies</value>
+    </data>
+    <data name="DependencyIsRequired" xml:space="preserve">
+        <value>Required</value>
+    </data>
+    <data name="DependencyMinVersion" xml:space="preserve">
+        <value>Min Version</value>
+    </data>
+    <data name="Yes" xml:space="preserve">
+        <value>Yes</value>
+    </data>
+    <data name="No" xml:space="preserve">
+        <value>No</value>
+    </data>
+    <data name="ModNexusId" xml:space="preserve">
+        <value>Nexus ID</value>
+    </data>
+    <data name="ModLatestVersion" xml:space="preserve">
+        <value>Latest Version</value>
+    </data>
+    <data name="Date" xml:space="preserve">
+        <value>Date</value>
+    </data>
+    <data name="Endorsements" xml:space="preserve">
+        <value>Endorsements</value>
+    </data>
+    <data name="Downloads" xml:space="preserve">
+        <value>Downloads</value>
+    </data>
+    <data name="UniqueDownloads" xml:space="preserve">
+        <value>Unique Downloads</value>
+    </data>
+    <data name="LatestUpdated" xml:space="preserve">
+        <value>Latest Updated</value>
+    </data>
+    <data name="FileName" xml:space="preserve">
+        <value>File Name</value>
+    </data>
+    <data name="Size" xml:space="preserve">
+        <value>Size</value>
+    </data>
+    <data name="Trending" xml:space="preserve">
+        <value>Trending</value>
+    </data>
+    <data name="LastComment" xml:space="preserve">
+        <value>Last Comment</value>
+    </data>
+    <data name="Random" xml:space="preserve">
+        <value>Random</value>
+    </data>
+    <data name="ToInstallI18N" xml:space="preserve">
+        <value>Installing mod localization package, installation path: {0}</value>
+    </data>
+    <data name="I18NInstallSuccess" xml:space="preserve">
+        <value>Installed Localization Package: {0}</value>
+    </data>
+    <data name="I18NInstallFailed" xml:space="preserve">
+        <value>Failed to Install Language Pack</value>
+    </data>
+    <data name="I18NInstallNotFound" xml:space="preserve">
+        <value>Missing mod for translation pack: {0}</value>
+    </data>
+</root>

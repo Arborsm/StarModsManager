@@ -2,6 +2,7 @@
 using StarModsManager.Api.NexusMods;
 using StarModsManager.Config;
 using StarModsManager.Trans;
+
 namespace StarModsManager.Api;
 
 public static class Services
@@ -16,9 +17,16 @@ public static class Services
     public static readonly string BackupTempDir = CombineNCheckDirectory(TempDir, "Backup");
     public static readonly string OnlineModsDir = CombineNCheckDirectory(TempDir, "OnlineMods");
     public static readonly string LogDir = CombineNCheckDirectory(AppSavingPath, "Log");
+
+    static Services()
+    {
+        NexusManager.Initialize(MainConfig.NexusModsApiKey, $"StarModsManager/{AppVersion}");
+    }
+
     public static MainConfig MainConfig { get; } = MainConfig.LoadOrCreate();
     public static TransConfig TransConfig { get; } = TransConfig.LoadOrCreate();
     public static ProofreadConfig ProofreadConfig { get; } = ProofreadConfig.LoadOrCreate();
+
     public static Dictionary<string, TransApiConfig> TransApiConfigs { get; } =
         Translator.Instance.Apis.ToDictionary(t => t.Name, t => TransApiConfig.LoadOrCreate(t.Name));
 
@@ -26,7 +34,7 @@ public static class Services
     public static IProgress Progress { get; set; } = null!;
     public static IDialog Dialog { get; set; } = null!;
     public static IPopUp PopUp { get; set; } = null!;
-    
+
     private static string SystemSavingPath => Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
 
     private static string CombineNCheckDirectory(params string[] directories)
@@ -35,6 +43,4 @@ public static class Services
         if (!Directory.Exists(path)) Directory.CreateDirectory(path);
         return path;
     }
-
-    static Services() => NexusManager.Initialize(MainConfig.NexusModsApiKey, $"StarModsManager/{AppVersion}");
 }

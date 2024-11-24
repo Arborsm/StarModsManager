@@ -9,16 +9,9 @@ namespace StarModsManager.ViewModels.Items;
 
 public partial class ItemLabelViewModel : ViewModelBase
 {
-    [ObservableProperty]
-    private bool _isEditing;
-    
-    private readonly bool _isInit;
-    private string SavePath => Path.Combine(Services.ModLabelsPath, $"{Title}.json");
-
-    [ObservableProperty]
-    private Color _borderColor;
-
     public const string Hidden = "Hidden";
+    private readonly bool _isInit;
+
     public ItemLabelViewModel() : this("Hidden", [], Colors.LightBlue)
     {
     }
@@ -45,15 +38,23 @@ public partial class ItemLabelViewModel : ViewModelBase
         _isInit = false;
     }
 
-    [ObservableProperty]
-    private string _title;
+    private string SavePath => Path.Combine(Services.ModLabelsPath, $"{Title}.json");
 
-    [JsonIgnore] 
+    [ObservableProperty]
+    public partial bool IsEditing { get; set; }
+
+    [ObservableProperty]
+    public partial Color BorderColor { get; set; }
+
+    [ObservableProperty]
+    public partial string Title { get; set; }
+
+    [JsonIgnore]
     public ObservableCollection<ModViewModel> Items { get; set; }
 
-    partial void OnTitleChanged(string? oldValue, string newValue)
+    partial void OnTitleChanged(string oldValue, string newValue)
     {
-        if (oldValue == newValue || _isInit) return; 
+        if (oldValue == newValue || _isInit) return;
         Save();
         var filePath = Path.Combine(Services.ModLabelsPath, $"{oldValue}.json");
         if (File.Exists(filePath)) File.Delete(filePath);

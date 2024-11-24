@@ -13,12 +13,12 @@ public class NavigationService
     public const string Check = "Check";
     public const string Settings = "Settings";
     public static readonly NavigationService Instance = new();
-    
+
+    private Frame? _frame;
+
     private NavigationService()
     {
     }
-
-    private Frame? _frame;
 
     public Control? PreviousPage { get; set; }
 

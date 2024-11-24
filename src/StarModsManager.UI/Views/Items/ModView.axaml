@@ -10,6 +10,7 @@
     xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
     xmlns:v="clr-namespace:StarModsManager.Views.Pages"
     xmlns:vm="clr-namespace:StarModsManager.ViewModels.Pages"
+    xmlns:assets="clr-namespace:StarModsManager.Assets;assembly=StarModsManager.Common"
     d:DesignHeight="200"
     d:DesignWidth="200"
     x:DataType="items:ModViewModel"
@@ -32,23 +33,23 @@
             <ui:MenuFlyoutSubItem
                 IsVisible="{Binding !!LocalMod}"
                 ItemsSource="{Binding $parent[v:MainPageView].((vm:MainPageViewModel)DataContext).ModLabels}"
-                Text="添加到标签" />
+                Text="{x:Static assets:Lang.AddToTag}" />
             <ui:MenuFlyoutItem
                 Command="{Binding $parent[v:MainPageView].((vm:MainPageViewModel)DataContext).RmFromLabelCommand}"
                 IsVisible="{Binding !!LocalMod}"
-                Text="从标签中删除" />
+                Text="{x:Static assets:Lang.RemoveFromTag}" />
             <ui:MenuFlyoutItem
                 Command="{Binding OpenModFolderCommand}"
                 IsVisible="{Binding !!LocalMod}"
-                Text="打开Mod目录" />
+                Text="{x:Static assets:Lang.OpenFolder}" />
             <ui:MenuFlyoutItem
                 Command="{Binding ChangeCoverCommand}"
                 IsVisible="{Binding !!LocalMod}"
-                Text="更改图片" />
-            <ui:MenuFlyoutItem Command="{Binding GetDetailCommand}" Text="查看详情" />
-            <ui:MenuFlyoutItem Command="{Binding OpenUrlCommand}" Text="访问Mod网页" />
-            <ui:MenuFlyoutItem Command="{Binding LoadCoverCommand}" Text="刷新Mod" />
-            <ui:MenuFlyoutItem Command="{Binding DownloadCommand}" Text="下载最新版本" />
+                Text="{x:Static assets:Lang.ChangePic}" />
+            <ui:MenuFlyoutItem Command="{Binding GetDetailCommand}" Text="{x:Static assets:Lang.Detail}" />
+            <ui:MenuFlyoutItem Command="{Binding OpenUrlCommand}" Text="{x:Static assets:Lang.OpenUrl}" />
+            <ui:MenuFlyoutItem Command="{Binding LoadCoverCommand}" Text="{x:Static assets:Lang.Refresh}" />
+            <ui:MenuFlyoutItem Command="{Binding DownloadCommand}" Text="{x:Static assets:Lang.DownloadLatestVersion}" />
         </ui:FAMenuFlyout>
     </UserControl.Resources>
 
@@ -68,10 +69,10 @@
             <Setter Property="BorderThickness" Value="2" />
         </Style>
         <Style Selector="ui|MenuFlyoutItem.EnabledMod">
-            <Setter Property="Text" Value="启用Mod" />
+            <Setter Property="Text" Value="{x:Static assets:Lang.Enable}" />
         </Style>
         <Style Selector="ui|MenuFlyoutItem">
-            <Setter Property="Text" Value="禁用Mod" />
+            <Setter Property="Text" Value="{x:Static assets:Lang.Disable}" />
         </Style>
     </UserControl.Styles>
 
@@ -102,7 +103,7 @@
                     FontWeight="Bold"
                     Foreground="White"
                     IsVisible="{Binding IsDisabled}"
-                    Text="已禁用" />
+                    Text="{x:Static assets:Lang.Disabled}" />
                 <StackPanel
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
@@ -111,11 +112,11 @@
                         FontSize="20"
                         FontWeight="Bold"
                         Foreground="White"
-                        Text="依赖项丢失" />
+                        Text="{x:Static assets:Lang.DependencyMissing}" />
                     <Button
                         HorizontalAlignment="Center"
                         Command="{Binding GetDetailCommand}"
-                        Content="详情" />
+                        Content="{x:Static assets:Lang.Detail}" />
                 </StackPanel>
             </Panel>
         </Border>

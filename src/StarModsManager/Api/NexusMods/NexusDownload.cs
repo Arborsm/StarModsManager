@@ -1,5 +1,6 @@
 ﻿using Serilog;
 using StardewModdingAPI;
+using StarModsManager.Assets;
 
 namespace StarModsManager.Api.NexusMods;
 
@@ -24,13 +25,15 @@ public class NexusDownload(string? modUrl = default)
             }
             catch (NotPremiumException)
             {
-                Services.Notification.Show("Warning", "需要Nexus会员才能直接下载模组，请使用网页一键跳转并下载", Severity.Warning);
+                Services.Notification.Show(Lang.Warning, Lang.NexusPremiumRequired, Severity.Warning);
             }
+
             if (link is null)
             {
-                Services.Notification.Show("Warning", "未找到/无法下载符合的Mod文件", Severity.Warning);
+                Services.Notification.Show(Lang.Warning, Lang.ModFileNotFound, Severity.Warning);
                 return;
             }
+
             Services.PopUp.AddDownload(link);
         }
         catch (Exception e)
@@ -39,5 +42,8 @@ public class NexusDownload(string? modUrl = default)
         }
     }
 
-    public static NexusDownload Create(string modId) => new() { _modId = int.Parse(modId) };
+    public static NexusDownload Create(string modId)
+    {
+        return new NexusDownload { _modId = int.Parse(modId) };
+    }
 }

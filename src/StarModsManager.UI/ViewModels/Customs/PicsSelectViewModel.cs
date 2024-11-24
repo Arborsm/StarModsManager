@@ -16,13 +16,6 @@ public partial class PicsSelectViewModel : ViewModelBase, IDisposable
 {
     private readonly ModViewModel _mod;
 
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsListEmpty))]
-    private bool _isLoading;
-
-    [ObservableProperty]
-    private BitmapViewModel? _selectedPic;
-
     // Test
     public PicsSelectViewModel() : this(new ModViewModel())
     {
@@ -35,7 +28,15 @@ public partial class PicsSelectViewModel : ViewModelBase, IDisposable
         Pics.CollectionChanged += OnPicsOnCollectionChanged;
     }
 
-    private void OnPicsOnCollectionChanged(object? o, NotifyCollectionChangedEventArgs args) => OnPropertyChanged(nameof(IsListEmpty));
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsListEmpty))]
+    public partial bool IsLoading { get; set; }
+
+    [ObservableProperty]
+    public partial BitmapViewModel? SelectedPic { get; set; }
+
+    public ObservableCollection<BitmapViewModel> Pics { get; } = [];
+    public bool IsListEmpty => Pics.Count < 1 && !IsLoading;
 
     public void Dispose()
     {
@@ -43,8 +44,10 @@ public partial class PicsSelectViewModel : ViewModelBase, IDisposable
         GC.SuppressFinalize(this);
     }
 
-    public ObservableCollection<BitmapViewModel> Pics { get; } = [];
-    public bool IsListEmpty => Pics.Count < 1 && !IsLoading;
+    private void OnPicsOnCollectionChanged(object? o, NotifyCollectionChangedEventArgs args)
+    {
+        OnPropertyChanged(nameof(IsListEmpty));
+    }
 
     private async Task LoadPicsAsync()
     {
@@ -64,7 +67,7 @@ public partial class PicsSelectViewModel : ViewModelBase, IDisposable
         IsLoading = true;
         List<BitmapViewModel> pics = [];
         var nexusMod = await NexusMod.CreateAsync(modUrl);
-        var modLinks = nexusMod.GetModPicsUrlAsync(NexusMod.Pics);
+        var modLinks = nexusMod.GetModPicsUrl(NexusMod.Pics);
 
         await Task.WhenAll(modLinks.Select(async it =>
         {
@@ -72,7 +75,7 @@ public partial class PicsSelectViewModel : ViewModelBase, IDisposable
             if (!Path.Exists(cachePath)) Directory.CreateDirectory(cachePath);
             var picFilePath = Path.Combine(cachePath, Path.GetFileNameWithoutExtension(it) + ".bmp");
             var picStream = await _mod.OnlineMod.LoadPicBitmapAsync(it, picFilePath);
-            if (picStream is not null)
+            if (picStream != null)
             {
                 var pic = await Task.Run(() => Bitmap.DecodeToWidth(picStream, 400));
                 pics.Add(new BitmapViewModel(pic, picFilePath));
@@ -117,7 +120,7 @@ public partial class PicsSelectViewModel : ViewModelBase, IDisposable
                 }
             };
 
-            var customPicPath = 
+            var customPicPath =
                 await Services.Dialog.ShowPickupFilesDialogAsync("Select a picture", false, fileTypes);
 
             var picPath = _mod.LocalMod!.InfoPicturePath;
