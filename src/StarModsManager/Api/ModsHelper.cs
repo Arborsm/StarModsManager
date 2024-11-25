@@ -90,4 +90,11 @@ public class ModsHelper
             Log.Error(ex, Lang.ErrorOccurred);
         }
     }
+
+    public static void Reset()
+    {
+        Instance.LocalModsMap.Clear();
+        Instance.OnlineModsMap.Clear();
+        Instance.I18LocalMods.Clear();
+    }
 }

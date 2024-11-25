@@ -4,7 +4,6 @@ using System.Text.Json.Serialization.Metadata;
 using StarModsManager.Api;
 using StarModsManager.Api.NexusMods;
 using StarModsManager.Api.NexusMods.Interface;
-using StarModsManager.Assets;
 
 namespace StarModsManager.Config;
 
@@ -47,7 +46,7 @@ public class MainConfig : ConfigBase
         set
         {
             if (SetProperty(ref field, value) && IsLoaded)
-                Services.Notification.Show(Lang.Notice, Lang.RestartRequired, Severity.Warning);
+                Services.LifeCycle.Reset();
         }
     } = ModsHelper.Instance.GameFolders.Select(x => x.FullName).FirstOrDefault(Services.AppSavingPath);
 

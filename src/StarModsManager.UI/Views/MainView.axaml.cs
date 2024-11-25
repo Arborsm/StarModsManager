@@ -30,7 +30,8 @@ public partial class MainView : UserControl
             PlacementConstraintAdjustment = PopupPositionerConstraintAdjustment.All,
             Content = new DownloadManagerView(ViewModelService.Resolve<DownloadManagerViewModel>())
         };
-        Services.PopUp = new PopUp(this, () => _flyout.ShowAt(DownloadItem));
+        Services.PopUp = new PopUp(this);
+        Services.LifeCycle = new LifeCycle(() => _flyout.ShowAt(DownloadItem));
     }
 
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
@@ -102,20 +103,28 @@ public partial class MainView : UserControl
     {
         MainNav.IsBackButtonVisible = show;
     }
+
+    public class LifeCycle(Action dmAction) : ILifeCycle
+    {
+        public void Reset()
+        {
+            ViewModelService.Reset();
+        }
+
+        public void ShowDownloadManager()
+        {
+            dmAction();
+        }
+
+        public void AddDownload(string url)
+        {
+            ViewModelService.Resolve<DownloadManagerViewModel>().AddDownload(url);
+        }
+    }
 }
 
-public class PopUp(Control control, Action downloadManager) : IPopUp
+public class PopUp(Control control) : IPopUp
 {
-    public void ShowDownloadManager()
-    {
-        downloadManager();
-    }
-
-    public void AddDownload(string url)
-    {
-        ViewModelService.Resolve<DownloadManagerViewModel>().AddDownload(url);
-    }
-
     public void ShowFlyout(object flyout)
     {
         (flyout as Flyout)?.ShowAt(control);
@@ -144,33 +153,9 @@ public class Notification(WindowNotificationManager manager) : INotification
         Dispatcher.UIThread.Invoke(() => manager.Show(content, type, expiration, onClick, onClose));
     }
 
-    public object Show(string title, string message, Severity severity,
+    public object Show(string title, string msg, Severity severity,
         TimeSpan? expiration = null,
         Action? onClick = null,
-        Action? onClose = null)
-    {
-        var type = GetInfoType(severity);
-        InitExpiration(severity, ref expiration);
-        var msg = new Avalonia.Controls.Notifications.Notification(title, message, type, expiration, onClick, onClose);
-        Dispatcher.UIThread.Invoke(() => manager.Show(msg));
-        return msg;
-    }
-
-    private static void InitExpiration(Severity type, ref TimeSpan? expiration) => expiration ??= type switch
-    {
-        Severity.Error => TimeSpan.Zero,
-        Severity.Warning => TimeSpan.FromSeconds(10),
-        _ => TimeSpan.FromSeconds(8)
-    };
-
-    public object Show(string message)
-    {
-        return Show("Info", message, Severity.Informational);
-    }
-
-    public object ShowLongMsg(string title, string msg, Severity severity, 
-        TimeSpan? expiration = null,
-        Action? onClick = null, 
         Action? onClose = null)
     {
         var vm = new CustomNotificationViewModel
@@ -180,6 +165,21 @@ public class Notification(WindowNotificationManager manager) : INotification
         };
         Show(vm, severity, expiration, onClick, onClose);
         return vm;
+    }
+
+    public object Show(string message)
+    {
+        return Show("Info", message, Severity.Informational);
+    }
+
+    private static void InitExpiration(Severity type, ref TimeSpan? expiration)
+    {
+        expiration ??= type switch
+        {
+            Severity.Error => TimeSpan.Zero,
+            Severity.Warning => TimeSpan.FromSeconds(10),
+            _ => TimeSpan.FromSeconds(8)
+        };
     }
 
     private static NotificationType GetInfoType(Severity severity)

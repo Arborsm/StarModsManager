@@ -18,6 +18,9 @@ public static class Services
     public static readonly string OnlineModsDir = CombineNCheckDirectory(TempDir, "OnlineMods");
     public static readonly string LogDir = CombineNCheckDirectory(AppSavingPath, "Log");
 
+    public static readonly string BackupPath =
+        CombineNCheckDirectory(AppSavingPath, "Backup", DateTime.Now.ToString("yyyyMMdd"));
+
     static Services()
     {
         NexusManager.Initialize(MainConfig.NexusModsApiKey, $"StarModsManager/{AppVersion}");
@@ -34,6 +37,7 @@ public static class Services
     public static IProgress Progress { get; set; } = null!;
     public static IDialog Dialog { get; set; } = null!;
     public static IPopUp PopUp { get; set; } = null!;
+    public static ILifeCycle LifeCycle { get; set; } = null!;
 
     private static string SystemSavingPath => Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
 

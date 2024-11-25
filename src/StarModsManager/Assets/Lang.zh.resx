@@ -334,7 +334,7 @@
         <value>自动选择</value>
     </data>
     <data name="SettingNexusApiKeyDes" xml:space="preserve">
-        <value>这用于从N网下载模组</value>
+        <value>用于从N网下载模组, 获取Mod信息等</value>
     </data>
     <data name="SettingNexusApi" xml:space="preserve">
         <value>N网Api</value>
@@ -478,7 +478,7 @@
         <value>正在获取模组下载链接...</value>
     </data>
     <data name="NexusPremiumRequired" xml:space="preserve">
-        <value>需要Nexus会员才能直接下载模组，请使用网页下载</value>
+        <value>需要Nexus会员才能直接下载模组，请使用网页/设置Cookie下载</value>
     </data>
     <data name="ModFileNotFound" xml:space="preserve">
         <value>未找到/无法下载符合的Mod文件</value>
@@ -581,5 +581,14 @@
     </data>
     <data name="I18NInstallNotFound" xml:space="preserve">
         <value>无法找到汉化包对应的Mod: {0}</value>
+    </data>
+    <data name="NexusModsCookieWaterMark" xml:space="preserve">
+        <value>非Nexus会员请填写此项以启用下载功能</value>
+    </data>
+    <data name="GetApiKeyButton" xml:space="preserve">
+        <value>获取ApiKey</value>
+    </data>
+    <data name="InstallAll" xml:space="preserve">
+        <value>全部安装</value>
     </data>
 </root>

@@ -334,7 +334,7 @@
         <value>Auto Select</value>
     </data>
     <data name="SettingNexusApiKeyDes" xml:space="preserve">
-        <value>This is used to download the the mods from the Nexus Mods website</value>
+        <value>Used for downloading mods from Nexus and retrieving mod information</value>
     </data>
     <data name="SettingNexusApi" xml:space="preserve">
         <value>Nexus Api</value>
@@ -581,5 +581,14 @@
     </data>
     <data name="I18NInstallNotFound" xml:space="preserve">
         <value>Missing mod for translation pack: {0}</value>
+    </data>
+    <data name="NexusModsCookieWaterMark" xml:space="preserve">
+        <value>Non-NexusPremium users please fill in this field to enable download feature</value>
+    </data>
+    <data name="GetApiKeyButton" xml:space="preserve">
+        <value>Get Api Key</value>
+    </data>
+    <data name="InstallAll" xml:space="preserve">
+        <value>Install All</value>
     </data>
 </root>

@@ -180,6 +180,12 @@ public partial class MainPageViewModel : MainPageViewModelBase, IDisposable
         ModLabels?.Add(new ItemLabelViewModel("Test", [], Colors.Aqua));
     }
 
+    [RelayCommand]
+    private void Refresh()
+    {
+        _ = Task.Run(LoadModsAsync);
+    }
+
     public void ReFreshLabels()
     {
         if (ModLabels is null) return;

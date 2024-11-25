@@ -26,8 +26,8 @@ public class SmapiModInstaller(string fileDir)
                 var lineBreak = string.IsNullOrEmpty(current) ? current : Environment.NewLine;
                 return current + lineBreak + text;
             });
-        Services.Notification.ShowLongMsg(Lang.Installing, msg, Severity.Informational);
-        
+        Services.Notification.Show(Lang.Installing, msg, Severity.Informational);
+
         var successMsg = new StringBuilder();
         Task.Run(async () =>
         {
@@ -38,7 +38,7 @@ public class SmapiModInstaller(string fileDir)
         }).ContinueWith(_ =>
         {
             if (successMsg.Length == 0) return;
-            Services.Notification.ShowLongMsg(Lang.ModInstallSuccess, successMsg.ToString(), Severity.Success);
+            Services.Notification.Show(Lang.ModInstallSuccess, successMsg.ToString(), Severity.Success);
         });
     }
 
@@ -217,11 +217,10 @@ public class SmapiModInstaller(string fileDir)
         if (!Directory.Exists(i18NPath)) return;
 
         Log.Information("Found i18n folder for {modName}, backing up...", _context.ModFolderName);
-        var files = Directory.GetFiles(i18NPath, "*", SearchOption.AllDirectories);
         var tempI18NDir = Path.Combine(_context.TempModDir, "i18n");
         Directory.CreateDirectory(tempI18NDir);
 
-        foreach (var file in files)
+        foreach (var file in Directory.GetFiles(i18NPath, "*.json", SearchOption.AllDirectories))
         {
             var newPath = Path.Combine(tempI18NDir, Path.GetFileName(file));
             File.Copy(file, newPath, true);
@@ -395,7 +394,8 @@ public class TranslationPackInstaller(string fileName)
     {
         true => null,
         false => Services.Notification.Show(Lang.Warning, Lang.I18NInstallFailed, Severity.Warning),
-        null => Services.Notification.Show(Lang.Warning, string.Format(Lang.I18NInstallNotFound, fileName), Severity.Warning)
+        null => Services.Notification.Show(Lang.Warning, string.Format(Lang.I18NInstallNotFound, fileName),
+            Severity.Warning)
     };
 }
 

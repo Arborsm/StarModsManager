@@ -438,6 +438,15 @@ namespace StarModsManager.Assets {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Get Api Key.
+        /// </summary>
+        public static string GetApiKeyButton {
+            get {
+                return ResourceManager.GetString("GetApiKeyButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Getting mod download links....
         /// </summary>
         public static string GetDownloadUrl {
@@ -479,6 +488,15 @@ namespace StarModsManager.Assets {
         public static string I18NInstallSuccess {
             get {
                 return ResourceManager.GetString("I18NInstallSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Install All.
+        /// </summary>
+        public static string InstallAll {
+            get {
+                return ResourceManager.GetString("InstallAll", resourceCulture);
             }
         }
         
@@ -722,6 +740,15 @@ namespace StarModsManager.Assets {
         public static string NewDownload {
             get {
                 return ResourceManager.GetString("NewDownload", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Non-NexusPremium users please fill in this field to enable download feature.
+        /// </summary>
+        public static string NexusModsCookieWaterMark {
+            get {
+                return ResourceManager.GetString("NexusModsCookieWaterMark", resourceCulture);
             }
         }
         
@@ -1077,7 +1104,7 @@ namespace StarModsManager.Assets {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This is used to download the the mods from the Nexus Mods website.
+        ///   Looks up a localized string similar to Used for downloading mods from Nexus and retrieving mod information.
         /// </summary>
         public static string SettingNexusApiKeyDes {
             get {

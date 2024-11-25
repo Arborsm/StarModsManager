@@ -161,7 +161,7 @@ public class NexusWebClient
 
     public void SetCookie(string cookie)
     {
-        if (_httpClient is null) return;
+        if (_httpClient is null || string.IsNullOrEmpty(cookie)) return;
         _httpClient.DefaultRequestHeaders.Clear();
         _httpClient.DefaultRequestHeaders.Add("Cookie", cookie);
     }

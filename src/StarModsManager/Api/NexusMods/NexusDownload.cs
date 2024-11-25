@@ -34,7 +34,7 @@ public class NexusDownload(string? modUrl = default)
                 return;
             }
 
-            Services.PopUp.AddDownload(link);
+            Services.LifeCycle.AddDownload(link);
         }
         catch (Exception e)
         {

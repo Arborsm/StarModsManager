@@ -62,7 +62,7 @@ public partial class ModViewModel : ViewModelBase
     {
         Services.Notification.Show(Lang.GetDownloadUrl);
         await new NexusDownload(OnlineMod.Url).GetModDownloadUrlAsync();
-        Services.PopUp.ShowDownloadManager();
+        Services.LifeCycle.ShowDownloadManager();
     }
 
     [RelayCommand]

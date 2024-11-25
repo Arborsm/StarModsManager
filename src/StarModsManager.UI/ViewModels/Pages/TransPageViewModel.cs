@@ -94,8 +94,7 @@ public partial class TransPageViewModel : MainPageViewModelBase, IProgress
         ModsHelper.Instance.I18LocalMods
             .Where(it => it.GetUntranslatedMap().Count > 0)
             .ForEach(it => BackupMod(it, tempPath));
-
-        var zipFileName = $"backup-{DateTime.Now:yyyy-MM-dd-HH-mm-ss}.zip";
+        const string zipFileName = "Localization";
         tempPath.CreateZipBackup(zipFileName);
         Directory.Delete(tempPath, true);
     }
@@ -105,12 +104,12 @@ public partial class TransPageViewModel : MainPageViewModelBase, IProgress
         var i18NFolderPath = Path.Combine(mod.PathS, "i18n");
         var files = Directory.GetFiles(i18NFolderPath, "*", SearchOption.AllDirectories);
 
-        var backupPath = Path.Combine(tempPath, mod.Manifest.Name.SanitizePath(), "i18n");
-        Directory.CreateDirectory(backupPath);
+        var tempI18NPath = Path.Combine(tempPath, mod.Manifest.Name.SanitizePath(), "i18n");
+        Directory.CreateDirectory(tempI18NPath);
 
         foreach (var file in files)
         {
-            var newPath = file.Replace(i18NFolderPath, backupPath);
+            var newPath = file.Replace(i18NFolderPath, tempI18NPath);
             File.Copy(file, newPath, true);
         }
     }

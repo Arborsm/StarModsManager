@@ -2,6 +2,7 @@
     x:Class="StarModsManager.Views.Items.ModView"
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:assets="clr-namespace:StarModsManager.Assets;assembly=StarModsManager.Common"
     xmlns:ct="clr-namespace:Avalonia.Markup.Xaml.Converters;assembly=Avalonia.Markup.Xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:items="clr-namespace:StarModsManager.ViewModels.Items"
@@ -10,7 +11,6 @@
     xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
     xmlns:v="clr-namespace:StarModsManager.Views.Pages"
     xmlns:vm="clr-namespace:StarModsManager.ViewModels.Pages"
-    xmlns:assets="clr-namespace:StarModsManager.Assets;assembly=StarModsManager.Common"
     d:DesignHeight="200"
     d:DesignWidth="200"
     x:DataType="items:ModViewModel"
@@ -114,7 +114,9 @@
                         Foreground="White"
                         Text="{x:Static assets:Lang.DependencyMissing}" />
                     <Button
+                        Margin="0,10,0,0"
                         HorizontalAlignment="Center"
+                        BorderBrush="White"
                         Command="{Binding GetDetailCommand}"
                         Content="{x:Static assets:Lang.Detail}" />
                 </StackPanel>

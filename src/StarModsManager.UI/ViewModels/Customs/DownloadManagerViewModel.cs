@@ -82,6 +82,14 @@ public partial class DownloadManagerViewModel : ViewModelBase, IDisposable
     }
 
     [RelayCommand]
+    private void InstallAll()
+    {
+        foreach (var download in Downloads)
+            if (!download.IsDownloading)
+                download.InstallCommand.Execute(null);
+    }
+
+    [RelayCommand]
     private void DeleteAll()
     {
         foreach (var download in Downloads)

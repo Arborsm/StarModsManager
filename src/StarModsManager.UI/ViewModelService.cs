@@ -1,3 +1,4 @@
+using StarModsManager.Api;
 using StarModsManager.ViewModels;
 using StarModsManager.ViewModels.Pages;
 using DownloadManagerViewModel = StarModsManager.ViewModels.Customs.DownloadManagerViewModel;
@@ -53,6 +54,12 @@ public static class ViewModelService
         }
 
         throw new InvalidOperationException($"Service of type {type} is not registered.");
+    }
+
+    public static void Reset()
+    {
+        ModsHelper.Reset();
+        _ = Task.Run(Resolve<MainPageViewModel>().LoadModsAsync);
     }
 
     public static T Resolve<T>() where T : class

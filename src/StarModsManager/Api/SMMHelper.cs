@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.IO.Compression;
+using System.Security.Cryptography;
 using System.Text;
 using StardewModdingAPI;
 using StardewModdingAPI.Toolkit;
@@ -121,13 +122,43 @@ public static class SMMHelper
 
     public static void CreateZipBackup(this string directoryPath, string zipFileName)
     {
-        var backupPath = Path.Combine(Environment.CurrentDirectory, "Backup", DateTime.Now.ToString("yyyyMMdd"));
-        if (!Directory.Exists(backupPath)) Directory.CreateDirectory(backupPath);
-        var zipFilePath = Path.Combine(backupPath, zipFileName);
+        var backupPath = Services.BackupPath;
+        var zipFilePath = Path.Combine(backupPath, $"{zipFileName}.zip");
         if (File.Exists(zipFilePath))
-            zipFilePath = Path.Combine(backupPath, $"{zipFileName}_{Guid.NewGuid().ToString("N")[..6]}.zip");
-        using var archive = ZipFile.Open(zipFilePath, ZipArchiveMode.Create);
-        ZipDirectory(directoryPath, archive);
+        {
+            zipFilePath = Path.Combine(backupPath, $"{zipFileName}_{DateTime.Now:yyyy-MM-dd-HH-mm-ss}.zip");
+        }
+
+        using (var archive = ZipFile.Open(zipFilePath, ZipArchiveMode.Create))
+        {
+            ZipDirectory(directoryPath, archive);
+        }
+
+        var isSame = Directory.GetFiles(backupPath)
+            .Where(x => x.Contains(zipFileName))
+            .Any(x => IsFileSame(x, zipFilePath));
+        if (isSame) File.Delete(zipFilePath);
+    }
+
+    private static bool IsFileSame(string sourceFile, string backupFile)
+    {
+        try
+        {
+            var sourceInfo = new FileInfo(sourceFile);
+            var backupInfo = new FileInfo(backupFile);
+            if (sourceInfo.Length == backupInfo.Length) return true;
+            using var md5 = MD5.Create();
+            using var sourceStream = File.OpenRead(sourceFile);
+            using var backupStream = File.OpenRead(backupFile);
+            var sourceHash = Convert.ToHexString(md5.ComputeHash(sourceStream));
+            md5.Initialize();
+            var backupHash = Convert.ToHexString(md5.ComputeHash(backupStream));
+            return string.Equals(sourceHash, backupHash, StringComparison.OrdinalIgnoreCase);
+        }
+        catch (Exception)
+        {
+            return false;
+        }
     }
 
     private static void ZipDirectory(string directoryPath, ZipArchive archive, string entryRootPath = "")

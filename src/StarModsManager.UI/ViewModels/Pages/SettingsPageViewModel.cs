@@ -155,6 +155,13 @@ public partial class SettingsPageViewModel : MainPageViewModelBase
         Log.Information("Auto selected mods directory: {path}", MainConfig.DirectoryPath);
     }
 
+    [RelayCommand]
+    private void GetApiKey()
+    {
+        const string url = "https://www.nexusmods.com/users/myaccount?tab=api";
+        PlatformHelper.OpenFileOrUrl(url);
+    }
+
     private void GetPredefColors()
     {
         PredefinedColors =

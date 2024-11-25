@@ -155,7 +155,7 @@ public partial class ToUpdateMod(LocalMod localMod, bool isChecked = false) : Ob
 {
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CanUpdate))]
-    private ISemanticVersion? _latestVersion;
+    public partial ISemanticVersion? LatestVersion { get; set; }
 
     public LocalMod LocalMod => localMod;
     public bool CanUpdate => LocalMod.Manifest.Version.IsOlderThan(LatestVersion);

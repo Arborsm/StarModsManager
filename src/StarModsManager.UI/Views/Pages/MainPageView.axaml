@@ -2,13 +2,13 @@
     x:Class="StarModsManager.Views.Pages.MainPageView"
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:assets="clr-namespace:StarModsManager.Assets;assembly=StarModsManager.Common"
     xmlns:converters="clr-namespace:Avalonia.Markup.Xaml.Converters;assembly=Avalonia.Markup.Xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:lib="clr-namespace:StarModsManager.Lib"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:pages="clr-namespace:StarModsManager.ViewModels.Pages"
     xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
-    xmlns:assets="clr-namespace:StarModsManager.Assets;assembly=StarModsManager.Common"
     d:DesignHeight="450"
     d:DesignWidth="800"
     x:DataType="pages:MainPageViewModel"
@@ -30,8 +30,7 @@
                 IsVisible="{Binding !IsHiddenLabel}" />
             <!--  ReSharper disable once Xaml.PossibleNullReferenceException  -->
             <MenuItem Header="{x:Static assets:Lang.ChangeColor}">
-                <ui:ColorPickerButton ShowAcceptDismissButtons="False"
-                                      Color="{Binding Path=SelectedLabel.BorderColor, Converter={StaticResource ColorToBrush}}" />
+                <ui:ColorPickerButton ShowAcceptDismissButtons="False" Color="{Binding Path=SelectedLabel.BorderColor, Converter={StaticResource ColorToBrush}}" />
             </MenuItem>
             <MenuItem Command="{Binding RenameCommand}" Header="{x:Static assets:Lang.Rename}" />
         </MenuFlyout>
@@ -41,8 +40,7 @@
         Name="MainGrid"
         Margin="20,40,20,20"
         RowDefinitions="Auto, Auto, *">
-        <Expander Grid.Row="1"
-                  MaxHeight="{Binding #MainGrid.Bounds.Height, Converter={StaticResource HeightMultiplierConverter}, ConverterParameter=0.8}">
+        <Expander Grid.Row="1" MaxHeight="{Binding #MainGrid.Bounds.Height, Converter={StaticResource HeightMultiplierConverter}, ConverterParameter=0.8}">
             <Expander.Styles>
                 <Style Selector="ToggleButton">
                     <Setter Property="Padding" Value="0" />
@@ -88,8 +86,7 @@
                             SelectedItem="{Binding SelectedLabel}">
                             <ListBox.ItemsPanel>
                                 <ItemsPanelTemplate>
-                                    <WrapPanel ContextFlyout="{StaticResource CategoryContextMenu}"
-                                               Orientation="Horizontal" />
+                                    <WrapPanel ContextFlyout="{StaticResource CategoryContextMenu}" Orientation="Horizontal" />
                                 </ItemsPanelTemplate>
                             </ListBox.ItemsPanel>
                         </ListBox>
@@ -108,7 +105,7 @@
                 </ListBox.ItemsPanel>
             </ListBox>
         </Expander>
-        <Panel Grid.Row="2">
+        <Panel Grid.Row="2" Margin="0,5,0,0">
             <ListBox
                 AutoScrollToSelectedItem="False"
                 Background="Transparent"
