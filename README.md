@@ -42,7 +42,7 @@ For issues and feature requests, please use the GitHub issues page.
 - Modern C# features and patterns
 
 ## License 📄
-MIT License
+GPL-3.0 license
 
 ## Acknowledgments 🙏
 - Stardew Valley
