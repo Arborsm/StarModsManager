@@ -1,4 +1,5 @@
-﻿using Avalonia;
+﻿using System.Windows.Input;
+using Avalonia;
 using Avalonia.Controls.Notifications;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Primitives.PopupPositioning;
@@ -133,6 +134,11 @@ public class PopUp(Control control) : IPopUp
 
 public class Notification(WindowNotificationManager manager) : INotification
 {
+    static Notification()
+    {
+        UpdateChecker.CheckUpdate();
+    }
+
     public void Close(object? o)
     {
         if (o != null) manager.Close(o);
@@ -156,12 +162,16 @@ public class Notification(WindowNotificationManager manager) : INotification
     public object Show(string title, string msg, Severity severity,
         TimeSpan? expiration = null,
         Action? onClick = null,
-        Action? onClose = null)
+        Action? onClose = null,
+        string? buttonText = null,
+        ICommand? buttonCommand = null)
     {
         var vm = new CustomNotificationViewModel
         {
             Title = title,
-            Message = msg
+            Message = msg,
+            ButtonText = buttonText,
+            ButtonCommand = buttonCommand
         };
         Show(vm, severity, expiration, onClick, onClose);
         return vm;

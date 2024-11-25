@@ -7,6 +7,7 @@ using CommunityToolkit.Mvvm.Input;
 using FluentAvalonia.Styling;
 using Serilog;
 using StarModsManager.Api;
+using StarModsManager.Assets;
 using StarModsManager.Config;
 using StarModsManager.Lib;
 
@@ -53,6 +54,7 @@ public partial class SettingsPageViewModel : MainPageViewModelBase
     public FlowDirection[] AppFlowDirections { get; } = [FlowDirection.LeftToRight, FlowDirection.RightToLeft];
 
     public List<Color> PredefinedColors { get; private set; } = [];
+    public string VersionText => $"{Lang.ModAuthor}: Arborsm, {Lang.CurrentVersion}: {Services.AppVersion}";
 
     public void Init()
     {
@@ -139,6 +141,12 @@ public partial class SettingsPageViewModel : MainPageViewModelBase
         if (value == null) return;
         CustomAccentColor = value.Value;
         UpdateAppAccentColor(value.Value);
+    }
+
+    [RelayCommand]
+    private void CheckUpdate()
+    {
+        UpdateChecker.CheckUpdate();
     }
 
     [RelayCommand]

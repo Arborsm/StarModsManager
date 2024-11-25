@@ -606,4 +606,13 @@
     <data name="EnterURL" xml:space="preserve">
         <value>Enter URL</value>
     </data>
+    <data name="UpdateAvailableContent" xml:space="preserve">
+        <value>New version {0} available</value>
+    </data>
+    <data name="UpdateAvailable" xml:space="preserve">
+        <value>Update Available</value>
+    </data>
+    <data name="CheckUpdate" xml:space="preserve">
+        <value>Check Update</value>
+    </data>
 </root>

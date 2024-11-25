@@ -16,6 +16,7 @@
         <PackageIcon>icon.ico</PackageIcon>
         <AssemblyName>StarModsManager</AssemblyName>
         <RootNamespace>StarModsManager</RootNamespace>
+        <ApplicationIcon>Assets\icon.ico</ApplicationIcon>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">

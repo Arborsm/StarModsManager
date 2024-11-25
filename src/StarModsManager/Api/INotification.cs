@@ -1,4 +1,6 @@
-﻿namespace StarModsManager.Api;
+﻿using System.Windows.Input;
+
+namespace StarModsManager.Api;
 
 public interface INotification
 {
@@ -14,7 +16,9 @@ public interface INotification
     object? Show(string title, string message, Severity severity,
         TimeSpan? expiration = null,
         Action? onClick = null,
-        Action? onClose = null);
+        Action? onClose = null,
+        string? buttonText = null,
+        ICommand? buttonCommand = null);
 
     object? Show(string message);
 }

@@ -177,6 +177,15 @@ namespace StarModsManager.Assets {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Check Update.
+        /// </summary>
+        public static string CheckUpdate {
+            get {
+                return ResourceManager.GetString("CheckUpdate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Clear.
         /// </summary>
         public static string Clear {
@@ -1460,6 +1469,24 @@ namespace StarModsManager.Assets {
         public static string Update {
             get {
                 return ResourceManager.GetString("Update", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Update Available.
+        /// </summary>
+        public static string UpdateAvailable {
+            get {
+                return ResourceManager.GetString("UpdateAvailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to New version {0} available.
+        /// </summary>
+        public static string UpdateAvailableContent {
+            get {
+                return ResourceManager.GetString("UpdateAvailableContent", resourceCulture);
             }
         }
         

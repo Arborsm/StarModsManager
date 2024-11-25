@@ -59,7 +59,11 @@ public static class ViewModelService
     public static void Reset()
     {
         ModsHelper.Reset();
-        _ = Task.Run(Resolve<MainPageViewModel>().LoadModsAsync);
+        Task.Run(async () =>
+        {
+            await Resolve<MainPageViewModel>().LoadModsAsync();
+            if (Services.MainConfig.AutoCheckUpdates) Resolve<UpdatePageViewModel>().Init();
+        });
     }
 
     public static T Resolve<T>() where T : class

@@ -1,10 +1,8 @@
 ﻿using Avalonia;
 using Avalonia.Media;
 using FluentIcons.Avalonia.Fluent;
-using Serilog;
 using StarModsManager.Api;
 using StarModsManager.Lib;
-using StarModsManager.ViewModels.Pages;
 
 namespace StarModsManager;
 
@@ -27,15 +25,7 @@ internal static class Program
     private static AppBuilder InitializeDataBackground(this AppBuilder builder)
     {
         SMMDebug.Init();
-        Log.Information("Starting StarModsManager...");
-        _ = Task.Run(async () =>
-        {
-            await ViewModelService.Resolve<MainPageViewModel>().LoadModsAsync();
-            if (Services.MainConfig.AutoCheckUpdates) ViewModelService.Resolve<UpdatePageViewModel>().Init();
-        });
-        Log.Information("Welcome to StarModsManager v{Version}", Services.AppVersion);
-        var startTime = DateTime.Now;
-        Log.Information("Starting at: {Time}", startTime);
+        ViewModelService.Reset();
         return builder;
     }
 

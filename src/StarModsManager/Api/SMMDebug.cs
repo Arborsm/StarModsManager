@@ -35,6 +35,11 @@ public static class SMMDebug
                 restrictedToMinimumLevel: LogEventLevel.Information)
             .CreateLogger();
         Log.Logger = log;
+
+        var startTime = DateTime.Now;
+        Log.Information("Starting StarModsManager...");
+        Log.Information("Welcome to StarModsManager v{Version}", Services.AppVersion);
+        Log.Information("Starting at: {Time}", startTime);
     }
 
     public static void Error(Exception e, string? msg = default, bool isMsg = true)
@@ -93,6 +98,6 @@ public static partial class DebugHelper
         Console.OutputEncoding = Encoding.UTF8;
         Console.InputEncoding = Encoding.UTF8;
         Console.SetWindowSize(60, 25);
-        Console.SetBufferSize(60, 25);
+        // Console.SetBufferSize(60, 25);
     }
 }

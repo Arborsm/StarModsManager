@@ -606,4 +606,13 @@
     <data name="EnterURL" xml:space="preserve">
         <value>输入下载链接</value>
     </data>
+    <data name="UpdateAvailableContent" xml:space="preserve">
+        <value>发现新版本：{0}</value>
+    </data>
+    <data name="UpdateAvailable" xml:space="preserve">
+        <value>更新可用</value>
+    </data>
+    <data name="CheckUpdate" xml:space="preserve">
+        <value>检查更新</value>
+    </data>
 </root>
