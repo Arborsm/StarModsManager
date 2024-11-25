@@ -1,6 +1,8 @@
+using System.Globalization;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using StarModsManager.Assets;
 using StarModsManager.Views;
 
 namespace StarModsManager;
@@ -14,7 +16,9 @@ public class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
-        //Lang.Culture = CultureInfo.GetCultureInfo("us-en");
+#if DEBUG
+        Lang.Culture = CultureInfo.GetCultureInfo("us-en");
+#endif
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             var mainWindow = new MainWindow();

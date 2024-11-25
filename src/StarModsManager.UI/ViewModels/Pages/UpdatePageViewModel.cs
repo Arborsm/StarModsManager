@@ -105,7 +105,7 @@ public partial class UpdatePageViewModel : MainPageViewModelBase
         var mod = Mods
             .Where(m => m.IsChecked)
             .Select(m => (m.LocalMod.OnlineMod.ModId, m.LatestVersion))
-            .Select(g => Task.Run(async () => await NexusDownload.Create(g.ModId).GetModDownloadUrlAsync(g.Item2)))
+            .Select(g => Task.Run(async () => await NexusDownload.DownloadLatestModAsync(g.ModId, g.Item2)))
             .ToList();
         Services.Notification.Show(Lang.FetchingModLink);
         Task.WhenAll(mod);
@@ -164,6 +164,14 @@ public partial class ToUpdateMod(LocalMod localMod, bool isChecked = false) : Ob
     public string Name { get; } = localMod.Manifest.Name;
     public string UniqueID { get; } = localMod.Manifest.UniqueID;
     public ISemanticVersion CurrentVersion { get; } = localMod.Manifest.Version;
+
+    [RelayCommand]
+    private async Task OpenDownloadPageAsync()
+    {
+        var url = await NexusDownload.Create(LocalMod.OnlineMod.ModId).GetModDownloadUrlAsync();
+        if (url is null) return;
+        PlatformHelper.OpenFileOrUrl(url);
+    }
 
     public async Task<ToUpdateMod> UpdateLatestVersionAsync()
     {
