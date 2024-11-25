@@ -879,7 +879,7 @@ namespace StarModsManager.Assets {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Open Download Folder.
+        ///   Looks up a localized string similar to Open Folder.
         /// </summary>
         public static string OpenFolder {
             get {

@@ -202,7 +202,7 @@
         <value>Clear Download Items</value>
     </data>
     <data name="OpenFolder" xml:space="preserve">
-        <value>Open Download Folder</value>
+        <value>Open Folder</value>
     </data>
     <data name="NoPics" xml:space="preserve">
         <value>Cannot find any pictures in the mod page</value>

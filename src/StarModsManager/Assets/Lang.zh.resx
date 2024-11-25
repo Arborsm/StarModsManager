@@ -202,7 +202,7 @@
         <value>清空下载</value>
     </data>
     <data name="OpenFolder" xml:space="preserve">
-        <value>打开下载文件夹</value>
+        <value>打开文件夹</value>
     </data>
     <data name="NoPics" xml:space="preserve">
         <value>在Mod页面无可用图片</value>
