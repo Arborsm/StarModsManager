@@ -1,6 +1,7 @@
 using Avalonia.Interactivity;
 using FluentAvalonia.UI.Controls;
 using Serilog;
+using StarModsManager.Assets;
 using StarModsManager.ViewModels.Customs;
 using StarModsManager.ViewModels.Pages;
 using StarModsManager.Views.Customs;
@@ -31,14 +32,14 @@ public partial class TransPageView : UserControl
             var vm = new TransSettingViewModel();
             var dialog = new ContentDialog
             {
-                Title = "Translating Settings",
+                Title = Lang.TranslatingSettings,
                 Content = new TransSettingView
                 {
                     DataContext = vm
                 },
-                PrimaryButtonText = "Save",
+                PrimaryButtonText = Lang.Save,
                 PrimaryButtonCommand = vm.SaveCommand,
-                CloseButtonText = "Close"
+                CloseButtonText = Lang.Close
             };
 
             await dialog.ShowAsync();

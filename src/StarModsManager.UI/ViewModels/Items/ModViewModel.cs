@@ -104,10 +104,10 @@ public partial class ModViewModel : ViewModelBase
         var content = new PicsSelectViewModel(this);
         var dialog = new ContentDialog
         {
-            Title = "Change Cover",
-            PrimaryButtonText = "Select",
-            SecondaryButtonText = "Custom",
-            CloseButtonText = "Close",
+            Title = Lang.ChangePic,
+            PrimaryButtonText = Lang.Select,
+            SecondaryButtonText = Lang.Custom,
+            CloseButtonText = Lang.Close,
             Content = new PicsSelectView
             {
                 DataContext = content

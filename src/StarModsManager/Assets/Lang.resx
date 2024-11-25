@@ -591,4 +591,19 @@
     <data name="InstallAll" xml:space="preserve">
         <value>Install All</value>
     </data>
+    <data name="Custom" xml:space="preserve">
+        <value>Custom</value>
+    </data>
+    <data name="ApiSettings" xml:space="preserve">
+        <value>Api Settings</value>
+    </data>
+    <data name="TranslatingSettings" xml:space="preserve">
+        <value>Translating Settings</value>
+    </data>
+    <data name="InstallingMods" xml:space="preserve">
+        <value>Installing Mods</value>
+    </data>
+    <data name="EnterURL" xml:space="preserve">
+        <value>Enter URL</value>
+    </data>
 </root>

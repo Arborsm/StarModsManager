@@ -96,6 +96,15 @@ namespace StarModsManager.Assets {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Api Settings.
+        /// </summary>
+        public static string ApiSettings {
+            get {
+                return ResourceManager.GetString("ApiSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to App Theme.
         /// </summary>
         public static string AppTheme {
@@ -191,6 +200,15 @@ namespace StarModsManager.Assets {
         public static string CurrentVersion {
             get {
                 return ResourceManager.GetString("CurrentVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Custom.
+        /// </summary>
+        public static string Custom {
+            get {
+                return ResourceManager.GetString("Custom", resourceCulture);
             }
         }
         
@@ -393,6 +411,15 @@ namespace StarModsManager.Assets {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Enter URL.
+        /// </summary>
+        public static string EnterURL {
+            get {
+                return ResourceManager.GetString("EnterURL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unable to find a mod folder that meets the requirements in the target folder.
         /// </summary>
         public static string ErrorFoldersMsg {
@@ -515,6 +542,15 @@ namespace StarModsManager.Assets {
         public static string Installing {
             get {
                 return ResourceManager.GetString("Installing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Installing Mods.
+        /// </summary>
+        public static string InstallingMods {
+            get {
+                return ResourceManager.GetString("InstallingMods", resourceCulture);
             }
         }
         
@@ -1289,6 +1325,15 @@ namespace StarModsManager.Assets {
         public static string Translating {
             get {
                 return ResourceManager.GetString("Translating", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Translating Settings.
+        /// </summary>
+        public static string TranslatingSettings {
+            get {
+                return ResourceManager.GetString("TranslatingSettings", resourceCulture);
             }
         }
         

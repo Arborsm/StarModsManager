@@ -1,6 +1,7 @@
 using Avalonia.Interactivity;
 using FluentAvalonia.UI.Controls;
 using Serilog;
+using StarModsManager.Assets;
 using StarModsManager.ViewModels.Customs;
 
 namespace StarModsManager.Views.Customs;
@@ -20,14 +21,14 @@ public partial class TransSettingView : UserControl
             var vm = new ApiSettingViewModel(selectedApi);
             var dialog = new ContentDialog
             {
-                Title = "Api Settings",
+                Title = Lang.ApiSettings,
                 Content = new ApiSettingView
                 {
                     DataContext = vm
                 },
-                PrimaryButtonText = "Save",
+                PrimaryButtonText = Lang.Save,
                 PrimaryButtonCommand = vm.SaveCommand,
-                CloseButtonText = "Close"
+                CloseButtonText = Lang.Close
             };
             await dialog.ShowAsync();
         }

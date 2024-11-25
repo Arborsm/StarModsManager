@@ -591,4 +591,19 @@
     <data name="InstallAll" xml:space="preserve">
         <value>全部安装</value>
     </data>
+    <data name="Custom" xml:space="preserve">
+        <value>自定义</value>
+    </data>
+    <data name="ApiSettings" xml:space="preserve">
+        <value>Api设置</value>
+    </data>
+    <data name="TranslatingSettings" xml:space="preserve">
+        <value>翻译设置</value>
+    </data>
+    <data name="InstallingMods" xml:space="preserve">
+        <value>安装模组</value>
+    </data>
+    <data name="EnterURL" xml:space="preserve">
+        <value>输入下载链接</value>
+    </data>
 </root>

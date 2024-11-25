@@ -3,6 +3,7 @@ using Avalonia.Input;
 using Avalonia.Platform.Storage;
 using FluentAvalonia.UI.Controls;
 using StarModsManager.Api;
+using StarModsManager.Assets;
 using StarModsManager.ViewModels.Customs;
 using StarModsManager.Views.Customs;
 
@@ -65,11 +66,11 @@ public partial class MainWindow : Window
         if (installModViewModel.Files.Count == 0) return;
         var dialog = new ContentDialog
         {
-            Title = "Installing Mods",
+            Title = Lang.InstallingMods,
             Content = installModView,
-            PrimaryButtonText = "OK",
+            PrimaryButtonText = Lang.OK,
             PrimaryButtonCommand = installModViewModel.InstallCommand,
-            CloseButtonText = "Cancel"
+            CloseButtonText = Lang.Cancel
         };
         dialog.ShowAsync();
         e.Handled = true;
@@ -93,15 +94,14 @@ public class Dialog(TopLevel topLevel) : IDialog
     {
         var dialog = new ContentDialog
         {
-            Title = "New Download",
+            Title = Lang.NewDownload,
             Content = new TextBox
             {
-                Name = "TextBox",
-                Watermark = "Enter URL",
+                Watermark = Lang.EnterURL,
                 Width = 400
             },
-            PrimaryButtonText = "OK",
-            CloseButtonText = "Cancel"
+            PrimaryButtonText = Lang.OK,
+            CloseButtonText = Lang.Cancel
         };
         var result = await dialog.ShowAsync();
         return result == ContentDialogResult.Primary ? (dialog.Content as TextBox)?.Text : null;
