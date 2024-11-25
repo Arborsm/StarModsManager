@@ -13,9 +13,9 @@ StarModsManager 是一款专为星露谷物语设计的模组管理工具。基�
 - 💻 Windows 支持 (Linux/MacOS 支持开发中)
 
 ### 截图展示 📸
-[截图 1：显示模组列表和管理选项的主界面]
-[截图 2：下载管理器界面]
-[截图 3：翻译界面]
+![Screenshot 1: Main](https://raw.githubusercontent.com/Arborsm/StarModsManager/refs/heads/master/Asssets/Main-zh.png)
+![Screenshot 2: Update](https://raw.githubusercontent.com/Arborsm/StarModsManager/refs/heads/master/Asssets/Update-zh.png)
+![Screenshot 3: Settings](https://raw.githubusercontent.com/Arborsm/StarModsManager/refs/heads/master/Asssets/Setting-zh.png)
 
 ### 安装说明 💻
 1. 从 GitHub 下载最新版本

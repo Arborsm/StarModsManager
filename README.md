@@ -1,5 +1,5 @@
 # StarModsManager 🌟
-[English](#english) | [中文](#chinese)
+[English](https://github.com/Arborsm/StarModsManager/blob/master/README.md) | [中文](https://github.com/Arborsm/StarModsManager/blob/master/README_CN.md)
 
 ### Introduction 📖
 StarModsManager is a comprehensive tool designed for managing Stardew Valley mods. Built with Avalonia UI framework, it provides a modern interface for downloading, updating, translating, and managing your mods.
@@ -14,9 +14,9 @@ StarModsManager is a comprehensive tool designed for managing Stardew Valley mod
 - 💻 Windows Support (Linux/macOS support coming soon)
 
 ### Screenshots 📸
-[Screenshot 1: Main interface showing mod list and management options]
-[Screenshot 2: Download manager interface]
-[Screenshot 3: Translation interface]
+![Screenshot 1: Main](https://raw.githubusercontent.com/Arborsm/StarModsManager/refs/heads/master/Asssets/Main.png)
+![Screenshot 2: Update](https://raw.githubusercontent.com/Arborsm/StarModsManager/refs/heads/master/Asssets/Update.png)
+![Screenshot 3: Settings](https://raw.githubusercontent.com/Arborsm/StarModsManager/refs/heads/master/Asssets/Setting.png)
 
 ### Installation 💻
 1. Download the latest release from GitHub
