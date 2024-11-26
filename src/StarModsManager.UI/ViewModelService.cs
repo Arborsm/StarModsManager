@@ -56,14 +56,10 @@ public static class ViewModelService
         throw new InvalidOperationException($"Service of type {type} is not registered.");
     }
 
-    public static void Reset()
+    public static Task Reset()
     {
         ModsHelper.Reset();
-        Task.Run(async () =>
-        {
-            await Resolve<MainPageViewModel>().LoadModsAsync();
-            if (Services.MainConfig.AutoCheckUpdates) Resolve<UpdatePageViewModel>().Init();
-        });
+        return Task.Run(Resolve<MainPageViewModel>().LoadModsAsync);
     }
 
     public static T Resolve<T>() where T : class

@@ -17,14 +17,17 @@ public partial class DownloadItemViewModel : ViewModelBase, IDisposable
     private readonly Stopwatch _speedTimer = new();
     private CancellationTokenSource? _cancellationTokenSource;
     private bool _disposed;
+    private string _downloadedSize = "0 KB";
+    private string _downloadSpeed = "0 KB/s";
+    private string _fileSize = "Unknown";
     private long _lastBytesRead;
 
     public DownloadItemViewModel(string fileUrl)
     {
         _fileUrl = fileUrl;
         _httpClient = new HttpClient();
-
         FileName = Path.GetFileName(new Uri(fileUrl).LocalPath);
+        FilePath = Path.Combine(Services.DownloadPath, FileName);
         Status = "Ready to download";
         Progress = 0;
         IsDownloading = false;
@@ -32,6 +35,8 @@ public partial class DownloadItemViewModel : ViewModelBase, IDisposable
 
         StartDownload();
     }
+
+    public string FilePath { get; }
 
     [ObservableProperty]
     public partial string FileName { get; set; }
@@ -48,15 +53,6 @@ public partial class DownloadItemViewModel : ViewModelBase, IDisposable
     [ObservableProperty]
     public partial string Status { get; set; }
 
-    [ObservableProperty]
-    private partial string DownloadSpeed { get; set; } = "0 KB/s";
-
-    [ObservableProperty]
-    private partial string FileSize { get; set; } = "Unknown";
-
-    [ObservableProperty]
-    private partial string DownloadedSize { get; set; } = "0 KB";
-
     public void Dispose()
     {
         Dispose(true);
@@ -69,15 +65,14 @@ public partial class DownloadItemViewModel : ViewModelBase, IDisposable
         {
             _cancellationTokenSource = new CancellationTokenSource();
             IsDownloading = true;
-            Status = $"{DownloadedSize}/{FileSize}, {DownloadSpeed}";
+            Status = $"{_downloadedSize}/{_fileSize}, {_downloadSpeed}";
             _speedTimer.Restart();
 
-            var filePath = Path.Combine(Services.DownloadPath, FileName);
             long resumePosition = 0;
 
-            if (File.Exists(filePath))
+            if (File.Exists(FilePath))
             {
-                var fileInfo = new FileInfo(filePath);
+                var fileInfo = new FileInfo(FilePath);
                 resumePosition = fileInfo.Length;
 
                 var headRequest = new HttpRequestMessage(HttpMethod.Head, _fileUrl);
@@ -89,8 +84,8 @@ public partial class DownloadItemViewModel : ViewModelBase, IDisposable
                     IsCompleted = true;
                     IsDownloading = false;
                     Progress = 100;
-                    FileSize = FormatFileSize(total.Value);
-                    DownloadedSize = FileSize;
+                    _fileSize = FormatFileSize(total.Value);
+                    _downloadedSize = _fileSize;
                     Status = "File already exists";
                     return;
                 }
@@ -103,10 +98,10 @@ public partial class DownloadItemViewModel : ViewModelBase, IDisposable
             response.EnsureSuccessStatusCode();
 
             var totalBytes = response.Content.Headers.ContentLength;
-            FileSize = FormatFileSize(totalBytes ?? 0);
+            _fileSize = FormatFileSize(totalBytes ?? 0);
 
             await using var contentStream = await response.Content.ReadAsStreamAsync();
-            await using var fileStream = new FileStream(filePath,
+            await using var fileStream = new FileStream(FilePath,
                 resumePosition > 0 ? FileMode.Append : FileMode.Create, FileAccess.Write, FileShare.None);
 
             var buffer = new byte[8192];
@@ -148,9 +143,9 @@ public partial class DownloadItemViewModel : ViewModelBase, IDisposable
         if (elapsed >= 1)
         {
             var bytesPerSecond = (totalBytesRead - _lastBytesRead) / elapsed;
-            DownloadSpeed = $"{FormatFileSize((long)bytesPerSecond)}/s";
-            DownloadedSize = FormatFileSize(totalBytesRead);
-            Status = $"{DownloadedSize}/{FileSize}, {DownloadSpeed}";
+            _downloadSpeed = $"{FormatFileSize((long)bytesPerSecond)}/s";
+            _downloadedSize = FormatFileSize(totalBytesRead);
+            Status = $"{_downloadedSize}/{_fileSize}, {_downloadSpeed}";
             _lastBytesRead = totalBytesRead;
             _speedTimer.Restart();
         }
@@ -176,7 +171,7 @@ public partial class DownloadItemViewModel : ViewModelBase, IDisposable
         if (IsDownloading)
         {
             _cancellationTokenSource?.Cancel();
-            Status = $"{DownloadedSize}/{FileSize}, Paused";
+            Status = $"{_downloadedSize}/{_fileSize}, Paused";
             IsDownloading = false;
         }
         else
@@ -225,7 +220,7 @@ public partial class DownloadItemViewModel : ViewModelBase, IDisposable
     private void Install()
     {
         var filePath = Path.Combine(Services.DownloadPath, FileName);
-        if (File.Exists(filePath)) SmapiModInstaller.Install(filePath);
+        if (File.Exists(filePath)) SmapiModInstaller.Install([filePath]);
     }
 
     [RelayCommand]

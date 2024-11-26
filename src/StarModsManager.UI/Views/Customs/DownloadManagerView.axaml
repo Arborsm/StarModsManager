@@ -16,7 +16,7 @@
     </Design.DataContext>
 
     <Panel>
-        <StackPanel Width="400" Height="500">
+        <StackPanel Width="400">
             <ui:CommandBar>
                 <TextBlock
                     Margin="5,5,0,0"
@@ -42,7 +42,7 @@
                         Label="{x:Static assets:Lang.OpenFolder}" />
                 </ui:CommandBar.SecondaryCommands>
             </ui:CommandBar>
-            <ListBox ItemsSource="{Binding Downloads}">
+            <ListBox Height="450" ItemsSource="{Binding Downloads}">
                 <ListBox.ItemsPanel>
                     <ItemsPanelTemplate>
                         <WrapPanel />

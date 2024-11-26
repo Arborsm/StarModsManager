@@ -18,7 +18,7 @@ public static class NexusManager
     {
         _api = new NexusApiClient(apiKey, userAgent);
         _throttle = new Throttle(30, TimeSpan.FromSeconds(1));
-        _ = Task.Run(Init);
+        Task.Run(Init);
     }
 
     private static async Task<object?> Init()
@@ -78,7 +78,6 @@ public static class NexusManager
 
     public static async Task<Uri?> GetModFileAsync(int fileId)
     {
-        //todo 检查设置
         return (await ExecuteThrottledRequestAsync(() => NexusWebClient.Instance.GetModDownloadUrl(fileId)))?.Url;
     }
 

@@ -169,7 +169,7 @@ public class Notification(WindowNotificationManager manager) : INotification
         var vm = new CustomNotificationViewModel
         {
             Title = title,
-            Message = msg,
+            Message = msg.TrimEndNewLine(),
             ButtonText = buttonText,
             ButtonCommand = buttonCommand
         };
@@ -179,7 +179,7 @@ public class Notification(WindowNotificationManager manager) : INotification
 
     public object Show(string message)
     {
-        return Show("Info", message, Severity.Informational);
+        return Show("Info", message.TrimEndNewLine(), Severity.Informational);
     }
 
     private static void InitExpiration(Severity type, ref TimeSpan? expiration)

@@ -24,7 +24,7 @@ public partial class PicsSelectViewModel : ViewModelBase, IDisposable
     public PicsSelectViewModel(ModViewModel mod)
     {
         _mod = mod;
-        _ = Task.Run(LoadPicsAsync);
+        Task.Run(LoadPicsAsync);
         Pics.CollectionChanged += OnPicsOnCollectionChanged;
     }
 

@@ -56,7 +56,10 @@ public class MainConfig : ConfigBase
         set
         {
             if (SetProperty(ref field, value) && IsLoaded)
+            {
                 NexusManager.Initialize(value, $"StarModsManager/{Services.AppVersion}");
+                NexusDownload.Instance.Reset();
+            }
         }
     } = string.Empty;
 
@@ -65,7 +68,11 @@ public class MainConfig : ConfigBase
         get;
         set
         {
-            if (SetProperty(ref field, value)) NexusWebClient.Instance.SetCookie(value);
+            if (SetProperty(ref field, value))
+            {
+                NexusWebClient.Instance.SetCookie(value);
+                NexusDownload.Instance.Reset();
+            }
         }
     } = string.Empty;
 

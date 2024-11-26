@@ -48,7 +48,7 @@ public partial class UpdatePageViewModel : MainPageViewModelBase
             {
                 foreach (var it in cacheData.Data)
                 {
-                    var mod = ModsHelper.Instance.LocalModsMap[it.UniqueID];
+                    if (!ModsHelper.Instance.LocalModsMap.TryGetValue(it.UniqueID, out var mod)) continue;
                     Mods.Add(new ToUpdateMod(mod, true)
                     {
                         LatestVersion = it.LatestVersion
@@ -168,7 +168,7 @@ public partial class ToUpdateMod(LocalMod localMod, bool isChecked = false) : Ob
     [RelayCommand]
     private async Task OpenDownloadPageAsync()
     {
-        var url = await NexusDownload.Create(LocalMod.OnlineMod.ModId).GetModDownloadUrlAsync();
+        var url = await NexusDownload.Instance.GetModDownloadUrlAsync(LocalMod.OnlineMod.Url);
         if (url is null) return;
         PlatformHelper.OpenFileOrUrl(url);
     }

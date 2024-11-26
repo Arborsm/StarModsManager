@@ -183,7 +183,7 @@ public partial class MainPageViewModel : MainPageViewModelBase, IDisposable
     [RelayCommand]
     private void Refresh()
     {
-        _ = Task.Run(LoadModsAsync);
+        Task.Run(LoadModsAsync);
     }
 
     public void ReFreshLabels()

@@ -1,6 +1,7 @@
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using CommunityToolkit.Mvvm.Input;
 using Serilog;
 using SharpCompress.Archives;
 using StarModsManager.Assets;
@@ -12,9 +13,7 @@ public class SmapiModInstaller(string fileDir)
 {
     private readonly string _targetDirectory = Services.MainConfig.DirectoryPath;
     private readonly string _tempDir = Services.TempDir;
-    private ModInstallContext? _context;
-
-    public static void Install(string fileDir) => Install([fileDir]);
+    private ModInstallContext _context = new();
 
     public static void Install(IEnumerable<string> localPaths)
     {
@@ -28,37 +27,50 @@ public class SmapiModInstaller(string fileDir)
             });
         Services.Notification.Show(Lang.Installing, msg, Severity.Informational);
 
+        var notSupportMsg = new StringBuilder();
         var successMsg = new StringBuilder();
         Task.Run(async () =>
         {
             foreach (var pair in paths)
             {
-                await StartInstall(pair, successMsg);
+                var context = await StartInstall(pair, successMsg);
+                if (context is { IsNotSupportPack: true }) notSupportMsg.AppendLine(context.ModFolderName);
             }
         }).ContinueWith(_ =>
         {
-            if (successMsg.Length == 0) return;
-            Services.Notification.Show(Lang.ModInstallSuccess, successMsg.ToString(), Severity.Success);
+            if (successMsg.Length != 0)
+                Services.Notification.Show(Lang.ModInstallSuccess,
+                    successMsg.ToString(), Severity.Success, TimeSpan.FromSeconds(15));
+
+            if (notSupportMsg.Length != 0)
+                Services.Notification.Show(Lang.MultiModUpdateNotSupport,
+                    notSupportMsg.ToString(), Severity.Warning, TimeSpan.FromMinutes(1));
+
+            Services.LifeCycle.Reset();
         });
     }
 
-    private static async Task StartInstall(KeyValuePair<string, IArchive> pair, StringBuilder successMsg)
+    private static async Task<ModInstallContext?> StartInstall(KeyValuePair<string, IArchive> pair,
+        StringBuilder successMsg)
     {
         var type = GetArchiveType(pair.Value.Entries);
         switch (type)
         {
             case ArchiveType.Mod:
                 var installer = new SmapiModInstaller(pair.Key);
-                installer.Install();
-                successMsg.AppendLine(string.Format(Lang.InstalledModWithVersion,
-                    installer._context!.ModFolderName, installer._context.Manifest.Version));
-                break;
+                var context = installer.Install();
+                if (!context.IsNotSupportPack)
+                    successMsg.AppendLine(string.Format(Lang.InstalledModWithVersion,
+                        installer._context.ModFolderName, installer._context.Manifest.Version));
+
+                return context;
             case ArchiveType.Translation:
                 var fileName = new FileInfo(pair.Key).Name;
                 var tansInstaller = new TranslationPackInstaller(fileName);
                 var result = await tansInstaller.ProcessI18NInstallation(pair.Value);
                 if (result is null) successMsg.AppendLine(string.Format(Lang.I18NInstallSuccess, fileName));
-                break;
+
+                return null;
             case ArchiveType.Unknown:
             default:
                 throw new ArgumentOutOfRangeException($"{type} is not supported");
@@ -81,14 +93,13 @@ public class SmapiModInstaller(string fileDir)
         return ArchiveType.Unknown;
     }
 
-    private void Install()
+    private ModInstallContext Install()
     {
         try
         {
             using var archive = ArchiveFactory.Open(fileDir);
             _context = ValidateAndCreateContext(archive);
-            if (_context == null) return;
-
+            if (_context.IsNotSupportPack) return _context;
             CreateTempDirectories();
             ProcessModInstallation(archive);
         }
@@ -104,66 +115,99 @@ public class SmapiModInstaller(string fileDir)
         {
             CleanupTempDirectories();
         }
+
+        return _context;
     }
 
-    private ModInstallContext? ValidateAndCreateContext(IArchive archive)
+    private ModInstallContext ValidateAndCreateContext(IArchive archive)
     {
-        var manifestEntry = archive.Entries.FirstOrDefault(e =>
-            e.Key != null && e.Key.EndsWith("manifest.json", StringComparison.OrdinalIgnoreCase));
+        var defaultResult = new ModInstallContext(Path.GetFileName(fileDir));
 
-        if (manifestEntry != null) return CreateModContext(manifestEntry);
+        var manifestEntries = archive.Entries
+            .Where(e => e.Key != null && e.Key.EndsWith("manifest.json", StringComparison.OrdinalIgnoreCase))
+            .ToList();
 
-        Services.Notification.Show(Lang.NotModArchive, Lang.ManifestFileNotFound, Severity.Warning);
-        return null;
-    }
+        if (manifestEntries.Count == 0)
+        {
+            Services.Notification.Show(Lang.NotModArchive, Lang.ManifestFileNotFound, Severity.Warning);
+            return defaultResult;
+        }
 
-    private ModInstallContext CreateModContext(IArchiveEntry manifestEntry)
-    {
+        var manifestEntry = manifestEntries.First();
         var manifest = JsonSerializer.Deserialize(manifestEntry.OpenEntryStream(), ManifestContent.Default.Manifest)!;
         var modFolderName = Path.GetDirectoryName(manifestEntry.Key) ?? Path.GetFileNameWithoutExtension(fileDir);
+        if (modFolderName.Split('\\').Length > 1) modFolderName = modFolderName.Split('\\').Last();
+
+        var existingMod = ModsHelper.Instance.LocalModsMap.Values
+            .FirstOrDefault(mod => mod.Manifest.UniqueID == manifest.UniqueID);
+
+        if (manifestEntries.Count > 1 && existingMod != null) return defaultResult;
+
         var tempDir = Path.Combine(_tempDir, "ToInstallMod");
         var tempModDir = Path.Combine(_tempDir, modFolderName);
-        var sourceDir = Path.Combine(tempDir, modFolderName);
-        var destDir = GetDestinationDirectory(manifest, modFolderName);
+        var destDir = ModsHelper.Instance.LocalModsMap.Values
+            .FirstOrDefault(mod => mod.Manifest.UniqueID == manifest.UniqueID)?.PathS;
+        var modDir = Path.Combine(_targetDirectory, modFolderName);
 
         return new ModInstallContext
         {
+            IsNotSupportPack = false,
             Manifest = manifest,
             ModFolderName = modFolderName,
             TempDir = tempDir,
             TempModDir = tempModDir,
-            SourceDir = sourceDir,
-            DestDir = destDir
+            DestDir = destDir,
+            ModDir = modDir,
+            DestDirParent = FindCommonPath(destDir, Services.MainConfig.DirectoryPath)
         };
     }
 
-    private string GetDestinationDirectory(Manifest manifest, string modFolderName)
+    private static string? FindCommonPath(string? subPath, string basePath)
     {
-        var destDir = Path.Combine(_targetDirectory, modFolderName);
-        var local = ModsHelper.Instance.LocalModsMap.Values
-            .FirstOrDefault(mod => mod.Manifest.UniqueID == manifest.UniqueID);
+        if (string.IsNullOrEmpty(subPath)) return null;
+        subPath = subPath.Replace('/', '\\').TrimEnd('\\');
+        basePath = basePath.Replace('/', '\\').TrimEnd('\\');
 
-        return local?.PathS ?? destDir;
+        if (subPath.StartsWith(basePath, StringComparison.OrdinalIgnoreCase))
+        {
+            var subParts = subPath.Split('\\');
+            var baseParts = basePath.Split('\\');
+
+            return baseParts.Length < subParts.Length
+                ? string.Join("\\", subParts.Take(baseParts.Length + 1))
+                : basePath;
+        }
+
+        var pathParts = subPath.Split('\\');
+        for (var i = 0; i < pathParts.Length - 1; i++)
+        {
+            var currentPath = string.Join("\\", pathParts.Take(i + 1));
+            var nextPath = string.Join("\\", pathParts.Take(i + 2));
+
+            if (currentPath.Equals(basePath, StringComparison.OrdinalIgnoreCase)) return nextPath;
+        }
+
+        return string.Empty;
     }
 
     private void CreateTempDirectories()
     {
-        if (_context == null) return;
         Directory.CreateDirectory(_context.TempDir);
         Directory.CreateDirectory(_context.TempModDir);
     }
 
     private void ProcessModInstallation(IArchive archive)
     {
-        if (_context == null) return;
-
         archive.ExtractToDirectory(_context.TempDir);
 
-        if (Directory.Exists(_context.DestDir)) HandleExistingMod();
+        if (_context.DestDirParent != null) HandleExistingMod(_context.DestDirParent);
 
-        MoveDirectory(Directory.Exists(_context.SourceDir) ? _context.SourceDir : _context.TempDir, _context.DestDir);
+        var dir = Directory.GetParent(
+            Directory.EnumerateFileSystemEntries(_context.TempDir, "*", SearchOption.AllDirectories)
+                .First(it => it.Contains(_context.ModFolderName) && it.Contains("manifest.json")))!.FullName;
+        MoveDirectory(dir, _context.ModDir);
 
-        if (Directory.EnumerateDirectories(_context.TempDir).Any()) RestoreModFiles();
+        if (Directory.EnumerateFiles(_context.TempModDir).Any()) RestoreModFiles();
 
         Log.Information("Mod installed successfully: {Dir}", _context.ModFolderName);
     }
@@ -185,23 +229,29 @@ public class SmapiModInstaller(string fileDir)
         }
     }
 
-    private void HandleExistingMod()
+    private void HandleExistingMod(string dir)
     {
-        if (_context == null) return;
-
-        Log.Information("Mod already exists: {Dir}", _context.DestDir);
-        _context.DestDir.CreateZipBackup(_context.ModFolderName);
+        Log.Information("Mod already exists: {Dir}", dir);
+        dir.CreateZipBackup(_context.ModFolderName);
 
         BackupConfigFile();
         BackupI18NFolder();
 
-        Directory.Delete(_context.DestDir, true);
+        try
+        {
+            Directory.Delete(dir, true);
+        }
+        catch (Exception)
+        {
+            Services.Notification.Show(Lang.Warning, string.Format(Lang.CannotDeleteFolder, dir)
+                , Severity.Warning, null, null, null, Lang.OpenFolder,
+                new RelayCommand(() => PlatformHelper.OpenFileOrUrl(dir)));
+        }
     }
 
     private void BackupConfigFile()
     {
-        if (_context == null) return;
-
+        if (_context.DestDir == null) return;
         var configPath = Path.Combine(_context.DestDir, "config.json");
         if (!File.Exists(configPath)) return;
 
@@ -211,8 +261,7 @@ public class SmapiModInstaller(string fileDir)
 
     private void BackupI18NFolder()
     {
-        if (_context == null) return;
-
+        if (_context.DestDir == null) return;
         var i18NPath = Path.Combine(_context.DestDir, "i18n");
         if (!Directory.Exists(i18NPath)) return;
 
@@ -229,53 +278,55 @@ public class SmapiModInstaller(string fileDir)
 
     private void RestoreModFiles()
     {
-        if (_context == null) return;
         RestoreConfigFile();
         RestoreI18NFolder();
     }
 
     private void RestoreConfigFile()
     {
-        if (_context == null) return;
-
         var tempConfigPath = Path.Combine(_context.TempModDir, "config.json");
         if (!File.Exists(tempConfigPath)) return;
 
         Log.Information("Found config for {modName}, restoring...", _context.ModFolderName);
-        File.Move(tempConfigPath, Path.Combine(_context.DestDir, "config.json"), true);
+        File.Move(tempConfigPath, Path.Combine(_context.ModDir, "config.json"), true);
     }
 
     private void RestoreI18NFolder()
     {
-        if (_context == null) return;
-
         var tempI18NPath = Path.Combine(_context.TempModDir, "i18n");
         if (!Directory.Exists(tempI18NPath)) return;
 
         Log.Information("Found i18n folder for {modName}, restoring...", _context.ModFolderName);
-        var i18NHandler = new I18NFileHandler(_context.DestDir);
+        var i18NHandler = new I18NFileHandler(_context.ModDir);
 
         foreach (var file in Directory.GetFiles(tempI18NPath)) i18NHandler.ProcessI18NFile(file);
     }
 
     private void CleanupTempDirectories()
     {
-        if (_context == null) return;
-
-        if (Directory.Exists(_context.TempDir))
-            Directory.Delete(_context.TempDir, true);
         if (Directory.Exists(_context.TempModDir))
             Directory.Delete(_context.TempModDir, true);
     }
 
     private class ModInstallContext
     {
-        public required Manifest Manifest { get; init; }
-        public required string ModFolderName { get; init; }
-        public required string TempDir { get; init; }
-        public required string TempModDir { get; init; }
-        public required string SourceDir { get; init; }
-        public required string DestDir { get; init; }
+        public ModInstallContext()
+        {
+        }
+
+        public ModInstallContext(string modFolderName)
+        {
+            ModFolderName = modFolderName;
+        }
+
+        public bool IsNotSupportPack { get; init; } = true;
+        public Manifest Manifest { get; init; } = new();
+        public string ModFolderName { get; init; } = string.Empty;
+        public string TempDir { get; init; } = string.Empty;
+        public string TempModDir { get; init; } = string.Empty;
+        public string? DestDir { get; init; } = string.Empty;
+        public string ModDir { get; init; } = string.Empty;
+        public string? DestDirParent { get; init; }
     }
 }
 
@@ -436,7 +487,7 @@ public class I18NFileHandler(string destDir)
     }
 }
 
-enum ArchiveType
+internal enum ArchiveType
 {
     Mod,
     Translation,

@@ -60,7 +60,7 @@
             Orientation="Horizontal"
             Spacing="20">
             <Button Command="{Binding RefreshCommand}" Content="{x:Static assets:Lang.Refresh}" />
-            <Button Command="{Binding DownloadCommand}" Content="{x:Static assets:Lang.Update}" />
+            <Button Command="{Binding DownloadCommand}" Content="{x:Static assets:Lang.DownloadManagerLabel}" />
         </StackPanel>
     </Grid>
 </UserControl>

@@ -12,12 +12,12 @@ public static class SMMDebug
 {
     public static void Init()
     {
+#if !DEBUG
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-#if !DEBUG
             DebugHelper.InitConsole();
-#endif
         }
+#endif
 
         var debugFileName = Path.Combine(Services.LogDir, "debug_.log");
         var logFileName = Path.Combine(Services.LogDir, "log_.log");
@@ -35,11 +35,6 @@ public static class SMMDebug
                 restrictedToMinimumLevel: LogEventLevel.Information)
             .CreateLogger();
         Log.Logger = log;
-
-        var startTime = DateTime.Now;
-        Log.Information("Starting StarModsManager...");
-        Log.Information("Welcome to StarModsManager v{Version}", Services.AppVersion);
-        Log.Information("Starting at: {Time}", startTime);
     }
 
     public static void Error(Exception e, string? msg = default, bool isMsg = true)

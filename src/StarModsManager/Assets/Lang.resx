@@ -615,4 +615,10 @@
     <data name="CheckUpdate" xml:space="preserve">
         <value>Check Update</value>
     </data>
+    <data name="MultiModUpdateNotSupport" xml:space="preserve">
+        <value>Multiple mods archive not supported yet:</value>
+    </data>
+    <data name="CannotDeleteFolder" xml:space="preserve">
+        <value>Cannot Delete Folder: {0}</value>
+    </data>
 </root>

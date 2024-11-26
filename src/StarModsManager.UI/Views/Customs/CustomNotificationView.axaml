@@ -7,21 +7,21 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     x:DataType="customs:CustomNotificationViewModel"
     mc:Ignorable="d">
-    <Panel>
+    <Grid ColumnDefinitions="*, Auto">
         <StackPanel
-            Name="StackPanel"
             Margin="12"
             Spacing="8"
             TextElement.Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}">
             <TextBlock FontWeight="Medium" Text="{Binding Title}" />
-            <StackPanel Spacing="10">
+            <ScrollViewer MaxHeight="350">
                 <TextBlock
                     Margin="0,0,12,0"
                     Text="{Binding Message}"
-                    TextWrapping="Wrap" />
-            </StackPanel>
+                    TextWrapping="WrapWithOverflow" />
+            </ScrollViewer>
         </StackPanel>
         <Button
+            Grid.Column="1"
             Margin="10"
             HorizontalAlignment="Right"
             VerticalAlignment="Bottom"
@@ -29,5 +29,5 @@
             IsVisible="{Binding !!ButtonText}">
             <TextBlock Text="{Binding ButtonText}" />
         </Button>
-    </Panel>
+    </Grid>
 </UserControl>

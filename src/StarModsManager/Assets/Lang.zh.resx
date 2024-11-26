@@ -615,4 +615,10 @@
     <data name="CheckUpdate" xml:space="preserve">
         <value>检查更新</value>
     </data>
+    <data name="MultiModUpdateNotSupport" xml:space="preserve">
+        <value>尚未支持含有多个已安装的Mod压缩包:</value>
+    </data>
+    <data name="CannotDeleteFolder" xml:space="preserve">
+        <value>无法删除文件夹：{0}</value>
+    </data>
 </root>

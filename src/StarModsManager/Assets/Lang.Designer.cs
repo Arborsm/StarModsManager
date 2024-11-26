@@ -159,6 +159,15 @@ namespace StarModsManager.Assets {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot Delete Folder: {0}.
+        /// </summary>
+        public static string CannotDeleteFolder {
+            get {
+                return ResourceManager.GetString("CannotDeleteFolder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Change Color.
         /// </summary>
         public static string ChangeColor {
@@ -767,6 +776,15 @@ namespace StarModsManager.Assets {
         public static string ModVersion {
             get {
                 return ResourceManager.GetString("ModVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Multiple mods archive not supported yet:.
+        /// </summary>
+        public static string MultiModUpdateNotSupport {
+            get {
+                return ResourceManager.GetString("MultiModUpdateNotSupport", resourceCulture);
             }
         }
         

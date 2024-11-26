@@ -120,6 +120,11 @@ public static class SMMHelper
         return defaultLang.Where(x => !targetLang.ContainsKey(x.Key)).ToDictionary(x => x.Key, x => x.Value);
     }
 
+    public static string TrimEndNewLine(this string str)
+    {
+        return string.IsNullOrEmpty(str) ? str : str.TrimEnd('\r', '\n');
+    }
+
     public static void CreateZipBackup(this string directoryPath, string zipFileName)
     {
         var backupPath = Services.BackupPath;

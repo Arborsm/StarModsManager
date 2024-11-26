@@ -4,6 +4,7 @@ using System.ComponentModel;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.Input;
 using StarModsManager.Api;
+using StarModsManager.Api.SMAPI;
 using StarModsManager.ViewModels.Items;
 
 namespace StarModsManager.ViewModels.Customs;
@@ -42,7 +43,7 @@ public partial class DownloadManagerViewModel : ViewModelBase, IDisposable
 
     public void AddDownload(string url)
     {
-        _ = Task.Run(() => AddDownloadAsync(url));
+        Task.Run(() => AddDownloadAsync(url));
     }
 
     private async Task AddDownloadAsync(string url)
@@ -54,7 +55,6 @@ public partial class DownloadManagerViewModel : ViewModelBase, IDisposable
             var download = new DownloadItemViewModel(url);
             Dispatcher.UIThread.Invoke(() => Downloads.Add(download));
 
-            // 监视下载完成
             var completion = new TaskCompletionSource<bool>();
             PropertyChangedEventHandler? handler = null;
             handler = (_, e) =>
@@ -84,9 +84,7 @@ public partial class DownloadManagerViewModel : ViewModelBase, IDisposable
     [RelayCommand]
     private void InstallAll()
     {
-        foreach (var download in Downloads)
-            if (!download.IsDownloading)
-                download.InstallCommand.Execute(null);
+        SmapiModInstaller.Install(Downloads.Where(model => model.IsCompleted).Select(model => model.FilePath));
     }
 
     [RelayCommand]
