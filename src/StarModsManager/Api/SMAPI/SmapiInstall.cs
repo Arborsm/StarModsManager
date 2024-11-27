@@ -40,7 +40,7 @@ public class SmapiInstall
     private async Task<bool> Download(string filePath, CancellationToken cancellationToken)
     {
         if (_downloadUrl is null) return false;
-        var response = await HttpHelper.Instance.GetAsync(_downloadUrl, cancellationToken);
+        var response = await HttpHelper.Instance.GetAsync(_downloadUrl, RequestPriority.High, cancellationToken);
         await using var file = await response.Content.ReadAsStreamAsync(cancellationToken);
         await using var fileStream =
             new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.Read, 4096, true);

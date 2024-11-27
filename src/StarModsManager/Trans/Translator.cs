@@ -3,7 +3,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Security.Authentication;
 using Serilog;
 using StarModsManager.Api;
-using StarModsManager.Assets;
 using StarModsManager.Mods;
 using TransConfig = StarModsManager.Config.TransConfig;
 
@@ -13,10 +12,13 @@ public class Translator
 {
     private Translator()
     {
+        Task.Run(Test);
     }
 
     public static Translator Instance { get; } = new();
     public List<ITranslator> Apis { get; } = [new OllamaTrans(), new OpenAITrans()];
+
+    public bool IsAvailable { get; private set; }
 
     [field: AllowNull]
     [field: MaybeNull]
@@ -26,9 +28,15 @@ public class Translator
         {
             if (field is null || field.Name != Services.TransConfig.ApiSelected)
                 field = Instance.Apis.First(it => it.Name == Services.TransConfig.ApiSelected);
-
             return field;
         }
+    }
+
+    public async Task Test()
+    {
+        var result = await Instance.TranslateTextAsync(
+            "This is a test message, just easy return yes, must not return other things");
+        IsAvailable = !string.IsNullOrEmpty(result);
     }
 
     public async Task ProcessDirectoriesAsync(IList<LocalMod> toTansMods, CancellationToken token = default)
@@ -127,7 +135,6 @@ public class Translator
         catch (InvalidCredentialException)
         {
             Log.Warning("Translate fail -- Invalid Credential");
-            Services.Notification.Show(Lang.TranslationError, Lang.TranslationErrorMsg, Severity.Warning);
         }
         catch (Exception e)
         {

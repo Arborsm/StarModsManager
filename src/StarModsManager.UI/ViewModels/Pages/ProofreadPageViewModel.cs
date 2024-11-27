@@ -4,6 +4,7 @@ using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using StarModsManager.Api;
+using StarModsManager.Assets;
 using StarModsManager.Config;
 using StarModsManager.Lib;
 using StarModsManager.Mods;
@@ -129,6 +130,12 @@ public partial class ProofreadPageViewModel : MainPageViewModelBase
     [RelayCommand]
     private async Task TranslateAsync()
     {
+        if (!Translator.Instance.IsAvailable)
+        {
+            Services.Notification.Show(Lang.Warning, Lang.TranslationNotAvailable, Severity.Warning);
+            return;
+        }
+
         if (SelectedItem?.SourceLang != null)
         {
             var result = await Translator.Instance.TranslateTextAsync(SelectedItem.SourceLang);

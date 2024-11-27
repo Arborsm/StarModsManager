@@ -40,7 +40,7 @@ public class TransApiConfig : ConfigBase
     {
         get;
         set => SetProperty(ref field, value);
-    } = "https://api.openai.com";
+    } = "api.openai.com";
 
     protected override JsonTypeInfo GetJsonTypeInfo()
     {

@@ -183,6 +183,12 @@ public partial class SettingsPageViewModel : MainPageViewModelBase
         PlatformHelper.OpenFileOrUrl(Services.BackupPath);
     }
 
+    [RelayCommand]
+    private void GetCookie()
+    {
+        Services.Notification.Show(Lang.GetCookiesText);
+    }
+
     private void GetPredefColors()
     {
         PredefinedColors =

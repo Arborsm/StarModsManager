@@ -54,6 +54,12 @@ public partial class ApiSettingViewModel(string selectedApi) : ViewModelBase
     }
 
     [RelayCommand]
+    public async Task RefreshAsync()
+    {
+        await Task.Run(Translator.Instance.Test);
+    }
+
+    [RelayCommand]
     private void Save()
     {
         var apiConfig = Services.TransApiConfigs[selectedApi];

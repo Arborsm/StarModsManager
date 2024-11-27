@@ -27,9 +27,10 @@ public class NexusMod
         CancellationToken cancellationToken = default)
     {
         var url = getPics ? modUrl + "?tab=images" : modUrl;
+        var priority = getPics ? RequestPriority.Low : RequestPriority.Normal;
         var mod = new NexusMod(modUrl)
         {
-            Doc = await HttpHelper.Instance.FetchHtmlDocumentAsync(url, cancellationToken)
+            Doc = await HttpHelper.Instance.FetchHtmlDocumentAsync(url, priority, cancellationToken)
         };
         return mod;
     }

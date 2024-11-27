@@ -501,11 +501,38 @@ namespace StarModsManager.Assets {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Get Cookies.
+        /// </summary>
+        public static string GetCookies {
+            get {
+                return ResourceManager.GetString("GetCookies", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to To view cookies in Chrome, open Chrome Settings (right-click on your browser window) &gt; Inspect &gt; Applications &gt; Storage &gt; Cookies, and select the website you want to see cookies in Chrome. Here you can see, edit, or delete cookies in Chrome..
+        /// </summary>
+        public static string GetCookiesText {
+            get {
+                return ResourceManager.GetString("GetCookiesText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Getting mod download links....
         /// </summary>
         public static string GetDownloadUrl {
             get {
                 return ResourceManager.GetString("GetDownloadUrl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Get Models.
+        /// </summary>
+        public static string GetModels {
+            get {
+                return ResourceManager.GetString("GetModels", resourceCulture);
             }
         }
         
@@ -825,7 +852,7 @@ namespace StarModsManager.Assets {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Non-NexusPremium users please fill in this field to enable download feature.
+        ///   Looks up a localized string similar to Non-NexusPremium users please fill in this field to enable download feature, like: token_invalidated_at=context; nexusmods_session=context; fwroute=context; nexusmods_session_refresh=content; cf_clearance=content.
         /// </summary>
         public static string NexusModsCookieWaterMark {
             get {
@@ -1194,11 +1221,11 @@ namespace StarModsManager.Assets {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Cookie:.
+        ///   Looks up a localized string similar to Cookies:.
         /// </summary>
-        public static string SettingNexusCookie {
+        public static string SettingNexusCookies {
             get {
-                return ResourceManager.GetString("SettingNexusCookie", resourceCulture);
+                return ResourceManager.GetString("SettingNexusCookies", resourceCulture);
             }
         }
         
@@ -1406,6 +1433,15 @@ namespace StarModsManager.Assets {
         public static string TranslationMismatch {
             get {
                 return ResourceManager.GetString("TranslationMismatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Translate Not Available, please check Translate Settings.
+        /// </summary>
+        public static string TranslationNotAvailable {
+            get {
+                return ResourceManager.GetString("TranslationNotAvailable", resourceCulture);
             }
         }
         

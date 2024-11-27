@@ -1,8 +1,9 @@
 using Avalonia.Interactivity;
-using FluentAvalonia.UI.Controls;
 using Serilog;
+using StarModsManager.Api;
 using StarModsManager.Assets;
-using StarModsManager.ViewModels.Customs;
+using StarModsManager.Lib;
+using StarModsManager.Trans;
 using StarModsManager.ViewModels.Pages;
 using StarModsManager.Views.Customs;
 
@@ -17,6 +18,12 @@ public partial class TransPageView : UserControl
 
     private void TransButton_OnClick(object? sender, RoutedEventArgs e)
     {
+        if (!Translator.Instance.IsAvailable)
+        {
+            Services.Notification.Show(Lang.Warning, Lang.TranslationNotAvailable, Severity.Warning);
+            return;
+        }
+
         var vm = ViewModelService.Resolve<TransPageViewModel>();
         vm.CancellationTokenSource = new CancellationTokenSource();
         Content = new TranslatingView
@@ -29,24 +36,11 @@ public partial class TransPageView : UserControl
     {
         try
         {
-            var vm = new TransSettingViewModel();
-            var dialog = new ContentDialog
-            {
-                Title = Lang.TranslatingSettings,
-                Content = new TransSettingView
-                {
-                    DataContext = vm
-                },
-                PrimaryButtonText = Lang.Save,
-                PrimaryButtonCommand = vm.SaveCommand,
-                CloseButtonText = Lang.Close
-            };
-
-            await dialog.ShowAsync();
+            await NavigationService.ShowTranslationSetting();
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "Error in ApiSettingButton Click");
+            Log.Error(ex, "Error in TransPageView");
         }
     }
 }

@@ -101,11 +101,17 @@ public partial class DownloadPageViewModel : MainPageViewModelBase
     [RelayCommand(CanExecute = nameof(CanLoadMoreMods))]
     private async Task LoadMoreModsAsync()
     {
-        await Task.Run(() => _throttle.Queue(async () =>
+        try
         {
-            _currentPage++;
-            await LoadModsAsync(false);
-        }));
+            await Task.Run(() => _throttle.Queue(async () =>
+            {
+                _currentPage++;
+                await LoadModsAsync(false);
+            }));
+        }
+        catch (OperationCanceledException)
+        {
+        }
     }
 
     private async Task LoadModsAsync(bool clearSearch)

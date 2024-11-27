@@ -68,7 +68,7 @@ public class NexusPage
         HttpResponseMessage response;
         try
         {
-            response = await HttpHelper.Instance.GetAsync(GetUrl(searchText), cancellationToken);
+            response = await HttpHelper.Instance.GetAsync(GetUrl(searchText), RequestPriority.High, cancellationToken);
         }
         catch (Exception e)
         {

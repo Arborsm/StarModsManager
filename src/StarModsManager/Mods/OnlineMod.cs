@@ -102,7 +102,7 @@ public class OnlineMod
     {
         if (File.Exists(cachePath)) return File.OpenRead(cachePath);
 
-        var response = await HttpHelper.Instance.GetAsync(picUrl, cancellationToken);
+        var response = await HttpHelper.Instance.GetAsync(picUrl, RequestPriority.Low, cancellationToken);
 
         if (!response.IsSuccessStatusCode) return null;
         await using (var contentStream = await response.Content.ReadAsStreamAsync(cancellationToken))

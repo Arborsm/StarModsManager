@@ -342,8 +342,8 @@
     <data name="SettingNexusApiKey" xml:space="preserve">
         <value>Api Key：</value>
     </data>
-    <data name="SettingNexusCookie" xml:space="preserve">
-        <value>Cookie：</value>
+    <data name="SettingNexusCookies" xml:space="preserve">
+        <value>Cookies：</value>
     </data>
     <data name="Others" xml:space="preserve">
         <value>其他</value>
@@ -583,7 +583,7 @@
         <value>无法找到汉化包对应的Mod: {0}</value>
     </data>
     <data name="NexusModsCookieWaterMark" xml:space="preserve">
-        <value>非Nexus会员请填写此项以启用下载功能</value>
+        <value>非Nexus会员请填写此项以启用下载功能, 类似:token_invalidated_at=context; nexusmods_session=context; fwroute=context; nexusmods_session_refresh=content; cf_clearance=content</value>
     </data>
     <data name="GetApiKeyButton" xml:space="preserve">
         <value>获取ApiKey</value>
@@ -626,5 +626,17 @@
     </data>
     <data name="BackupFolder" xml:space="preserve">
         <value>备份文件夹</value>
+    </data>
+    <data name="GetModels" xml:space="preserve">
+        <value>获取模型</value>
+    </data>
+    <data name="TranslationNotAvailable" xml:space="preserve">
+        <value>翻译不可用，请查看翻译设置</value>
+    </data>
+    <data name="GetCookies" xml:space="preserve">
+        <value>获取Cookies</value>
+    </data>
+    <data name="GetCookiesText" xml:space="preserve">
+        <value>要在 Chrome 中查看 Cookie，请打开 Chrome 设置（右键单击浏览器窗口）&gt; 检查 &gt; 应用程序 &gt; 存储 &gt; Cookie，然后选择您想查看 Cookie 的网站。在这里，您可以查看、编辑或删除 Chrome 中的 Cookie。</value>
     </data>
 </root>

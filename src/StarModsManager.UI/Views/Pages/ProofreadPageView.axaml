@@ -3,13 +3,13 @@
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:api="using:StarModsManager.Api"
+    xmlns:assets="clr-namespace:StarModsManager.Assets;assembly=StarModsManager.Common"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:lib="clr-namespace:StarModsManager.Lib"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:mods="using:StarModsManager.Mods"
     xmlns:pages="using:StarModsManager.ViewModels.Pages"
     xmlns:ui="using:FluentAvalonia.UI.Controls"
-    xmlns:assets="clr-namespace:StarModsManager.Assets;assembly=StarModsManager.Common"
     d:DesignHeight="800"
     d:DesignWidth="1200"
     x:DataType="pages:ProofreadPageViewModel"
@@ -46,17 +46,14 @@
                                             <Setter Property="BorderThickness" Value="0" />
                                         </Style>
                                     </StackPanel.Styles>
-                                    <TextBox Text="{Binding SearchText}" Width="200" />
-                                    <Button
-                                        Command="{Binding SearchCommand}">
+                                    <TextBox Width="200" Text="{Binding SearchText}" />
+                                    <Button Command="{Binding SearchCommand}">
                                         <ui:SymbolIcon Symbol="Find" />
                                     </Button>
-                                    <Button
-                                        Command="{Binding PrevSearchCommand}">
+                                    <Button Command="{Binding PrevSearchCommand}">
                                         <ui:SymbolIcon Symbol="Previous" />
                                     </Button>
-                                    <Button
-                                        Command="{Binding NextSearchCommand}">
+                                    <Button Command="{Binding NextSearchCommand}">
                                         <ui:SymbolIcon Symbol="Next" />
                                     </Button>
                                 </StackPanel>
@@ -88,24 +85,29 @@
                 </ui:CommandBar.SecondaryCommands>
             </ui:CommandBar>
 
-            <ComboBox
-                Name="I18NModsComboBox"
+            <StackPanel
                 Grid.Column="1"
-                MinWidth="400"
                 HorizontalAlignment="Right"
-                VerticalAlignment="Center"
-                ItemsSource="{Binding ShowMods}"
-                SelectedItem="{Binding CurrentMod}"
-                SelectionChanged="ComboBox_SelectionChanged">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock
-                            x:DataType="mods:LocalMod"
-                            Foreground="{Binding LazyIsMisMatch.Value, Converter={StaticResource NullableBoolToColorConverter}}"
-                            Text="{Binding Manifest.Name}" />
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-            </ComboBox>
+                Orientation="Horizontal"
+                Spacing="10">
+                <Button VerticalAlignment="Center" Click="Button_OnClick" />
+                <ComboBox
+                    Name="I18NModsComboBox"
+                    MinWidth="400"
+                    VerticalAlignment="Center"
+                    ItemsSource="{Binding ShowMods}"
+                    SelectedItem="{Binding CurrentMod}"
+                    SelectionChanged="ComboBox_SelectionChanged">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock
+                                x:DataType="mods:LocalMod"
+                                Foreground="{Binding LazyIsMisMatch.Value, Converter={StaticResource NullableBoolToColorConverter}}"
+                                Text="{Binding Manifest.Name}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+            </StackPanel>
         </Grid>
 
         <Panel Grid.Row="1">

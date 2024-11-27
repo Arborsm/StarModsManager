@@ -3,6 +3,8 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
+using Serilog;
+using StarModsManager.Lib;
 using StarModsManager.Mods;
 using StarModsManager.ViewModels.Pages;
 
@@ -64,5 +66,17 @@ public partial class ProofreadPageView : UserControl
 
         proofreadDataGrid.ScrollIntoView(proofreadDataGrid.SelectedItem, proofreadDataGrid.Columns[0]);
         proofreadDataGrid.InvalidateVisual();
+    }
+
+    private async void Button_OnClick(object? sender, RoutedEventArgs e)
+    {
+        try
+        {
+            await NavigationService.ShowTranslationSetting();
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Error in ProofreadPageView");
+        }
     }
 }

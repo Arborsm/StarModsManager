@@ -342,8 +342,8 @@
     <data name="SettingNexusApiKey" xml:space="preserve">
         <value>Api Key:</value>
     </data>
-    <data name="SettingNexusCookie" xml:space="preserve">
-        <value>Cookie:</value>
+    <data name="SettingNexusCookies" xml:space="preserve">
+        <value>Cookies:</value>
     </data>
     <data name="Others" xml:space="preserve">
         <value>Others</value>
@@ -583,7 +583,7 @@
         <value>Missing mod for translation pack: {0}</value>
     </data>
     <data name="NexusModsCookieWaterMark" xml:space="preserve">
-        <value>Non-NexusPremium users please fill in this field to enable download feature</value>
+        <value>Non-NexusPremium users please fill in this field to enable download feature, like: token_invalidated_at=context; nexusmods_session=context; fwroute=context; nexusmods_session_refresh=content; cf_clearance=content</value>
     </data>
     <data name="GetApiKeyButton" xml:space="preserve">
         <value>Get Api Key</value>
@@ -626,5 +626,17 @@
     </data>
     <data name="BackupFolder" xml:space="preserve">
         <value>Backup Folder</value>
+    </data>
+    <data name="GetModels" xml:space="preserve">
+        <value>Get Models</value>
+    </data>
+    <data name="TranslationNotAvailable" xml:space="preserve">
+        <value>Translate Not Available, please check Translate Settings</value>
+    </data>
+    <data name="GetCookies" xml:space="preserve">
+        <value>Get Cookies</value>
+    </data>
+    <data name="GetCookiesText" xml:space="preserve">
+        <value>To view cookies in Chrome, open Chrome Settings (right-click on your browser window) &gt; Inspect &gt; Applications &gt; Storage &gt; Cookies, and select the website you want to see cookies in Chrome. Here you can see, edit, or delete cookies in Chrome.</value>
     </data>
 </root>
