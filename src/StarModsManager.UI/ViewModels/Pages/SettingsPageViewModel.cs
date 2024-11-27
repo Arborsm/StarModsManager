@@ -177,6 +177,12 @@ public partial class SettingsPageViewModel : MainPageViewModelBase
         PlatformHelper.OpenFileOrUrl(url);
     }
 
+    [RelayCommand]
+    private void OpenBackupFolder()
+    {
+        PlatformHelper.OpenFileOrUrl(Services.BackupPath);
+    }
+
     private void GetPredefColors()
     {
         PredefinedColors =

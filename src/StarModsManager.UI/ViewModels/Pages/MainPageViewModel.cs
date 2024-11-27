@@ -58,7 +58,6 @@ public partial class MainPageViewModel : MainPageViewModelBase, IDisposable
         IsLoading = true;
         Mods.Clear();
         AllMods = ModsHelper.Instance.LocalModsMap.Values
-            //.Where(it => !string.IsNullOrEmpty(it.OnlineMod.ModId))
             .Select(it => new ModViewModel(it.OnlineMod, it))
             .OrderBy(it => it.OnlineMod.Title)
             .ToList();
@@ -86,6 +85,8 @@ public partial class MainPageViewModel : MainPageViewModelBase, IDisposable
                 .ToList();
         Dispatcher.UIThread.Invoke(() =>
         {
+            if (list != null && list.All(item => item.Title != ItemLabelViewModel.Hidden))
+                list?.Add(new ItemLabelViewModel());
             ModLabels = list is null || list.Count < 1 ? [new()] : new ObservableCollection<ItemLabelViewModel>(list);
             ModLabels.CollectionChanged += ModLabelsOnCollectionChanged;
             ModLabels.ForEach(vm => vm.PropertyChanged += ModLabelViewModelOnPropertyChanged);
@@ -151,7 +152,7 @@ public partial class MainPageViewModel : MainPageViewModelBase, IDisposable
     [RelayCommand]
     private void Rename()
     {
-        if (SelectedLabel is null) return;
+        if (SelectedLabel is null || SelectedLabel.Title == ItemLabelViewModel.Hidden) return;
         SelectedLabel.IsEditing = true;
     }
 
@@ -171,6 +172,7 @@ public partial class MainPageViewModel : MainPageViewModelBase, IDisposable
     private void RemoveLabel()
     {
         if (SelectedLabel is null) return;
+        SelectedLabel.PropertyChanged -= ModLabelViewModelOnPropertyChanged;
         ModLabels?.Remove(SelectedLabel);
     }
 

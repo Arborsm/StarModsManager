@@ -53,9 +53,12 @@ public partial class UpdatePageViewModel : MainPageViewModelBase
                 foreach (var it in cacheData.Data)
                 {
                     if (!ModsHelper.Instance.LocalModsMap.TryGetValue(it.UniqueID, out var mod)) continue;
-                    Mods.Add(new ToUpdateMod(mod, true)
+                    Dispatcher.UIThread.Invoke(() =>
                     {
-                        LatestVersion = it.LatestVersion
+                        Mods.Add(new ToUpdateMod(mod, true)
+                        {
+                            LatestVersion = it.LatestVersion
+                        });
                     });
                     if (it.LatestVersion.ComparePrecedenceTo(mod.Manifest.Version) < 0)
                     {
@@ -76,7 +79,7 @@ public partial class UpdatePageViewModel : MainPageViewModelBase
     {
         IsLoading = true;
         ViewModelService.Resolve<MainViewModel>().ToUpdateModsCount = 0;
-        Mods.Clear();
+        Dispatcher.UIThread.Invoke(Mods.Clear);
         var mods = ModsHelper.Instance.LocalModsMap.Values
             .Where(it => !string.IsNullOrEmpty(it.OnlineMod.ModId))
             .GroupBy(m => m.OnlineMod.ModId)
@@ -89,7 +92,7 @@ public partial class UpdatePageViewModel : MainPageViewModelBase
             await mods.ForEachAsync(async mod => await mod.UpdateLatestVersionAsync().ContinueWith(task =>
             {
                 if (!task.Result.CanUpdate) return;
-                Dispatcher.UIThread.InvokeAsync(() => Mods.Add(task.Result));
+                Dispatcher.UIThread.Invoke(() => Mods.Add(task.Result));
                 ViewModelService.Resolve<MainViewModel>().ToUpdateModsCount++;
             }), 2);
             var cacheData = new CacheData<ToUpdateModJson>(DateTime.Now, Mods

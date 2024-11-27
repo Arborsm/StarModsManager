@@ -624,4 +624,7 @@
     <data name="ModsDirNotFound" xml:space="preserve">
         <value>无法自动选择模组文件夹</value>
     </data>
+    <data name="BackupFolder" xml:space="preserve">
+        <value>备份文件夹</value>
+    </data>
 </root>

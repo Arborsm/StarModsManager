@@ -232,7 +232,7 @@ public class SmapiModInstaller(string fileDir)
     private void HandleExistingMod(string dir)
     {
         Log.Information("Mod already exists: {Dir}", dir);
-        dir.CreateZipBackup(_context.ModFolderName);
+        if (_context.DestDirParent != null) dir.CreateZipBackup(_context.DestDirParent);
 
         BackupConfigFile();
         BackupI18NFolder();

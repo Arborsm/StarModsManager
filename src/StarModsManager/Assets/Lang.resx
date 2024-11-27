@@ -624,4 +624,7 @@
     <data name="ModsDirNotFound" xml:space="preserve">
         <value>Cannot Auto Select Mod Folder</value>
     </data>
+    <data name="BackupFolder" xml:space="preserve">
+        <value>Backup Folder</value>
+    </data>
 </root>

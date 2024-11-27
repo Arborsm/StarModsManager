@@ -29,6 +29,8 @@
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003ADictionary_00602_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003FAppData_003FRoaming_003FJetBrains_003FRider2024_002E2_003Fresharper_002Dhost_003FDecompilerCache_003Fdecompiler_003F0916d17f52004633a3b8b4afaa508f70e8e8a0_003F4f_003F0569c7f6_003FDictionary_00602_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003ADispatcher_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003FAppData_003FRoaming_003FJetBrains_003FRider2024_002E2_003Fresharper_002Dhost_003FDecompilerCache_003Fdecompiler_003F679bd0d8a5a4428b835fd3385f03d3fd1e2200_003F40_003F583062a0_003FDispatcher_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String
+			x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003ADispatcher_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003FAppData_003FRoaming_003FJetBrains_003FRider2024_002E3_003Fresharper_002Dhost_003FDecompilerCache_003Fdecompiler_003F22d92db124764b1ab49745245c66f01b1e1a00_003F87_003Fb64fdf70_003FDispatcher_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
+	<s:String
 			x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003ADispatcher_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003FAppData_003FRoaming_003FJetBrains_003FRider2024_002E3_003Fresharper_002Dhost_003FSourcesCache_003Fe6d04341b5ca8c55e2be617e1b6fc5a12cc8647f7272d94f614ae7fb1c0e8d_003FDispatcher_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003ADispatcher_002EMainLoop_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003FAppData_003FRoaming_003FJetBrains_003FRider2024_002E2_003Fresharper_002Dhost_003FSourcesCache_003F5fdae29ea5e22bfaafa25be40a227d3b6b5d38cd6f44d87171c29b1ef36bb_003FDispatcher_002EMainLoop_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String
@@ -168,6 +170,10 @@
   &lt;Assembly Path="E:\SteamLibrary\steamapps\common\Stardew Valley\smapi-internal\SMAPI.Toolkit.dll" /&gt;&#xD;
   &lt;Assembly Path="E:\SteamLibrary\steamapps\common\Stardew Valley\smapi-internal\SMAPI.Toolkit.CoreInterfaces.dll" /&gt;&#xD;
 &lt;/AssemblyExplorer&gt;</s:String>
+	<s:Boolean
+			x:Key="/Default/ResxEditorPersonal/CheckedGroups/=Miscellaneous_0020Files_002FZatetar/@EntryIndexedValue">False</s:Boolean>
+	<s:Boolean
+			x:Key="/Default/ResxEditorPersonal/CheckedGroups/=Miscellaneous_0020Files_002FZatetar/@EntryIndexRemoved">True</s:Boolean>
 	<s:Boolean x:Key="/Default/ResxEditorPersonal/CheckedGroups/=StarModsManager_002EUI_002FEmbeddedLibraries/@EntryIndexedValue">False</s:Boolean>
 	<s:Boolean x:Key="/Default/ResxEditorPersonal/CheckedGroups/=StarModsManager_002EUI_002FEmbeddedLibraries/@EntryIndexRemoved">True</s:Boolean>
 	<s:Boolean x:Key="/Default/ResxEditorPersonal/CheckedGroups/=StarModsManager_002FApi_002FLang_002FStrings/@EntryIndexedValue">True</s:Boolean>

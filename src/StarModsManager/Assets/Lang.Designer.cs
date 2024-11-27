@@ -141,6 +141,15 @@ namespace StarModsManager.Assets {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Backup Folder.
+        /// </summary>
+        public static string BackupFolder {
+            get {
+                return ResourceManager.GetString("BackupFolder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Browse.
         /// </summary>
         public static string Browse {
