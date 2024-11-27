@@ -156,7 +156,7 @@ public static class SMMHelper
         }
 
         var isSame = Directory.GetFiles(backupPath)
-            .Where(x => x.Contains(zipFileName))
+            .Where(x => x.Contains(zipFileName) && x != zipFilePath)
             .Any(x => IsFileSame(x, zipFilePath));
         if (isSame) File.Delete(zipFilePath);
     }
