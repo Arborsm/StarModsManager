@@ -35,9 +35,11 @@ public static class UpdateChecker
         try
         {
             var nexus = await NexusMod.CreateAsync(NexusUrl);
-            var latest = new Version(nexus.GetModVersion()?.ToString() ?? string.Empty);
-            result = (latest > current, latest.ToString(), NexusUrl);
-            isSuccess = latest > current;
+            if (Version.TryParse(nexus.GetModVersion()?.ToString() ?? string.Empty, out var latest))
+            {
+                result = (latest > current, latest.ToString(), NexusUrl);
+                isSuccess = latest > current;
+            }
         }
         catch (Exception e)
         {
@@ -45,6 +47,7 @@ public static class UpdateChecker
         }
 
         if (!isSuccess)
+        {
             try
             {
                 var github = new GitHubClient(new ProductHeaderValue("StarModsManager"));
@@ -53,20 +56,22 @@ public static class UpdateChecker
                 if (releases.Count == 0) return result;
 
                 var latestRelease = releases[0];
-                var latestVersion = latestRelease.TagName.TrimStart('v');
-                var latest = new Version(latestVersion);
+                var latestVersionString = latestRelease.TagName.TrimStart('v');
+                if (Version.TryParse(latestVersionString ?? string.Empty, out var latestVersion))
+                {
+                    var hasUpdate = latestVersion > current;
 
-                var hasUpdate = latest > current;
+                    if (latestRelease.Assets.Count < 1) return result;
+                    var downloadUrl = latestRelease.Assets[0]?.BrowserDownloadUrl ?? latestRelease.HtmlUrl;
 
-                if (latestRelease.Assets.Count < 1) return result;
-                var downloadUrl = latestRelease.Assets[0]?.BrowserDownloadUrl ?? latestRelease.HtmlUrl;
-
-                result = (hasUpdate, latestVersion, downloadUrl);
+                    result = (hasUpdate, latestVersion.ToString(), downloadUrl);
+                }
             }
             catch (Exception ex)
             {
                 Log.Error(ex, "Error checking for updates on Github");
             }
+        }
 
         return result;
     }
