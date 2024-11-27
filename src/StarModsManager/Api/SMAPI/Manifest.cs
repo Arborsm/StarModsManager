@@ -1,14 +1,10 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
-using StardewModdingAPI;
-using StardewModdingAPI.Toolkit;
-using StardewModdingAPI.Toolkit.Serialization.Models;
+using Semver;
 
 namespace StarModsManager.Api.SMAPI;
 
-[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
-public class Manifest : IManifest
+public class Manifest
 {
     public string Name { get; set; } = string.Empty;
 
@@ -16,22 +12,18 @@ public class Manifest : IManifest
 
     public string Author { get; set; } = string.Empty;
 
-    [JsonConverter(typeof(SemanticVersionConverter))]
-    public ISemanticVersion Version { get; set; } = new SemanticVersion("1.0.0");
+    public SemVersion Version { get; set; } = SemVersion.Parse("1.0.0");
 
-    [JsonConverter(typeof(SemanticVersionConverter))]
-    public ISemanticVersion? MinimumApiVersion { get; set; }
+    public SemVersion? MinimumApiVersion { get; set; }
 
-    [JsonConverter(typeof(SemanticVersionConverter))]
-    public ISemanticVersion? MinimumGameVersion { get; set; }
+    public SemVersion? MinimumGameVersion { get; set; }
 
     public string? EntryDll { get; set; }
 
-    [JsonConverter(typeof(ManifestContentPackForConverter))]
-    public IManifestContentPackFor? ContentPackFor { get; set; }
+    public ManifestContentPackFor? ContentPackFor { get; set; }
 
     [JsonConverter(typeof(ManifestDependencyArrayConverter))]
-    public IManifestDependency[] Dependencies { get; set; } = [];
+    public ManifestDependency[] Dependencies { get; set; } = [];
 
     [JsonConverter(typeof(UpdateKeysConverter))]
     public string[] UpdateKeys { get; set; } = [];
@@ -40,6 +32,33 @@ public class Manifest : IManifest
 
     [JsonExtensionData]
     public IDictionary<string, object> ExtraFields { get; set; } = new Dictionary<string, object>();
+}
+
+public class ManifestContentPackFor
+{
+    public string UniqueID { get; set; } = string.Empty;
+
+    public SemVersion? MinimumVersion { get; set; }
+}
+
+public class ManifestDependency
+{
+    public ManifestDependency(string uniqueID, string? minimumVersion, bool isRequired)
+    {
+        UniqueID = uniqueID;
+        MinimumVersion = minimumVersion is null ? null : SemVersion.Parse(minimumVersion, SemVersionStyles.Any);
+        IsRequired = isRequired;
+    }
+
+    public ManifestDependency()
+    {
+    }
+
+    public string UniqueID { get; set; } = string.Empty;
+
+    public SemVersion? MinimumVersion { get; set; }
+
+    public bool IsRequired { get; set; }
 }
 
 internal class UpdateKeysConverter : JsonConverter<string[]>
@@ -72,7 +91,7 @@ internal class UpdateKeysConverter : JsonConverter<string[]>
     }
 }
 
-internal class ManifestDependencyArrayConverter : JsonConverter<IManifestDependency[]>
+internal class ManifestDependencyArrayConverter : JsonConverter<ManifestDependency[]>
 {
     public override ManifestDependency[] Read(ref Utf8JsonReader reader, Type typeToConvert,
         JsonSerializerOptions options)
@@ -129,29 +148,15 @@ internal class ManifestDependencyArrayConverter : JsonConverter<IManifestDepende
         return dependencies.ToArray();
     }
 
-    public override void Write(Utf8JsonWriter writer, IManifestDependency[] value, JsonSerializerOptions options)
+    public override void Write(Utf8JsonWriter writer, ManifestDependency[] value, JsonSerializerOptions options)
     {
         throw new InvalidOperationException("This converter does not write JSON.");
     }
 }
 
-public class ManifestContentPackForConverter : JsonConverter<IManifestContentPackFor>
+public class SemVersionConverter : JsonConverter<SemVersion>
 {
-    public override IManifestContentPackFor? Read(ref Utf8JsonReader reader, Type typeToConvert,
-        JsonSerializerOptions options)
-    {
-        return JsonSerializer.Deserialize(ref reader, ManifestContent.Default.ManifestContentPackFor);
-    }
-
-    public override void Write(Utf8JsonWriter writer, IManifestContentPackFor value, JsonSerializerOptions options)
-    {
-        throw new InvalidOperationException("This converter does not write JSON.");
-    }
-}
-
-public class SemanticVersionConverter : JsonConverter<ISemanticVersion>
-{
-    public override ISemanticVersion Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override SemVersion Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         if (reader.TokenType != JsonTokenType.String)
             throw new JsonException($"Expected a string value for SemanticVersion, but got {reader.TokenType}.");
@@ -161,7 +166,7 @@ public class SemanticVersionConverter : JsonConverter<ISemanticVersion>
 
         try
         {
-            return new SemanticVersion(versionString, true);
+            return SemVersion.Parse(versionString, SemVersionStyles.Any);
         }
         catch (Exception ex)
         {
@@ -169,24 +174,12 @@ public class SemanticVersionConverter : JsonConverter<ISemanticVersion>
         }
     }
 
-    public override void Write(Utf8JsonWriter writer, ISemanticVersion? value, JsonSerializerOptions options)
+    public override void Write(Utf8JsonWriter writer, SemVersion? value, JsonSerializerOptions options)
     {
         if (value == null)
             writer.WriteNullValue();
         else
             writer.WriteStringValue(value.ToString());
-    }
-
-    public static ISemanticVersion? Parse(string? versionString)
-    {
-        try
-        {
-            return string.IsNullOrEmpty(versionString) ? null : new SemanticVersion(versionString, true);
-        }
-        catch (Exception)
-        {
-            return null;
-        }
     }
 }
 
@@ -200,11 +193,12 @@ public class SemanticVersionConverter : JsonConverter<ISemanticVersion>
     Converters =
     [
         typeof(ManifestDependencyArrayConverter),
-        typeof(ManifestContentPackForConverter),
-        typeof(SemanticVersionConverter)
+        typeof(SemVersionConverter),
+        typeof(UpdateKeysConverter)
     ],
     GenerationMode = JsonSourceGenerationMode.Default
 )]
 [JsonSerializable(typeof(Manifest))]
 [JsonSerializable(typeof(ManifestContentPackFor))]
+[JsonSerializable(typeof(ManifestDependency))]
 public partial class ManifestContent : JsonSerializerContext;

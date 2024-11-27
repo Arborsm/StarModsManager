@@ -48,7 +48,7 @@ public class MainConfig : ConfigBase
             if (SetProperty(ref field, value) && IsLoaded)
                 Services.LifeCycle.Reset();
         }
-    } = ModsHelper.Instance.GameFolders.Select(x => x.FullName).FirstOrDefault(Services.AppSavingPath);
+    } = ModsHelper.Instance.GameFolders.FirstOrDefault(Services.AppSavingPath);
 
     public string NexusModsApiKey
     {

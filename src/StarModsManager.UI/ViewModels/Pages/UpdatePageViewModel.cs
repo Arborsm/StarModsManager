@@ -4,11 +4,12 @@ using System.Text.Json.Serialization;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using StardewModdingAPI;
+using Semver;
 using StarModsManager.Api;
 using StarModsManager.Api.NexusMods;
 using StarModsManager.Api.NexusMods.Interface;
 using StarModsManager.Api.SMAPI;
+using StarModsManager.Api.SMAPI.Model;
 using StarModsManager.Assets;
 using StarModsManager.Lib;
 using StarModsManager.Mods;
@@ -25,6 +26,8 @@ public partial class UpdatePageViewModel : MainPageViewModelBase
         if (!Services.MainConfig.AutoCheckUpdates) Init();
     }
 
+    public static List<ModEntry>? ModEntries { get; private set; }
+
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(NotEmpty))]
     [NotifyPropertyChangedFor(nameof(ShowNull))]
@@ -39,6 +42,7 @@ public partial class UpdatePageViewModel : MainPageViewModelBase
 
     public void Init()
     {
+        var anyChange = false;
         if (File.Exists(SaveFile))
         {
             var json = File.ReadAllText(SaveFile);
@@ -53,13 +57,18 @@ public partial class UpdatePageViewModel : MainPageViewModelBase
                     {
                         LatestVersion = it.LatestVersion
                     });
+                    if (it.LatestVersion.ComparePrecedenceTo(mod.Manifest.Version) < 0)
+                    {
+                        anyChange = true;
+                        break;
+                    }
                 }
 
                 FinishInit();
             }
         }
 
-        if (Mods.Count == 0) Refresh();
+        if (Mods.Count == 0 || anyChange) Refresh();
     }
 
     [RelayCommand(CanExecute = nameof(NotEmpty))]
@@ -76,6 +85,7 @@ public partial class UpdatePageViewModel : MainPageViewModelBase
             .ToList();
         Task.Run(async () =>
         {
+            ModEntries = await SMAPI.GetModUpdateData();
             await mods.ForEachAsync(async mod => await mod.UpdateLatestVersionAsync().ContinueWith(task =>
             {
                 if (!task.Result.CanUpdate) return;
@@ -113,7 +123,7 @@ public partial class UpdatePageViewModel : MainPageViewModelBase
 }
 
 [JsonSourceGenerationOptions(WriteIndented = true,
-    Converters = [typeof(UnixDateTimeConverter), typeof(SemanticVersionConverter)])]
+    Converters = [typeof(UnixDateTimeConverter)])]
 [JsonSerializable(typeof(CacheData<ToUpdateModJson>))]
 [JsonSerializable(typeof(List<ToUpdateModJson>))]
 [JsonSerializable(typeof(ToUpdateModJson))]
@@ -141,29 +151,30 @@ public class ToUpdateModJson
     {
     }
 
-    public ToUpdateModJson(string id, ISemanticVersion latestVersion)
+    public ToUpdateModJson(string id, SemVersion latestVersion)
     {
         UniqueID = id;
         LatestVersion = latestVersion;
     }
 
     public string UniqueID { get; set; } = null!;
-    public ISemanticVersion LatestVersion { get; set; } = null!;
+
+    [JsonConverter(typeof(SemVersionConverter))]
+    public SemVersion LatestVersion { get; set; } = null!;
 }
 
 public partial class ToUpdateMod(LocalMod localMod, bool isChecked = false) : ObservableObject
 {
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CanUpdate))]
-    public partial ISemanticVersion? LatestVersion { get; set; }
+    public partial SemVersion? LatestVersion { get; set; }
 
     public LocalMod LocalMod => localMod;
-    public bool CanUpdate => LocalMod.Manifest.Version.IsOlderThan(LatestVersion);
-
+    public bool CanUpdate => LocalMod.Manifest.Version.ComparePrecedenceTo(LatestVersion) < 0;
     public bool IsChecked { get; set; } = isChecked;
     public string Name { get; } = localMod.Manifest.Name;
     public string UniqueID { get; } = localMod.Manifest.UniqueID;
-    public ISemanticVersion CurrentVersion { get; } = localMod.Manifest.Version;
+    public SemVersion CurrentVersion { get; } = localMod.Manifest.Version;
 
     [RelayCommand]
     private async Task OpenDownloadPageAsync()
@@ -175,13 +186,20 @@ public partial class ToUpdateMod(LocalMod localMod, bool isChecked = false) : Ob
 
     public async Task<ToUpdateMod> UpdateLatestVersionAsync()
     {
+        if (UpdatePageViewModel.ModEntries != null)
+            LatestVersion = UpdatePageViewModel.ModEntries
+                .Where(m => m.Id == LocalMod.Manifest.UniqueID && !string.IsNullOrEmpty(m.Metadata.Main.Version))
+                .Select(m => SemVersion.Parse(m.Metadata.Main.Version))
+                .FirstOrDefault();
+
+        if (LatestVersion != null) return this;
         await Task.Delay(Random.Shared.Next(50, 500));
         LatestVersion = await NexusMod.CreateAsync(LocalMod.OnlineMod.Url, false)
             .ContinueWith(t => t.Result.GetModVersion());
         return this;
     }
 
-    partial void OnLatestVersionChanged(ISemanticVersion? oldValue, ISemanticVersion? newValue)
+    partial void OnLatestVersionChanged(SemVersion? oldValue, SemVersion? newValue)
     {
         if (newValue is null || newValue == oldValue) return;
         IsChecked = CanUpdate;

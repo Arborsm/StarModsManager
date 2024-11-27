@@ -1,8 +1,6 @@
 using Octokit;
 using Serilog;
 using SharpCompress.Archives;
-using StardewModdingAPI;
-using StardewModdingAPI.Toolkit;
 using FileMode = System.IO.FileMode;
 
 namespace StarModsManager.Api.SMAPI;
@@ -50,11 +48,11 @@ public class SmapiInstall
         return true;
     }
 
-    public async Task<ISemanticVersion?> GetLatestVersion()
+    public async Task<Version?> GetLatestVersion()
     {
         var client = new GitHubClient(new ProductHeaderValue(Services.AppName));
         var releases = await client.Repository.Release.GetAll("Pathoschild", "SMAPI");
         _downloadUrl = releases[0].Url;
-        return SemanticVersion.TryParse(releases[0].TagName, out var version) ? version : null;
+        return Version.TryParse(releases[0].TagName, out var version) ? version : null;
     }
 }

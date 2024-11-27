@@ -1,6 +1,5 @@
 ﻿using System.Text.Json;
 using Serilog;
-using StardewModdingAPI.Toolkit.Framework.GameScanning;
 using StarModsManager.Assets;
 using StarModsManager.Mods;
 
@@ -9,7 +8,7 @@ namespace StarModsManager.Api;
 public class ModsHelper
 {
     public static readonly ModsHelper Instance = new();
-    public readonly IEnumerable<DirectoryInfo> GameFolders = new GameScanner().Scan();
+    public readonly IEnumerable<string> GameFolders;
     public readonly List<LocalMod> I18LocalMods = [];
     public bool IsMismatchedTokens = false;
     public Dictionary<string, LocalMod> LocalModsMap = []; // Id/UniqueId -> mod
@@ -17,6 +16,8 @@ public class ModsHelper
 
     private ModsHelper()
     {
+        GameFolders = SMMHelper.GetDefaultInstallPaths()
+            .Select(SMMHelper.NormalizePath).Where(Directory.Exists).Cast<string>();
     }
 
     public async Task FindModsAsync()

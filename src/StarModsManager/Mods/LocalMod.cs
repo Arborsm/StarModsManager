@@ -34,7 +34,7 @@ public sealed class LocalMod
         PathS = parentDirectory;
         var updateKeys = Manifest.UpdateKeys;
         var numberPart = string.Empty;
-        var modUrl = updateKeys.Select(SMMHelper.Toolkit.GetUpdateUrl).FirstOrDefault(p => p != null) ?? "";
+        var modUrl = updateKeys.Select(SMMHelper.GetUpdateUrl).FirstOrDefault(p => p != null) ?? "";
 
         var picUrl = string.Empty;
         if (File.Exists(Path.Combine(Services.MainConfig.CachePath, numberPart + ".bmp")))

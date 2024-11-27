@@ -1,5 +1,5 @@
 ﻿using System.Text;
-using StardewModdingAPI;
+using StarModsManager.Api.SMAPI;
 using StarModsManager.Assets;
 using StarModsManager.Mods;
 
@@ -7,7 +7,7 @@ namespace StarModsManager.ViewModels.Customs;
 
 public class ModDetailViewModel : ViewModelBase
 {
-    public ModDetailViewModel(IManifest mod, string? addition = null)
+    public ModDetailViewModel(Manifest mod, string? addition = null)
     {
         Mod = GetText(mod);
         Addition = addition;
@@ -30,20 +30,20 @@ public class ModDetailViewModel : ViewModelBase
     private static string GetText(OnlineMod onlineMod)
     {
         var stringBuilder = new StringBuilder();
-        
+
         stringBuilder.Append($"{Lang.ModName}:  {onlineMod.Title}\n");
         stringBuilder.Append($"{Lang.ModNexusId}:  {onlineMod.ModId}\n");
-        if (onlineMod.Description != null) 
+        if (onlineMod.Description != null)
             stringBuilder.Append($"{Lang.ModDescription}:  {onlineMod.Description}\n");
-        if (onlineMod.Author != null) 
+        if (onlineMod.Author != null)
             stringBuilder.Append($"{Lang.ModAuthor}:  {onlineMod.Author}\n");
-        if (onlineMod.Version != null) 
+        if (onlineMod.Version != null)
             stringBuilder.Append($"{Lang.ModLatestVersion}:  {onlineMod.Version}\n");
-        
+
         return stringBuilder.ToString();
     }
 
-    private static string GetText(IManifest mod)
+    private static string GetText(Manifest mod)
     {
         var stringBuilder = new StringBuilder();
         stringBuilder.Append($"{Lang.ModName}:  {mod.Name}\n");

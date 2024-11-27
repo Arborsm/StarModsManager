@@ -104,12 +104,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Reference Include="SMAPI.Toolkit.CoreInterfaces">
-            <HintPath>..\StarModsManager\Assets\Dll\SMAPI.Toolkit.CoreInterfaces.dll</HintPath>
-        </Reference>
-    </ItemGroup>
-
-    <ItemGroup>
         <TrimmerRootDescriptor Include=".\TrimmerRoots.xml"/>
     </ItemGroup>
 </Project>

@@ -25,12 +25,12 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
+        <PackageReference Include="Semver" Version="3.0.0"/>
         <PackageReference Include="Serilog" Version="4.1.0"/>
         <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0"/>
         <PackageReference Include="Serilog.Sinks.File" Version="6.0.0"/>
         <PackageReference Include="SharpCompress" Version="0.38.0" />
         <PackageReference Include="System.Private.Uri" Version="4.3.2"/>
-        <PackageReference Include="VdfConverter" Version="1.0.3"/>
     </ItemGroup>
 
     <ItemGroup>
@@ -52,12 +52,6 @@
     <ItemGroup>
         <Reference Include="Avalonia.Base">
             <HintPath>..\StarModsManager.UI\bin\Debug\net9.0\Avalonia.Base.dll</HintPath>
-        </Reference>
-        <Reference Include="SMAPI.Toolkit">
-            <HintPath>Assets\Dll\SMAPI.Toolkit.dll</HintPath>
-        </Reference>
-        <Reference Include="SMAPI.Toolkit.CoreInterfaces">
-            <HintPath>Assets\Dll\SMAPI.Toolkit.CoreInterfaces.dll</HintPath>
         </Reference>
     </ItemGroup>
 

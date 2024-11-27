@@ -621,4 +621,7 @@
     <data name="CannotDeleteFolder" xml:space="preserve">
         <value>无法删除文件夹：{0}</value>
     </data>
+    <data name="ModsDirNotFound" xml:space="preserve">
+        <value>无法自动选择模组文件夹</value>
+    </data>
 </root>

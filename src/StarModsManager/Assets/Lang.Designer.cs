@@ -753,6 +753,15 @@ namespace StarModsManager.Assets {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot Auto Select Mod Folder.
+        /// </summary>
+        public static string ModsDirNotFound {
+            get {
+                return ResourceManager.GetString("ModsDirNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to UniqueID.
         /// </summary>
         public static string ModUniqueId {

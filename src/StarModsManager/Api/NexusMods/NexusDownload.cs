@@ -1,5 +1,5 @@
-﻿using Serilog;
-using StardewModdingAPI;
+﻿using Semver;
+using Serilog;
 using StarModsManager.Assets;
 
 namespace StarModsManager.Api.NexusMods;
@@ -62,7 +62,7 @@ public class NexusDownload
         }
     }
 
-    public async Task<string?> GetModDownloadUrlAsync(string? modUrl, ISemanticVersion? version = null)
+    public async Task<string?> GetModDownloadUrlAsync(string? modUrl, SemVersion? version = null)
     {
         await EnsureInitializedAsync();
 
@@ -106,7 +106,7 @@ public class NexusDownload
         }
     }
 
-    public static async Task DownloadLatestModAsync(string modId, ISemanticVersion? version = null)
+    public static async Task DownloadLatestModAsync(string modId, SemVersion? version = null)
     {
         var link = await Instance.GetModDownloadUrlAsync(modId, version);
         if (link is null) return;

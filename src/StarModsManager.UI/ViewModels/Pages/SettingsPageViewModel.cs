@@ -159,7 +159,14 @@ public partial class SettingsPageViewModel : MainPageViewModelBase
     [RelayCommand]
     private void AutoSelect()
     {
-        MainConfig.DirectoryPath = Path.Combine(ModsHelper.Instance.GameFolders.First().FullName, "mods");
+        var path = Path.Combine(ModsHelper.Instance.GameFolders.First(), "mods");
+        if (!Directory.Exists(path))
+        {
+            Services.Notification.Show(Lang.ModsDirNotFound);
+            return;
+        }
+
+        MainConfig.DirectoryPath = path;
         Log.Information("Auto selected mods directory: {path}", MainConfig.DirectoryPath);
     }
 

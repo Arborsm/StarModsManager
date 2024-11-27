@@ -621,4 +621,7 @@
     <data name="CannotDeleteFolder" xml:space="preserve">
         <value>Cannot Delete Folder: {0}</value>
     </data>
+    <data name="ModsDirNotFound" xml:space="preserve">
+        <value>Cannot Auto Select Mod Folder</value>
+    </data>
 </root>
