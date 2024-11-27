@@ -1,9 +1,13 @@
 ﻿using System.Collections;
+using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.Contracts;
 using System.IO.Compression;
+using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using System.Security.Cryptography;
 using System.Text;
-using StardewModdingAPI;
-using StardewModdingAPI.Toolkit;
+using Microsoft.Win32;
+using StarModsManager.Api.SMAPI;
 using StarModsManager.Mods;
 using StarModsManager.Trans;
 
@@ -11,7 +15,7 @@ namespace StarModsManager.Api;
 
 public static class SMMHelper
 {
-    public static readonly ModToolkit Toolkit = new();
+    private const string WindowsUncRoot = @"\\";
 
     public static readonly Dictionary<string, string> LanguageMap = new(StringComparer.OrdinalIgnoreCase)
     {
@@ -29,6 +33,18 @@ public static class SMMHelper
     };
 
     private static SemaphoreSlim? _semaphore;
+
+    private static readonly Dictionary<ModSiteKey, string> VendorModUrls = new()
+    {
+        [ModSiteKey.Chucklefish] = "https://community.playstarbound.com/resources/{0}",
+        [ModSiteKey.CurseForge] = "https://www.curseforge.com/projects/{0}",
+        [ModSiteKey.GitHub] = "https://github.com/{0}/releases",
+        [ModSiteKey.ModDrop] = "https://www.moddrop.com/stardew-valley/mods/{0}",
+        [ModSiteKey.Nexus] = "https://www.nexusmods.com/stardewvalley/mods/{0}"
+    };
+
+    private static readonly char[] PossiblePathSeparators =
+        new[] { '/', '\\', Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar }.Distinct().ToArray();
 
     public static string SwitchLanguage(string input)
     {
@@ -209,20 +225,178 @@ public static class SMMHelper
         return TranslationContext.GetMap(path.GetJsonString("default.json"));
     }
 
-    public static bool CheckModDependency(this IEnumerable<LocalMod> mods, IManifestDependency dependency)
+    public static bool CheckModDependency(this IEnumerable<LocalMod> mods,
+        ManifestDependency dependency)
     {
         return mods.Any(mod =>
             mod.Manifest.UniqueID == dependency.UniqueID &&
-            !mod.Manifest.Version.IsOlderThan(dependency.MinimumVersion));
+            mod.Manifest.Version.ComparePrecedenceTo(dependency.MinimumVersion) != -1);
     }
 
     public static bool CheckModDependency(this IEnumerable<LocalMod> mods,
-        IManifestContentPackFor manifestContentPackFor)
+        ManifestContentPackFor manifestContentPackFor)
     {
         return mods.Any(mod =>
             mod.Manifest.ContentPackFor != null &&
             mod.Manifest.ContentPackFor.UniqueID == manifestContentPackFor.UniqueID &&
-            !mod.Manifest.Version.IsOlderThan(manifestContentPackFor.MinimumVersion));
+            mod.Manifest.Version.ComparePrecedenceTo(manifestContentPackFor.MinimumVersion) != -1);
+    }
+
+    public static string? GetUpdateUrl(string updateKey)
+    {
+        var parsed = UpdateKey.Parse(updateKey);
+        if (parsed.LooksValid == null || !parsed.LooksValid.Value) return null;
+
+        return VendorModUrls.TryGetValue(parsed.Site, out var urlTemplate)
+            ? string.Format(urlTemplate, parsed.ID)
+            : null;
+    }
+
+    public static IEnumerable<string> GetDefaultInstallPaths()
+    {
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            const string steamAppId = "413150";
+            IDictionary<string, string> registryKeys = new Dictionary<string, string>
+            {
+                [@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Steam App " + steamAppId] = "InstallLocation",
+                [@"SOFTWARE\WOW6432Node\GOG.com\Games\1453375253"] = "PATH"
+            };
+            foreach (var pair in registryKeys)
+            {
+                var path = GetLocalMachineRegistryValue(pair.Key, pair.Value);
+                if (!string.IsNullOrWhiteSpace(path))
+                    yield return path;
+            }
+
+            var steamPath = GetCurrentUserRegistryValue(@"Software\Valve\Steam", "SteamPath");
+            if (steamPath != null)
+                yield return Path.Combine(steamPath.Replace('/', '\\'), @"steamapps\common\Stardew Valley");
+
+            foreach (var programFiles in new[] { @"C:\Program Files", @"C:\Program Files (x86)" })
+            {
+                yield return $@"{programFiles}\GalaxyClient\Games\Stardew Valley";
+                yield return $@"{programFiles}\GOG Galaxy\Games\Stardew Valley";
+                yield return $@"{programFiles}\GOG Games\Stardew Valley";
+                yield return $@"{programFiles}\Steam\steamapps\common\Stardew Valley";
+            }
+
+            for (var driveLetter = 'C'; driveLetter <= 'H'; driveLetter++)
+                yield return $@"{driveLetter}:\Program Files\ModifiableWindowsApps\Stardew Valley";
+        }
+
+        yield return Environment.CurrentDirectory;
+    }
+
+    [SupportedOSPlatform("windows")]
+    private static string? GetLocalMachineRegistryValue(string key, string name)
+    {
+        var localMachine = Environment.Is64BitOperatingSystem
+            ? RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64)
+            : Registry.LocalMachine;
+        var openKey = localMachine.OpenSubKey(key);
+        if (openKey == null)
+            return null;
+        using (openKey)
+        {
+            return (string?)openKey.GetValue(name);
+        }
+    }
+
+    [SupportedOSPlatform("windows")]
+    private static string? GetCurrentUserRegistryValue(string key, string name)
+    {
+        var currentUser = Environment.Is64BitOperatingSystem
+            ? RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry64)
+            : Registry.CurrentUser;
+        var openKey = currentUser.OpenSubKey(key);
+        if (openKey == null)
+            return null;
+        using (openKey)
+        {
+            return (string?)openKey.GetValue(name);
+        }
+    }
+
+    [Pure]
+    [return: NotNullIfNotNull("path")]
+    public static string? NormalizePath(string? path)
+    {
+        path = path?.Trim();
+        if (string.IsNullOrEmpty(path))
+            return path;
+
+        // get a basic path format (e.g. /some/asset\\path/ => some\asset\path)
+        var segments = GetSegments(path);
+        var newPath = string.Join(Path.DirectorySeparatorChar.ToString(), segments);
+
+        // keep root prefix
+        var hasRoot = false;
+        if (path.StartsWith(WindowsUncRoot))
+        {
+            newPath = WindowsUncRoot + newPath;
+            hasRoot = true;
+        }
+        else if (PossiblePathSeparators.Contains(path[0]))
+        {
+            newPath = Path.DirectorySeparatorChar + newPath;
+            hasRoot = true;
+        }
+
+        // keep trailing separator
+        if ((!hasRoot || segments.Length != 0) && PossiblePathSeparators.Contains(path[^1]))
+            newPath += Path.DirectorySeparatorChar;
+
+        return newPath;
+    }
+
+    [Pure]
+    private static string[] GetSegments(string? path, int? limit = null)
+    {
+        if (path == null) return [];
+
+        return limit.HasValue
+            ? path.Split(PossiblePathSeparators, limit.Value, StringSplitOptions.RemoveEmptyEntries)
+            : path.Split(PossiblePathSeparators, StringSplitOptions.RemoveEmptyEntries);
+    }
+
+    private enum ModSiteKey
+    {
+        Unknown,
+        Chucklefish,
+        CurseForge,
+        GitHub,
+        ModDrop,
+        Nexus
+    }
+
+    private class UpdateKey(ModSiteKey site, string? id)
+    {
+        public string? ID { get; } = id;
+
+        public ModSiteKey Site { get; } = site;
+
+        [MemberNotNullWhen(true, nameof(ID))]
+        public bool? LooksValid { get; } = site != ModSiteKey.Unknown && !string.IsNullOrWhiteSpace(id);
+
+        public static UpdateKey Parse(string? raw)
+        {
+            if (raw is null) return new UpdateKey(ModSiteKey.Unknown, null);
+            var (rawSite, id) = SplitTwoParts(raw, ':');
+            if (string.IsNullOrEmpty(id)) id = null;
+            if (id != null) (id, _) = SplitTwoParts(id, '@', true);
+            if (!Enum.TryParse(rawSite, true, out ModSiteKey site))
+                return new UpdateKey(ModSiteKey.Unknown, id);
+            return id == null ? new UpdateKey(site, null) : new UpdateKey(site, id);
+        }
+
+        private static (string, string?) SplitTwoParts(string str, char delimiter, bool keepDelimiter = false)
+        {
+            var splitIndex = str.IndexOf(delimiter);
+            return splitIndex >= 0
+                ? (str[..splitIndex].Trim(), str[(splitIndex + (keepDelimiter ? 0 : 1))..].Trim())
+                : (str.Trim(), null);
+        }
     }
 }
 
