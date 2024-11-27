@@ -86,3 +86,20 @@ public class HeightMultiplierConverter : IValueConverter
         throw new NotImplementedException();
     }
 }
+
+public class TextBlockWidthConverter : IValueConverter
+{
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is string text)
+            return 12 + text.Length * 4;
+        else if (value is int va) return 12 + va.ToString().Length * 4;
+
+        return 16;
+    }
+
+    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+}

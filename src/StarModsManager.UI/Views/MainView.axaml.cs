@@ -105,102 +105,102 @@ public partial class MainView : UserControl
         MainNav.IsBackButtonVisible = show;
     }
 
-    public class LifeCycle(Action dmAction) : ILifeCycle
+    private class LifeCycle(Action dmAction) : ILifeCycle
     {
-        public void Reset()
+        void ILifeCycle.Reset()
         {
             ViewModelService.Reset();
         }
 
-        public void ShowDownloadManager()
+        void ILifeCycle.ShowDownloadManager()
         {
             dmAction();
         }
 
-        public void AddDownload(string url)
+        void ILifeCycle.AddDownload(string url)
         {
             ViewModelService.Resolve<DownloadManagerViewModel>().AddDownload(url);
         }
     }
-}
 
-public class PopUp(Control control) : IPopUp
-{
-    public void ShowFlyout(object flyout)
+    private class PopUp(Control control) : IPopUp
     {
-        (flyout as Flyout)?.ShowAt(control);
-    }
-}
-
-public class Notification(WindowNotificationManager manager) : INotification
-{
-    static Notification()
-    {
-        UpdateChecker.CheckUpdate();
-    }
-
-    public void Close(object? o)
-    {
-        if (o != null) manager.Close(o);
-    }
-
-    public void CloseAll()
-    {
-        manager.CloseAll();
-    }
-
-    public void Show(object content, Severity severity,
-        TimeSpan? expiration = null,
-        Action? onClick = null,
-        Action? onClose = null)
-    {
-        var type = GetInfoType(severity);
-        InitExpiration(severity, ref expiration);
-        Dispatcher.UIThread.Invoke(() => manager.Show(content, type, expiration, onClick, onClose));
-    }
-
-    public object Show(string title, string msg, Severity severity,
-        TimeSpan? expiration = null,
-        Action? onClick = null,
-        Action? onClose = null,
-        string? buttonText = null,
-        ICommand? buttonCommand = null)
-    {
-        var vm = new CustomNotificationViewModel
+        void IPopUp.ShowFlyout(object flyout)
         {
-            Title = title,
-            Message = msg.TrimEndNewLine(),
-            ButtonText = buttonText,
-            ButtonCommand = buttonCommand
-        };
-        Show(vm, severity, expiration, onClick, onClose);
-        return vm;
+            (flyout as Flyout)?.ShowAt(control);
+        }
     }
 
-    public object Show(string message)
+    private class Notification(WindowNotificationManager manager) : INotification
     {
-        return Show("Info", message.TrimEndNewLine(), Severity.Informational);
-    }
-
-    private static void InitExpiration(Severity type, ref TimeSpan? expiration)
-    {
-        expiration ??= type switch
+        static Notification()
         {
-            Severity.Error => TimeSpan.Zero,
-            Severity.Warning => TimeSpan.FromSeconds(10),
-            _ => TimeSpan.FromSeconds(8)
-        };
-    }
+            UpdateChecker.CheckUpdate();
+        }
 
-    private static NotificationType GetInfoType(Severity severity)
-    {
-        return severity switch
+        void INotification.Close(object? o)
         {
-            Severity.Informational => NotificationType.Information,
-            Severity.Success => NotificationType.Success,
-            Severity.Warning => NotificationType.Warning,
-            Severity.Error => NotificationType.Error,
-            _ => throw new ArgumentOutOfRangeException(nameof(severity), severity, null)
-        };
+            if (o != null) manager.Close(o);
+        }
+
+        void INotification.CloseAll()
+        {
+            manager.CloseAll();
+        }
+
+        void INotification.Show(object content, Severity severity,
+            TimeSpan? expiration,
+            Action? onClick,
+            Action? onClose)
+        {
+            var type = GetInfoType(severity);
+            InitExpiration(severity, ref expiration);
+            Dispatcher.UIThread.Invoke(() => manager.Show(content, type, expiration, onClick, onClose));
+        }
+
+        object INotification.Show(string title, string msg, Severity severity,
+            TimeSpan? expiration,
+            Action? onClick,
+            Action? onClose,
+            string? buttonText,
+            ICommand? buttonCommand)
+        {
+            var vm = new CustomNotificationViewModel
+            {
+                Title = title,
+                Message = msg.TrimEndNewLine(),
+                ButtonText = buttonText,
+                ButtonCommand = buttonCommand
+            };
+            (this as INotification).Show(vm, severity, expiration, onClick, onClose);
+            return vm;
+        }
+
+        object? INotification.Show(string message)
+        {
+            return (this as INotification).Show("Info", message.TrimEndNewLine(), Severity.Informational);
+        }
+
+        private static void InitExpiration(Severity type, ref TimeSpan? expiration)
+        {
+            expiration ??= type switch
+            {
+                Severity.Error => TimeSpan.Zero,
+                Severity.Warning => TimeSpan.FromSeconds(10),
+                _ => TimeSpan.FromSeconds(8)
+            };
+        }
+
+        private static NotificationType GetInfoType(Severity severity)
+        {
+            return severity switch
+            {
+                Severity.Informational => NotificationType.Information,
+                Severity.Success => NotificationType.Success,
+                Severity.Warning => NotificationType.Warning,
+                Severity.Error => NotificationType.Error,
+                _ => throw new ArgumentOutOfRangeException(nameof(severity), severity, null)
+            };
+        }
     }
 }

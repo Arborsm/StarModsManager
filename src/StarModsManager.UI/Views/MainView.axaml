@@ -5,6 +5,7 @@
     xmlns:assets="clr-namespace:StarModsManager.Assets;assembly=StarModsManager.Common"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:fluent="clr-namespace:FluentIcons.Avalonia.Fluent;assembly=FluentIcons.Avalonia.Fluent"
+    xmlns:lib="clr-namespace:StarModsManager.Lib"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:primitives="clr-namespace:FluentAvalonia.UI.Controls.Primitives;assembly=FluentAvalonia"
     xmlns:ui="using:FluentAvalonia.UI.Controls"
@@ -14,9 +15,15 @@
     x:DataType="viewModels:MainViewModel"
     mc:Ignorable="d">
 
+    <UserControl.Resources>
+        <lib:TextBlockWidthConverter x:Key="TextBlockWidthConverter" />
+    </UserControl.Resources>
+
     <UserControl.Styles>
         <Style Selector="SplitView:closed ui|NavigationViewItem.Footer primitives|NavigationViewItemPresenter /template/ ContentPresenter#InfoBadgePresenter">
             <Setter Property="Margin" Value="-42, -14, 0, 0" />
+            <Setter Property="Width"
+                    Value="{Binding DownloadItemsCount, Converter={StaticResource TextBlockWidthConverter}}" />
         </Style>
     </UserControl.Styles>
 
