@@ -17,7 +17,7 @@
         <AssemblyName>StarModsManager</AssemblyName>
         <RootNamespace>StarModsManager</RootNamespace>
         <ApplicationIcon>Assets\icon.ico</ApplicationIcon>
-        <AssemblyVersion>1.0.2</AssemblyVersion>
+        <AssemblyVersion>1.0.3</AssemblyVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
@@ -57,6 +57,7 @@
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0-preview2"/>
         <PackageReference Include="FluentAvaloniaUI" Version="2.1.0"/>
         <PackageReference Include="FluentIcons.Avalonia.Fluent" Version="1.1.265"/>
+        <PackageReference Include="OpenAI-DotNet" Version="8.4.1"/>
     </ItemGroup>
 
     <ItemGroup>

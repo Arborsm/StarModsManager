@@ -9,14 +9,13 @@
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <AssemblyName>StarModsManager.Common</AssemblyName>
         <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
-        <AssemblyVersion>1.0.2</AssemblyVersion>
+        <AssemblyVersion>1.0.3</AssemblyVersion>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0-preview2"/>
         <PackageReference Include="HtmlAgilityPack" Version="1.11.71"/>
         <PackageReference Include="Octokit" Version="13.0.1"/>
-        <PackageReference Include="OllamaSharp" Version="4.0.7"/>
         <PackageReference Include="OpenAI-DotNet" Version="8.4.1"/>
         <PackageReference Include="Pathoschild.Http.FluentClient" Version="4.4.1"/>
         <PackageReference Include="Polly" Version="8.5.0"/>
@@ -38,6 +37,7 @@
             <Generator>PublicResXFileCodeGenerator</Generator>
             <LastGenOutput>Lang.Designer.cs</LastGenOutput>
         </EmbeddedResource>
+        <EmbeddedResource Include="Assets\Lang.tr.resx"/>
         <EmbeddedResource Include="Assets\Lang.zh.resx"/>
     </ItemGroup>
 
