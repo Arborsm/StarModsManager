@@ -11,13 +11,7 @@ public sealed class LocalMod
     private bool? _isDependencyMissing;
     public string? MissingDependencies;
 
-    public LocalMod() :
-        this(
-            @"E:\SteamLibrary\steamapps\common\Stardew Valley\mods\Romanceable Rasmodius Redux Revamp\Romanceable Rasmodius Redux Revamp\[CP] RRRR\manifest.json")
-    {
-    }
-
-    public LocalMod(string path)
+    private LocalMod(string path)
     {
         var manifestPath = Path.GetFullPath(path);
         var parentDirectory = Path.GetDirectoryName(manifestPath)!;
@@ -59,6 +53,22 @@ public sealed class LocalMod
     public string PathS { get; }
     public List<string> Lang { get; }
     public Lazy<bool?> LazyIsMisMatch { get; } = new(() => false);
+
+    public static LocalMod? Create(string path)
+    {
+        try
+        {
+            return new LocalMod(path);
+        }
+        catch (Exception e)
+        {
+            var name = Path.GetDirectoryName(SMMHelper.FindCommonPath(path, Services.MainConfig.DirectoryPath));
+            Services.Notification?.Show(Assets.Lang.Warning,
+                string.Format(Assets.Lang.CannotLoadMod, name), Severity.Warning);
+            Log.Error(e, "Failed to create LocalMod instance.");
+            return null;
+        }
+    }
 
     private bool CheckDependencies()
     {
