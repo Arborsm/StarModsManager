@@ -1,4 +1,3 @@
-using System.ComponentModel;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -159,8 +158,7 @@ public class OllamaService(string model, string server)
     WriteIndented = true,
     PropertyNameCaseInsensitive = true,
     IgnoreReadOnlyFields = true,
-    IgnoreReadOnlyProperties = true,
-    Converters = [typeof(DateTimeConverter), typeof(TimeSpanConverter)]
+    IgnoreReadOnlyProperties = true
 )]
 [JsonSerializable(typeof(OllamaChatRequest))]
 [JsonSerializable(typeof(OllamaChatResponse))]
