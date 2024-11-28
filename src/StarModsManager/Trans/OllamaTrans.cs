@@ -1,7 +1,5 @@
-﻿using OllamaSharp;
-using OllamaSharp.Models.Chat;
-using Message = OllamaSharp.Models.Chat.Message;
-using TransApiConfig = StarModsManager.Config.TransApiConfig;
+﻿using StarModsManager.Api.AI;
+using StarModsManager.Config;
 
 namespace StarModsManager.Trans;
 
@@ -13,25 +11,15 @@ internal class OllamaTrans : ITranslator
     public async Task<string> StreamCallWithMessageAsync(string text, string role, TransApiConfig config,
         CancellationToken cancellationToken)
     {
-        var ollama = new OllamaApiClient(config.Url);
-        var messages = new List<Message>
-        {
-            new(ChatRole.System, role),
-            new(ChatRole.User, text)
-        };
-        var chatRequest = new ChatRequest
-        {
-            Messages = messages,
-            Model = config.Model
-        };
-        var response = await ollama.ChatAsync(chatRequest, cancellationToken).StreamToEndAsync();
+        var api = new OllamaService(config.Model, config.Url);
+        var response = await api.ChatAsync(role, text, cancellationToken);
         return response?.Message.Content ?? string.Empty;
     }
 
     public async Task<List<string>> GetSupportModelsAsync(TransApiConfig config)
     {
-        var ollama = new OllamaApiClient(config.Url);
-        var models = await ollama.ListLocalModelsAsync();
-        return models.Select(it => it.Name).ToList();
+        var api = new OllamaService(config.Model, config.Url);
+        var models = await api.GetSupportModelsAsync(CancellationToken.None);
+        return models?.Models.Select(it => it.Name).ToList() ?? [];
     }
 }

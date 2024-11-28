@@ -39,7 +39,7 @@ public static class SMMDebug
 
     public static void Error(Exception e, string? msg = default, bool isMsg = true)
     {
-        if (isMsg) Services.Notification.Show(Lang.ErrorOccurred, msg ?? e.Message, Severity.Error);
+        if (isMsg) Services.Notification?.Show(Lang.ErrorOccurred, msg ?? e.Message, Severity.Error);
         Log.Error(e, msg ?? e.Message);
     }
 }

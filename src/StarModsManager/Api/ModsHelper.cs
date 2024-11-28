@@ -30,7 +30,9 @@ public class ModsHelper
         var manifestFiles = new List<string>();
         await FindManifestFilesAsync(path, manifestFiles);
         LocalModsMap = manifestFiles.AsParallel()
-            .Select(manifestFilePath => new LocalMod(manifestFilePath))
+            .Select(LocalMod.Create)
+            .Where(mod => mod != null)
+            .Cast<LocalMod>()
             .GroupBy(mod => mod.Manifest.UniqueID)
             .ToDictionary(grouping => grouping.Key, grouping => grouping.LastOrDefault())!;
         InitProcessMods();

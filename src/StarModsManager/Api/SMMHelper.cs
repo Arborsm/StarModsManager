@@ -398,6 +398,34 @@ public static class SMMHelper
                 : (str.Trim(), null);
         }
     }
+
+    public static string? FindCommonPath(string? subPath, string basePath)
+    {
+        if (string.IsNullOrEmpty(subPath)) return null;
+        subPath = subPath.Replace('/', '\\').TrimEnd('\\');
+        basePath = basePath.Replace('/', '\\').TrimEnd('\\');
+
+        if (subPath.StartsWith(basePath, StringComparison.OrdinalIgnoreCase))
+        {
+            var subParts = subPath.Split('\\');
+            var baseParts = basePath.Split('\\');
+
+            return baseParts.Length < subParts.Length
+                ? string.Join("\\", subParts.Take(baseParts.Length + 1))
+                : basePath;
+        }
+
+        var pathParts = subPath.Split('\\');
+        for (var i = 0; i < pathParts.Length - 1; i++)
+        {
+            var currentPath = string.Join("\\", pathParts.Take(i + 1));
+            var nextPath = string.Join("\\", pathParts.Take(i + 2));
+
+            if (currentPath.Equals(basePath, StringComparison.OrdinalIgnoreCase)) return nextPath;
+        }
+
+        return string.Empty;
+    }
 }
 
 public class KeyValuePairComparer<TKey, TValue>(

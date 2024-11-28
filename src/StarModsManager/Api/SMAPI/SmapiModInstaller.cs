@@ -25,7 +25,7 @@ public class SmapiModInstaller(string fileDir)
                 var lineBreak = string.IsNullOrEmpty(current) ? current : Environment.NewLine;
                 return current + lineBreak + text;
             });
-        Services.Notification.Show(Lang.Installing, msg, Severity.Informational);
+        Services.Notification?.Show(Lang.Installing, msg, Severity.Informational);
 
         var notSupportMsg = new StringBuilder();
         var successMsg = new StringBuilder();
@@ -39,11 +39,11 @@ public class SmapiModInstaller(string fileDir)
         }).ContinueWith(_ =>
         {
             if (successMsg.Length != 0)
-                Services.Notification.Show(Lang.ModInstallSuccess,
+                Services.Notification?.Show(Lang.ModInstallSuccess,
                     successMsg.ToString(), Severity.Success, TimeSpan.FromSeconds(15));
 
             if (notSupportMsg.Length != 0)
-                Services.Notification.Show(Lang.MultiModUpdateNotSupport,
+                Services.Notification?.Show(Lang.MultiModUpdateNotSupport,
                     notSupportMsg.ToString(), Severity.Warning, TimeSpan.FromMinutes(1));
 
             Services.LifeCycle.Reset();
@@ -129,7 +129,7 @@ public class SmapiModInstaller(string fileDir)
 
         if (manifestEntries.Count == 0)
         {
-            Services.Notification.Show(Lang.NotModArchive, Lang.ManifestFileNotFound, Severity.Warning);
+            Services.Notification?.Show(Lang.NotModArchive, Lang.ManifestFileNotFound, Severity.Warning);
             return defaultResult;
         }
 
@@ -158,37 +158,11 @@ public class SmapiModInstaller(string fileDir)
             TempModDir = tempModDir,
             DestDir = destDir,
             ModDir = modDir,
-            DestDirParent = FindCommonPath(destDir, Services.MainConfig.DirectoryPath)
+            DestDirParent = SMMHelper.FindCommonPath(destDir, Services.MainConfig.DirectoryPath)
         };
     }
 
-    private static string? FindCommonPath(string? subPath, string basePath)
-    {
-        if (string.IsNullOrEmpty(subPath)) return null;
-        subPath = subPath.Replace('/', '\\').TrimEnd('\\');
-        basePath = basePath.Replace('/', '\\').TrimEnd('\\');
 
-        if (subPath.StartsWith(basePath, StringComparison.OrdinalIgnoreCase))
-        {
-            var subParts = subPath.Split('\\');
-            var baseParts = basePath.Split('\\');
-
-            return baseParts.Length < subParts.Length
-                ? string.Join("\\", subParts.Take(baseParts.Length + 1))
-                : basePath;
-        }
-
-        var pathParts = subPath.Split('\\');
-        for (var i = 0; i < pathParts.Length - 1; i++)
-        {
-            var currentPath = string.Join("\\", pathParts.Take(i + 1));
-            var nextPath = string.Join("\\", pathParts.Take(i + 2));
-
-            if (currentPath.Equals(basePath, StringComparison.OrdinalIgnoreCase)) return nextPath;
-        }
-
-        return string.Empty;
-    }
 
     private void CreateTempDirectories()
     {
@@ -243,7 +217,7 @@ public class SmapiModInstaller(string fileDir)
         }
         catch (Exception)
         {
-            Services.Notification.Show(Lang.Warning, string.Format(Lang.CannotDeleteFolder, dir)
+            Services.Notification?.Show(Lang.Warning, string.Format(Lang.CannotDeleteFolder, dir)
                 , Severity.Warning, null, null, null, Lang.OpenFolder,
                 new RelayCommand(() => PlatformHelper.OpenFileOrUrl(dir)));
         }
@@ -343,7 +317,7 @@ public class TranslationPackInstaller(string fileName)
         }
         catch (Exception e)
         {
-            Services.Notification.Show(Lang.Warning, e.Message, Severity.Warning);
+            Services.Notification?.Show(Lang.Warning, e.Message, Severity.Warning);
             Log.Error(e, "Error occurred during i18n translation");
         }
         finally
@@ -444,8 +418,8 @@ public class TranslationPackInstaller(string fileName)
     private object? ShowI18NInstallationResult(bool? isSuccess) => isSuccess switch
     {
         true => null,
-        false => Services.Notification.Show(Lang.Warning, Lang.I18NInstallFailed, Severity.Warning),
-        null => Services.Notification.Show(Lang.Warning, string.Format(Lang.I18NInstallNotFound, fileName),
+        false => Services.Notification?.Show(Lang.Warning, Lang.I18NInstallFailed, Severity.Warning),
+        null => Services.Notification?.Show(Lang.Warning, string.Format(Lang.I18NInstallNotFound, fileName),
             Severity.Warning)
     };
 }

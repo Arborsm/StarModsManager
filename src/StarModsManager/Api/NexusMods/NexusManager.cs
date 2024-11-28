@@ -13,15 +13,21 @@ public static class NexusManager
 {
     private static NexusApiClient _api = null!;
     private static Throttle _throttle = null!;
+    public static bool IsAvailable { get; private set; }
 
     public static void Initialize(string apiKey, string userAgent)
     {
         _api = new NexusApiClient(apiKey, userAgent);
         _throttle = new Throttle(30, TimeSpan.FromSeconds(1));
-        Task.Run(Init);
+        _ = Test();
     }
 
-    private static async Task<object?> Init()
+    public static async Task Test()
+    {
+        await Task.Run(Init).ContinueWith(_ => IsAvailable = !RateLimits.IsBlocked());
+    }
+
+    public static async Task<object?> Init()
     {
         var retryPolicy = Policy.Handle<Exception>()
             .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));

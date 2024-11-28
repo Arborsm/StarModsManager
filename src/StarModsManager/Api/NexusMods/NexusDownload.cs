@@ -8,11 +8,11 @@ public class NexusDownload
 {
     private readonly SemaphoreSlim _initLock = new(1, 1);
     private volatile Task? _initializationTask;
-    private volatile bool _isNoCookie;
+    public volatile bool IsNoCookie = true;
     private volatile bool _isNotPremium;
     public static NexusDownload Instance { get; } = new();
 
-    private async Task EnsureInitializedAsync()
+    public async Task EnsureInitializedAsync()
     {
         var initTask = _initializationTask;
         if (initTask != null)
@@ -52,12 +52,12 @@ public class NexusDownload
         {
             const int fileId = 113065;
             var result = await Task.Run(async () => await NexusManager.GetModFileAsync(fileId));
-            _isNoCookie = result is null;
-            Log.Information("Testing Cookie, IsNoCookie: {isNoCookie}", _isNoCookie);
+            IsNoCookie = result is null;
+            Log.Information("Testing Cookie, IsNoCookie: {isNoCookie}", IsNoCookie);
         }
         catch (Exception)
         {
-            _isNoCookie = true;
+            IsNoCookie = true;
             // ignored
         }
     }
@@ -77,7 +77,7 @@ public class NexusDownload
                 : mods.Files.First(x => x.Version == version.ToString()).FileId;
 
             string? link = null;
-            if (!_isNoCookie) link = (await NexusManager.GetModFileAsync(fileId))?.ToString();
+            if (!IsNoCookie) link = (await NexusManager.GetModFileAsync(fileId))?.ToString();
 
             if (!_isNotPremium)
             {
@@ -87,14 +87,14 @@ public class NexusDownload
                 }
                 catch (NotPremiumException)
                 {
-                    Services.Notification.Show(Lang.Warning, Lang.NexusPremiumRequired, Severity.Warning);
+                    Services.Notification?.Show(Lang.Warning, Lang.NexusPremiumRequired, Severity.Warning);
                     _isNotPremium = true;
                 }
             }
 
-            if (link is null && (!_isNoCookie || !_isNotPremium))
+            if (link is null && (!IsNoCookie || !_isNotPremium))
             {
-                Services.Notification.Show(Lang.Warning, Lang.ModFileNotFound, Severity.Warning);
+                Services.Notification?.Show(Lang.Warning, Lang.ModFileNotFound, Severity.Warning);
             }
 
             return link;

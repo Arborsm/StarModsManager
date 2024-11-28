@@ -33,7 +33,7 @@ public static class Services
     public static Dictionary<string, TransApiConfig> TransApiConfigs { get; } =
         Translator.Instance.Apis.ToDictionary(t => t.Name, t => TransApiConfig.LoadOrCreate(t.Name));
 
-    public static INotification Notification { get; set; } = null!;
+    public static INotification? Notification { get; set; }
     public static IProgress Progress { get; set; } = null!;
     public static IDialog Dialog { get; set; } = null!;
     public static IPopUp PopUp { get; set; } = null!;

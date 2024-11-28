@@ -1,3 +1,4 @@
+using System.Globalization;
 using CommunityToolkit.Mvvm.Input;
 using Octokit;
 using Serilog;
@@ -11,19 +12,57 @@ public static class UpdateChecker
     private const string Owner = "Arborsm";
     private const string Repo = "StarModsManager";
     private const string NexusUrl = "https://www.nexusmods.com/stardewvalley/mods/29713";
+    private const string TimestampFileName = "LastUpdateCheck";
+    private const int CheckIntervalMinutes = 10;
+    private static string GetTimestampFilePath => Path.Combine(Services.AppSavingPath, TimestampFileName);
 
     public static void CheckUpdate()
     {
+        SaveLastCheckTimestamp();
+        
         Task.Run(CheckForUpdatesAsync).ContinueWith(t =>
         {
             var (hasUpdate, latestVersion, downloadUrl) = t.Result;
             if (!hasUpdate) return;
             var msg = string.Format(Lang.UpdateAvailableContent, latestVersion);
             var command = new RelayCommand(() => PlatformHelper.OpenFileOrUrl(downloadUrl));
-            Services.Notification.Show(Lang.UpdateAvailable, msg, Severity.Success,
+            Services.Notification?.Show(Lang.UpdateAvailable, msg, Severity.Success,
                 TimeSpan.FromSeconds(20), null, null, Lang.DownloadManagerLabel, command);
         });
     }
+
+    public static bool ShouldSkipCheck()
+    {
+        try
+        {
+            var timestampPath = GetTimestampFilePath;
+            if (!File.Exists(timestampPath)) return false;
+            var lastCheckTime = DateTime.Parse(File.ReadAllText(timestampPath));
+            var timeSinceLastCheck = DateTime.Now - lastCheckTime;
+            Log.Information("Skipping Auto update check, " +
+                            "last check was {TimeSinceLastCheck} minutes ago", timeSinceLastCheck.TotalMinutes);
+            return timeSinceLastCheck.TotalMinutes < CheckIntervalMinutes;
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Error reading last update check timestamp");
+            return false;
+        }
+    }
+
+    private static void SaveLastCheckTimestamp()
+    {
+        try
+        {
+            var timestampPath = GetTimestampFilePath;
+            File.WriteAllText(timestampPath, DateTime.Now.ToString(CultureInfo.InvariantCulture));
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Error saving update check timestamp");
+        }
+    }
+    
 
     private static async Task<(bool hasUpdate, string latestVersion, string downloadUrl)> CheckForUpdatesAsync()
     {

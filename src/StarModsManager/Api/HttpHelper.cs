@@ -85,7 +85,7 @@ public class HttpHelper
         catch (HttpRequestException ex) when (ex.Message.Contains("The SSL connection could not be established",
                                                   StringComparison.OrdinalIgnoreCase))
         {
-            Services.Notification.Show(Lang.NetworkErrorMsg);
+            Services.Notification?.Show(Lang.NetworkErrorMsg);
             return new HttpResponseMessage();
         }
         finally
