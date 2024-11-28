@@ -639,4 +639,40 @@
     <data name="GetCookiesText" xml:space="preserve">
         <value>To view cookies in Chrome, open Chrome Settings (right-click on your browser window) &gt; Inspect &gt; Applications &gt; Storage &gt; Cookies, and select the website you want to see cookies in Chrome. Here you can see, edit, or delete cookies in Chrome.</value>
     </data>
+    <data name="Error" xml:space="preserve">
+        <value>Error</value>
+    </data>
+    <data name="CannotLoadMod" xml:space="preserve">
+        <value>Cannot load mod: {0}</value>
+    </data>
+    <data name="ModTools" xml:space="preserve">
+        <value>Mod Tools</value>
+    </data>
+    <data name="TempPage" xml:space="preserve">
+        <value>This is a temporary page.</value>
+    </data>
+    <data name="NexusApiState" xml:space="preserve">
+        <value>Nexus Api State:</value>
+    </data>
+    <data name="NexusCookieState" xml:space="preserve">
+        <value>Nexus Cookie State:</value>
+    </data>
+    <data name="TranslateServiceState" xml:space="preserve">
+        <value>Translate Service State:</value>
+    </data>
+    <data name="Message" xml:space="preserve">
+        <value>Message:</value>
+    </data>
+    <data name="Response" xml:space="preserve">
+        <value>Response:</value>
+    </data>
+    <data name="Send" xml:space="preserve">
+        <value>Send</value>
+    </data>
+    <data name="Available" xml:space="preserve">
+        <value>Available</value>
+    </data>
+    <data name="WithPrompt" xml:space="preserve">
+        <value>With Prompt within Settings</value>
+    </data>
 </root>

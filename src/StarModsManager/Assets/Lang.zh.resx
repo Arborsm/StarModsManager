@@ -639,4 +639,40 @@
     <data name="GetCookiesText" xml:space="preserve">
         <value>要在 Chrome 中查看 Cookie，请打开 Chrome 设置（右键单击浏览器窗口）&gt; 检查 &gt; 应用程序 &gt; 存储 &gt; Cookie，然后选择您想查看 Cookie 的网站。在这里，您可以查看、编辑或删除 Chrome 中的 Cookie。</value>
     </data>
+    <data name="Error" xml:space="preserve">
+        <value>错误</value>
+    </data>
+    <data name="CannotLoadMod" xml:space="preserve">
+        <value>无法加载模组: {0}</value>
+    </data>
+    <data name="ModTools" xml:space="preserve">
+        <value>模组工具</value>
+    </data>
+    <data name="TempPage" xml:space="preserve">
+        <value>这是一个临时页面</value>
+    </data>
+    <data name="NexusApiState" xml:space="preserve">
+        <value>Nexus Api 状态:</value>
+    </data>
+    <data name="NexusCookieState" xml:space="preserve">
+        <value>Nexus Cookie 状态:</value>
+    </data>
+    <data name="TranslateServiceState" xml:space="preserve">
+        <value>翻译服务状态：</value>
+    </data>
+    <data name="Message" xml:space="preserve">
+        <value>消息：</value>
+    </data>
+    <data name="Response" xml:space="preserve">
+        <value>回复:</value>
+    </data>
+    <data name="Send" xml:space="preserve">
+        <value>发送</value>
+    </data>
+    <data name="Available" xml:space="preserve">
+        <value>可用</value>
+    </data>
+    <data name="WithPrompt" xml:space="preserve">
+        <value>带有设置中的提示词</value>
+    </data>
 </root>

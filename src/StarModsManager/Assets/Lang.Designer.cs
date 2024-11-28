@@ -141,6 +141,15 @@ namespace StarModsManager.Assets {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Available.
+        /// </summary>
+        public static string Available {
+            get {
+                return ResourceManager.GetString("Available", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Backup Folder.
         /// </summary>
         public static string BackupFolder {
@@ -173,6 +182,15 @@ namespace StarModsManager.Assets {
         public static string CannotDeleteFolder {
             get {
                 return ResourceManager.GetString("CannotDeleteFolder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot load mod: {0}.
+        /// </summary>
+        public static string CannotLoadMod {
+            get {
+                return ResourceManager.GetString("CannotLoadMod", resourceCulture);
             }
         }
         
@@ -447,6 +465,15 @@ namespace StarModsManager.Assets {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Error.
+        /// </summary>
+        public static string Error {
+            get {
+                return ResourceManager.GetString("Error", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unable to find a mod folder that meets the requirements in the target folder.
         /// </summary>
         public static string ErrorFoldersMsg {
@@ -717,6 +744,15 @@ namespace StarModsManager.Assets {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Message:.
+        /// </summary>
+        public static string Message {
+            get {
+                return ResourceManager.GetString("Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Author.
         /// </summary>
         public static string ModAuthor {
@@ -798,6 +834,15 @@ namespace StarModsManager.Assets {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Mod Tools.
+        /// </summary>
+        public static string ModTools {
+            get {
+                return ResourceManager.GetString("ModTools", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to UniqueID.
         /// </summary>
         public static string ModUniqueId {
@@ -848,6 +893,24 @@ namespace StarModsManager.Assets {
         public static string NewDownload {
             get {
                 return ResourceManager.GetString("NewDownload", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Nexus Api State:.
+        /// </summary>
+        public static string NexusApiState {
+            get {
+                return ResourceManager.GetString("NexusApiState", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Nexus Cookie State:.
+        /// </summary>
+        public static string NexusCookieState {
+            get {
+                return ResourceManager.GetString("NexusCookieState", resourceCulture);
             }
         }
         
@@ -1077,6 +1140,15 @@ namespace StarModsManager.Assets {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Response:.
+        /// </summary>
+        public static string Response {
+            get {
+                return ResourceManager.GetString("Response", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Restart required for changes to take effect.
         /// </summary>
         public static string RestartRequired {
@@ -1136,6 +1208,15 @@ namespace StarModsManager.Assets {
         public static string SelectFolderButton {
             get {
                 return ResourceManager.GetString("SelectFolderButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Send.
+        /// </summary>
+        public static string Send {
+            get {
+                return ResourceManager.GetString("Send", resourceCulture);
             }
         }
         
@@ -1356,6 +1437,15 @@ namespace StarModsManager.Assets {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to This is a temporary page..
+        /// </summary>
+        public static string TempPage {
+            get {
+                return ResourceManager.GetString("TempPage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Thread Internal Error.
         /// </summary>
         public static string ThreadInternalError {
@@ -1388,6 +1478,15 @@ namespace StarModsManager.Assets {
         public static string TranslatePageLabel {
             get {
                 return ResourceManager.GetString("TranslatePageLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Translate Service State:.
+        /// </summary>
+        public static string TranslateServiceState {
+            get {
+                return ResourceManager.GetString("TranslateServiceState", resourceCulture);
             }
         }
         
@@ -1595,6 +1694,15 @@ namespace StarModsManager.Assets {
         public static string Warning {
             get {
                 return ResourceManager.GetString("Warning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to With Prompt within Settings.
+        /// </summary>
+        public static string WithPrompt {
+            get {
+                return ResourceManager.GetString("WithPrompt", resourceCulture);
             }
         }
         
