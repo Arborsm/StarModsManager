@@ -20,7 +20,7 @@ public partial class TransPageView : UserControl
     {
         if (!Translator.Instance.IsAvailable)
         {
-            Services.Notification.Show(Lang.Warning, Lang.TranslationNotAvailable, Severity.Warning);
+            Services.Notification?.Show(Lang.Warning, Lang.TranslationNotAvailable, Severity.Warning);
             return;
         }
 

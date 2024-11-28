@@ -8,6 +8,11 @@ namespace StarModsManager.ViewModels;
 
 public partial class MainViewModel : ViewModelBase
 {
+    public MainViewModel()
+    {
+        ViewModelService.Resolve<SettingsPageViewModel>().Init();
+    }
+
     [ObservableProperty]
     public partial int DownloadItemsCount { get; set; }
 
@@ -16,11 +21,6 @@ public partial class MainViewModel : ViewModelBase
 
     [ObservableProperty]
     public partial int ToUpdateModsCount { get; set; }
-
-    public MainViewModel()
-    {
-        ViewModelService.Resolve<SettingsPageViewModel>().Init();
-    }
 
     public NavigationFactory NavigationFactory { get; } = new();
 }
@@ -59,6 +59,10 @@ public class NavigationFactory : INavigationPageFactory
             NavigationService.Settings => new SettingsPageView
             {
                 DataContext = ViewModelService.Resolve<SettingsPageViewModel>()
+            },
+            NavigationService.ModTools => new ModToolsPageView
+            {
+                DataContext = ViewModelService.Resolve<ModToolsPageViewModel>()
             },
             _ => throw new NotImplementedException($"Cannot get Page from source: {target}")
         };

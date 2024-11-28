@@ -1,0 +1,129 @@
+<UserControl
+    x:Class="StarModsManager.Views.Pages.ModToolsPageView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:assets="clr-namespace:StarModsManager.Assets;assembly=StarModsManager.Common"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:pages="clr-namespace:StarModsManager.ViewModels.Pages"
+    xmlns:ui="using:FluentAvalonia.UI.Controls"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    x:DataType="pages:ModToolsPageViewModel"
+    mc:Ignorable="d">
+    <Grid Margin="20,40,20,20" RowDefinitions="Auto, Auto, Auto, *">
+        <ui:InfoBar
+            Title="{x:Static assets:Lang.Warning}"
+            IsClosable="False"
+            IsOpen="True"
+            Message="{x:Static assets:Lang.TempPage}" />
+        <Grid
+            Grid.Row="1"
+            Margin="0,10,0,0"
+            ColumnDefinitions="Auto, *, Auto, Auto"
+            RowDefinitions="Auto, Auto, Auto, Auto"
+            ShowGridLines="False">
+            <TextBlock
+                Grid.Row="0"
+                Grid.Column="0"
+                VerticalAlignment="Center"
+                Text="{x:Static assets:Lang.NexusApiState}" />
+            <TextBlock
+                Grid.Row="0"
+                Grid.Column="1"
+                Margin="10,0,0,0"
+                VerticalAlignment="Center"
+                Text="{Binding NexusApiState}" />
+            <Button
+                Grid.Row="0"
+                Grid.Column="2"
+                Margin="0,0,10,10"
+                Click="ApiSettingsButton_OnClick"
+                Content="{x:Static assets:Lang.SettingsButton}" />
+            <Button
+                Grid.Row="0"
+                Grid.Column="3"
+                Margin="0,0,0,10"
+                Command="{Binding RefreshNexusApiStateCommand}"
+                Content="{x:Static assets:Lang.Refresh}" />
+            <TextBlock
+                Grid.Row="1"
+                Grid.Column="0"
+                VerticalAlignment="Center"
+                Text="{x:Static assets:Lang.NexusCookieState}" />
+            <TextBlock
+                Grid.Row="1"
+                Grid.Column="1"
+                Margin="10,0,0,0"
+                VerticalAlignment="Center"
+                Text="{Binding NexusCookieState}" />
+            <Button
+                Grid.Row="1"
+                Grid.Column="2"
+                Margin="0,0,0,10"
+                Click="CookiesSettingsButton_OnClick"
+                Content="{x:Static assets:Lang.SettingsButton}" />
+            <Button
+                Grid.Row="1"
+                Grid.Column="3"
+                Margin="0,0,0,10"
+                Command="{Binding RefreshNexusCookieStateCommand}"
+                Content="{x:Static assets:Lang.Refresh}" />
+            <TextBlock
+                Grid.Row="2"
+                Grid.Column="0"
+                VerticalAlignment="Center"
+                Text="{x:Static assets:Lang.TranslateServiceState}" />
+            <TextBlock
+                Grid.Row="2"
+                Grid.Column="1"
+                Margin="10,0,0,0"
+                VerticalAlignment="Center"
+                Text="{Binding TranslateServiceState}" />
+            <Button
+                Grid.Row="2"
+                Grid.Column="2"
+                Margin="0,0,0,10"
+                Click="TransSettingsButton_OnClick"
+                Content="{x:Static assets:Lang.SettingsButton}" />
+            <Button
+                Grid.Row="2"
+                Grid.Column="3"
+                Margin="0,0,0,10"
+                Command="{Binding RefreshTranslateServiceStateCommand}"
+                Content="{x:Static assets:Lang.Refresh}" />
+        </Grid>
+        <StackPanel Grid.Row="3" Spacing="10">
+            <Grid ColumnDefinitions="*, Auto, Auto, Auto">
+                <TextBlock VerticalAlignment="Center" Text="{x:Static assets:Lang.Message}" />
+                <TextBlock
+                    Grid.Column="1"
+                    Margin="0,0,10,0"
+                    VerticalAlignment="Center"
+                    Text="{x:Static assets:Lang.WithPrompt}" />
+                <ToggleSwitch
+                    Grid.Column="2"
+                    Margin="0,-2,0,0"
+                    IsChecked="{Binding WithPrompt}"
+                    OffContent=""
+                    OnContent="" />
+                <Button
+                    Grid.Column="3"
+                    Command="{Binding SendCommand}"
+                    Content="{x:Static assets:Lang.Send}" />
+            </Grid>
+            <TextBox
+                Height="100"
+                AcceptsReturn="True"
+                Text="{Binding Message}"
+                TextWrapping="WrapWithOverflow" />
+            <TextBlock VerticalAlignment="Center" Text="{x:Static assets:Lang.Response}" />
+            <TextBox
+                Height="100"
+                AcceptsReturn="True"
+                IsReadOnly="True"
+                Text="{Binding Response}"
+                TextWrapping="WrapWithOverflow" />
+        </StackPanel>
+    </Grid>
+</UserControl>

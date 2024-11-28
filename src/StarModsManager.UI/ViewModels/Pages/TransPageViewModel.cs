@@ -67,7 +67,7 @@ public partial class TransPageViewModel : MainPageViewModelBase, IProgress
         }
         catch (OperationCanceledException)
         {
-            Services.Notification.Show(Lang.OperationCanceled);
+            Services.Notification?.Show(Lang.OperationCanceled);
         }
         catch (Exception? e)
         {
@@ -80,7 +80,7 @@ public partial class TransPageViewModel : MainPageViewModelBase, IProgress
             Progress = 0;
         }
 
-        if (ModsHelper.Instance.IsMismatchedTokens) Services.Notification.Show(Lang.SymbolError);
+        if (ModsHelper.Instance.IsMismatchedTokens) Services.Notification?.Show(Lang.SymbolError);
     }
 
     public void Clear()

@@ -35,6 +35,7 @@ public static class ViewModelService
         RegisterInternal(typeof(UpdatePageViewModel), () => new UpdatePageViewModel());
         RegisterInternal(typeof(MainViewModel), () => new MainViewModel());
         RegisterInternal(typeof(DownloadManagerViewModel), () => new DownloadManagerViewModel());
+        RegisterInternal(typeof(ModToolsPageViewModel), () => new ModToolsPageViewModel());
     }
 
     private static void RegisterInternal(Type type, Func<object> factory, bool isSingleton = true)

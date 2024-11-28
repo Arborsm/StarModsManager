@@ -135,6 +135,7 @@ public partial class MainView : UserControl
     {
         static Notification()
         {
+            if (UpdateChecker.ShouldSkipCheck()) return;
             UpdateChecker.CheckUpdate();
         }
 

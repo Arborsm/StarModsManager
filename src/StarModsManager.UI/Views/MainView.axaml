@@ -22,8 +22,7 @@
     <UserControl.Styles>
         <Style Selector="SplitView:closed ui|NavigationViewItem.Footer primitives|NavigationViewItemPresenter /template/ ContentPresenter#InfoBadgePresenter">
             <Setter Property="Margin" Value="-42, -14, 0, 0" />
-            <Setter Property="Width"
-                    Value="{Binding DownloadItemsCount, Converter={StaticResource TextBlockWidthConverter}}" />
+            <Setter Property="Width" Value="{Binding DownloadItemsCount, Converter={StaticResource TextBlockWidthConverter}}" />
         </Style>
     </UserControl.Styles>
 
@@ -75,14 +74,21 @@
                             Value="{Binding ToUpdateModsCount}" />
                     </ui:NavigationViewItem.InfoBadge>
                 </ui:NavigationViewItem>
-                <ui:NavigationViewItem Content="{x:Static assets:Lang.TranslatePageLabel}" Tag="Trans">
+                <ui:NavigationViewItem Content="{x:Static assets:Lang.ModTools}" Tag="ModTools">
+                    <ui:NavigationViewItem.MenuItems>
+                        <ui:NavigationViewItem Content="{x:Static assets:Lang.TranslatePageLabel}" Tag="Trans">
+                            <ui:NavigationViewItem.IconSource>
+                                <fluent:SymbolIconSource Symbol="Translate" />
+                            </ui:NavigationViewItem.IconSource>
+                        </ui:NavigationViewItem>
+                        <ui:NavigationViewItem Content="{x:Static assets:Lang.ProofreadPageLabel}" Tag="Check">
+                            <ui:NavigationViewItem.IconSource>
+                                <fluent:SymbolIconSource Symbol="TextProofingTools" />
+                            </ui:NavigationViewItem.IconSource>
+                        </ui:NavigationViewItem>
+                    </ui:NavigationViewItem.MenuItems>
                     <ui:NavigationViewItem.IconSource>
-                        <fluent:SymbolIconSource Symbol="Translate" />
-                    </ui:NavigationViewItem.IconSource>
-                </ui:NavigationViewItem>
-                <ui:NavigationViewItem Content="{x:Static assets:Lang.ProofreadPageLabel}" Tag="Check">
-                    <ui:NavigationViewItem.IconSource>
-                        <fluent:SymbolIconSource Symbol="TextProofingTools" />
+                        <fluent:SymbolIconSource Symbol="Code" />
                     </ui:NavigationViewItem.IconSource>
                 </ui:NavigationViewItem>
             </ui:NavigationView.MenuItems>

@@ -60,7 +60,7 @@ public partial class ModViewModel : ViewModelBase
     [RelayCommand]
     private async Task DownloadAsync()
     {
-        Services.Notification.Show(Lang.GetDownloadUrl);
+        Services.Notification?.Show(Lang.GetDownloadUrl);
         await NexusDownload.DownloadLatestModAsync(OnlineMod.Url);
         Services.LifeCycle.ShowDownloadManager();
     }

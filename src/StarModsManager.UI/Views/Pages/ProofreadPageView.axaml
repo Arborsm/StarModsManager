@@ -90,7 +90,10 @@
                 HorizontalAlignment="Right"
                 Orientation="Horizontal"
                 Spacing="10">
-                <Button VerticalAlignment="Center" Click="Button_OnClick" />
+                <Button
+                    VerticalAlignment="Center"
+                    Click="Button_OnClick"
+                    Content="{x:Static assets:Lang.SettingsButton}" />
                 <ComboBox
                     Name="I18NModsComboBox"
                     MinWidth="400"

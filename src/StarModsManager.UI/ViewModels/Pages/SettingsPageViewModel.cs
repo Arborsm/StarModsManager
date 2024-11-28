@@ -162,7 +162,7 @@ public partial class SettingsPageViewModel : MainPageViewModelBase
         var path = Path.Combine(ModsHelper.Instance.GameFolders.First(), "mods");
         if (!Directory.Exists(path))
         {
-            Services.Notification.Show(Lang.ModsDirNotFound);
+            Services.Notification?.Show(Lang.ModsDirNotFound);
             return;
         }
 
@@ -186,7 +186,7 @@ public partial class SettingsPageViewModel : MainPageViewModelBase
     [RelayCommand]
     private void GetCookie()
     {
-        Services.Notification.Show(Lang.GetCookiesText);
+        Services.Notification?.Show(Lang.GetCookiesText);
     }
 
     private void GetPredefColors()

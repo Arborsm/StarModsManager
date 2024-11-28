@@ -18,7 +18,7 @@ public static class GlobalExceptionHandler
     private static void OnTaskSchedulerUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
     {
         Log.Error(e.Exception, "UnobservedTaskException");
-        Services.Notification.Show(Lang.ThreadInternalError, e.Exception.Message, Severity.Error);
+        Services.Notification?.Show(Lang.ThreadInternalError, e.Exception.Message, Severity.Error);
         e.SetObserved();
     }
 

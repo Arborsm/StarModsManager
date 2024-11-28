@@ -120,7 +120,7 @@ public partial class UpdatePageViewModel : MainPageViewModelBase
             .Select(m => (m.LocalMod.OnlineMod.ModId, m.LatestVersion))
             .Select(g => Task.Run(async () => await NexusDownload.DownloadLatestModAsync(g.ModId, g.Item2)))
             .ToList();
-        Services.Notification.Show(Lang.FetchingModLink);
+        Services.Notification?.Show(Lang.FetchingModLink);
         Task.WhenAll(mod);
     }
 }

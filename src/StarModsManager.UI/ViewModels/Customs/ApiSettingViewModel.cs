@@ -1,5 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using StarModsManager.Api;
 using StarModsManager.Trans;
@@ -17,8 +16,10 @@ public partial class ApiSettingViewModel(string selectedApi) : ViewModelBase
     [ObservableProperty]
     public partial string Url { get; set; } = Services.TransApiConfigs[selectedApi].Url;
 
+    [ObservableProperty]
+    public partial string[] Models { get; set; } = Services.TransApiConfigs[selectedApi].Models;
+
     public bool IsApiKeyEnabled => Translator.Instance.CurrentTranslator.NeedApi;
-    public ObservableCollection<string> Models { get; set; } = new(Services.TransApiConfigs[selectedApi].Models);
 
     partial void OnApiKeyChanged(string oldValue, string newValue)
     {
@@ -35,17 +36,21 @@ public partial class ApiSettingViewModel(string selectedApi) : ViewModelBase
         if (newValue != oldValue) Services.TransApiConfigs[selectedApi].Model = newValue;
     }
 
+    partial void OnModelsChanged(string[] oldValue, string[] newValue)
+    {
+        if (newValue != oldValue) Services.TransApiConfigs[selectedApi].Models = newValue;
+    }
+
     [RelayCommand]
     private async Task GetModelsAsync()
     {
         try
         {
-            Models.Clear();
             var models =
                 await Translator.Instance.CurrentTranslator.GetSupportModelsAsync(
                     Services.TransApiConfigs[selectedApi]);
-            models.ForEach(Models.Add);
-            if (Models.Count > 0) Model = Models.First();
+            Models = models.ToArray();
+            Model = Models.First();
         }
         catch (Exception? e)
         {
@@ -54,7 +59,7 @@ public partial class ApiSettingViewModel(string selectedApi) : ViewModelBase
     }
 
     [RelayCommand]
-    public async Task RefreshAsync()
+    private async Task RefreshAsync()
     {
         await Task.Run(Translator.Instance.Test);
     }
@@ -62,10 +67,5 @@ public partial class ApiSettingViewModel(string selectedApi) : ViewModelBase
     [RelayCommand]
     private void Save()
     {
-        var apiConfig = Services.TransApiConfigs[selectedApi];
-        apiConfig.Api = ApiKey;
-        apiConfig.Url = Url;
-        apiConfig.Model = Model;
-        apiConfig.Models = Models.ToArray();
     }
 }

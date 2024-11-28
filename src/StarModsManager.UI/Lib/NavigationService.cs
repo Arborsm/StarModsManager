@@ -15,6 +15,7 @@ public class NavigationService
     public const string Trans = "Trans";
     public const string Check = "Check";
     public const string Settings = "Settings";
+    public const string ModTools = "ModTools";
     public static readonly NavigationService Instance = new();
 
     private Frame? _frame;
