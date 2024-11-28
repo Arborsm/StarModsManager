@@ -11,7 +11,6 @@ namespace StarModsManager.Config;
 public abstract class ConfigBase : ObservableObject
 {
     private bool _isSaving;
-    protected string? AdditionName = null;
     protected bool IsLoaded;
 
     protected ConfigBase()
@@ -19,12 +18,16 @@ public abstract class ConfigBase : ObservableObject
         PropertyChanged += Save;
     }
 
+    protected virtual string? AdditionName()
+    {
+        return null;
+    }
+
     protected abstract JsonTypeInfo GetJsonTypeInfo();
 
     private string GetConfigFilePath()
     {
-        var additionName = string.Empty;
-        if (this is TransApiConfig) additionName = "_" + AdditionName;
+        var additionName = !string.IsNullOrEmpty(AdditionName()) ? $"_{AdditionName()}" : string.Empty;
         return Path.Combine(Services.AppSavingPath, GetType().Name + additionName + ".json");
     }
 

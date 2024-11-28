@@ -7,13 +7,13 @@ public class TransApiConfig : ConfigBase
 {
     public TransApiConfig(string additionName)
     {
-        if (!string.IsNullOrEmpty(additionName)) AdditionNameJson = AdditionName = additionName;
+        if (!string.IsNullOrEmpty(additionName))
+            AdditionNameJson = additionName;
     }
 
     [JsonConstructor]
     public TransApiConfig() : this(string.Empty)
     {
-        AdditionName = AdditionNameJson;
     }
 
     public string AdditionNameJson { get; set; } = null!;
@@ -41,6 +41,11 @@ public class TransApiConfig : ConfigBase
         get;
         set => SetProperty(ref field, value);
     } = "api.openai.com";
+
+    protected override string AdditionName()
+    {
+        return AdditionNameJson;
+    }
 
     protected override JsonTypeInfo GetJsonTypeInfo()
     {
