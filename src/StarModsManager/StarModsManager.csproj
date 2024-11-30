@@ -9,7 +9,7 @@
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <AssemblyName>StarModsManager.Common</AssemblyName>
         <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
-        <AssemblyVersion>1.0.3</AssemblyVersion>
+        <AssemblyVersion>1.0.4</AssemblyVersion>
     </PropertyGroup>
 
     <ItemGroup>
