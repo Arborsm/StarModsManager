@@ -189,6 +189,8 @@ public partial class ToUpdateMod(LocalMod localMod, bool isChecked = false) : Ob
 
     public async Task<ToUpdateMod> UpdateLatestVersionAsync()
     {
+        var notGetVersionTimes = ModsHelper.GetModNotGetVersionTimes(LocalMod.Manifest.UniqueID);
+        if (notGetVersionTimes >= 3) return this;
         if (UpdatePageViewModel.ModEntries != null)
             LatestVersion = UpdatePageViewModel.ModEntries
                 .Where(m => m.Id == LocalMod.Manifest.UniqueID && !string.IsNullOrEmpty(m.Metadata.Main.Version))
@@ -199,6 +201,8 @@ public partial class ToUpdateMod(LocalMod localMod, bool isChecked = false) : Ob
         await Task.Delay(Random.Shared.Next(50, 500));
         LatestVersion = await NexusMod.CreateAsync(LocalMod.OnlineMod.Url, false)
             .ContinueWith(t => t.Result.GetModVersion());
+        if (LatestVersion == null) await ModsHelper.AddModNotGetVersionTimes(LocalMod.Manifest.UniqueID);
+
         return this;
     }
 

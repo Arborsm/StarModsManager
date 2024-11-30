@@ -132,7 +132,7 @@ public partial class ModViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private async Task LoadCoverAsync(CancellationToken cancellationToken)
+    private async Task RefreshAsync(CancellationToken cancellationToken)
     {
         await LoadCoverAsync(true, cancellationToken);
     }
@@ -173,7 +173,12 @@ public partial class ModViewModel : ViewModelBase
             }
         }
 
+        if (refresh) await ModsHelper.RefreshMod(OnlineMod.ModId);
+        var modPicFailTimes = ModsHelper.GetModNotGetPicTimes(OnlineMod.ModId);
+        if (modPicFailTimes >= 3) return;
+
         await using var imageStream = await OnlineMod.LoadPicBitmapAsync(refresh, cancellationToken);
+
         if (imageStream != null && await IsValidImageFileAsync(imageStream))
         {
             Pic = await Task.Run(() => Bitmap.DecodeToWidth(imageStream, 400), cancellationToken);
@@ -183,6 +188,10 @@ public partial class ModViewModel : ViewModelBase
                 var file = File.Create(LocalMod.InfoPicturePath);
                 await imageStream.CopyToAsync(file, cancellationToken);
             }
+        }
+        else
+        {
+            await ModsHelper.AddModNotGetPicTimes(OnlineMod.ModId);
         }
     }
 

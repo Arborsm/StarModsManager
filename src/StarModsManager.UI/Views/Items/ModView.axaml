@@ -48,7 +48,7 @@
                 Text="{x:Static assets:Lang.ChangePic}" />
             <ui:MenuFlyoutItem Command="{Binding GetDetailCommand}" Text="{x:Static assets:Lang.Detail}" />
             <ui:MenuFlyoutItem Command="{Binding OpenUrlCommand}" Text="{x:Static assets:Lang.OpenUrl}" />
-            <ui:MenuFlyoutItem Command="{Binding LoadCoverCommand}" Text="{x:Static assets:Lang.Refresh}" />
+            <ui:MenuFlyoutItem Command="{Binding RefreshCommand}" Text="{x:Static assets:Lang.Refresh}" />
             <ui:MenuFlyoutItem Command="{Binding DownloadCommand}" Text="{x:Static assets:Lang.DownloadLatestVersion}" />
         </ui:FAMenuFlyout>
     </UserControl.Resources>

@@ -1,23 +1,52 @@
 ﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 using Serilog;
 using StarModsManager.Assets;
 using StarModsManager.Mods;
 
 namespace StarModsManager.Api;
 
-public class ModsHelper
+public class ModsHelper : IDisposable
 {
     public static readonly ModsHelper Instance = new();
+
+    private static readonly SemaphoreSlim Semaphore = new(1, 1);
+
+    private static readonly string NotGetPicTimesCachePath =
+        Path.Combine(Services.AppSavingPath, "NotGetPicTimes.json");
+
+    private static readonly string NotGetVersionTimesCachePath =
+        Path.Combine(Services.AppSavingPath, "NotGetVersionTimes.json");
+
+    private static readonly Dictionary<string, int> NotGetPicTimesMap; // ModId -> times
+    private static readonly Dictionary<string, int> NotGetVersionTimesMap; // ModId -> times
     public readonly IEnumerable<string> GameFolders;
     public readonly List<LocalMod> I18LocalMods = [];
     public bool IsMismatchedTokens = false;
     public Dictionary<string, LocalMod> LocalModsMap = []; // Id/UniqueId -> mod
     public Dictionary<string, OnlineMod> OnlineModsMap = []; // UniqueId -> mod
 
+
+    static ModsHelper()
+    {
+        if (!File.Exists(NotGetPicTimesCachePath)) File.WriteAllText(NotGetPicTimesCachePath, "{}");
+        if (!File.Exists(NotGetVersionTimesCachePath)) File.WriteAllText(NotGetVersionTimesCachePath, "{}");
+        NotGetPicTimesMap = JsonSerializer.Deserialize(File.ReadAllText(NotGetPicTimesCachePath),
+            StringIntMapContent.Default.DictionaryStringInt32) ?? [];
+        NotGetVersionTimesMap = JsonSerializer.Deserialize(File.ReadAllText(NotGetVersionTimesCachePath),
+            StringIntMapContent.Default.DictionaryStringInt32) ?? [];
+    }
+
     private ModsHelper()
     {
         GameFolders = SMMHelper.GetDefaultInstallPaths()
             .Select(SMMHelper.NormalizePath).Where(Directory.Exists).Cast<string>();
+    }
+
+    public void Dispose()
+    {
+        Semaphore?.Dispose();
+        GC.SuppressFinalize(this);
     }
 
     public async Task FindModsAsync()
@@ -94,6 +123,52 @@ public class ModsHelper
         }
     }
 
+    public static int GetModNotGetPicTimes(string modId)
+    {
+        return NotGetPicTimesMap.GetValueOrDefault(modId, 0);
+    }
+
+    public static async Task AddModNotGetPicTimes(string modId)
+    {
+        NotGetPicTimesMap[modId] = GetModNotGetPicTimes(modId) + 1;
+        await SaveMap(NotGetPicTimesMap, NotGetPicTimesCachePath);
+    }
+
+    public static int GetModNotGetVersionTimes(string modId)
+    {
+        return NotGetVersionTimesMap.GetValueOrDefault(modId, 0);
+    }
+
+    public static async Task AddModNotGetVersionTimes(string modId)
+    {
+        NotGetVersionTimesMap[modId] = GetModNotGetVersionTimes(modId) + 1;
+        await SaveMap(NotGetVersionTimesMap, NotGetVersionTimesCachePath);
+    }
+
+    private static async Task SaveMap(Dictionary<string, int> map, string dir)
+    {
+        var json = JsonSerializer.Serialize(map, StringIntMapContent.Default.DictionaryStringInt32);
+        if (await Semaphore.WaitAsync(TimeSpan.FromSeconds(5)))
+            try
+            {
+                await File.WriteAllTextAsync(dir, json);
+            }
+            finally
+            {
+                Semaphore.Release();
+            }
+        else
+            throw new TimeoutException("Unable to acquire lock to write file");
+    }
+
+    public static async Task RefreshMod(string modId)
+    {
+        NotGetPicTimesMap.Remove(modId);
+        NotGetVersionTimesMap.Remove(modId);
+        await SaveMap(NotGetPicTimesMap, NotGetPicTimesCachePath);
+        await SaveMap(NotGetVersionTimesMap, NotGetVersionTimesCachePath);
+    }
+
     public static void Reset()
     {
         Instance.LocalModsMap.Clear();
@@ -101,3 +176,6 @@ public class ModsHelper
         Instance.I18LocalMods.Clear();
     }
 }
+
+[JsonSerializable(typeof(Dictionary<string, int>))]
+public partial class StringIntMapContent : JsonSerializerContext;

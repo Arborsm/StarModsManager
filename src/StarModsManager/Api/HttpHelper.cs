@@ -118,7 +118,7 @@ public class RateLimiter : IDisposable
         {
             [RequestPriority.High] = new(2, TimeSpan.FromSeconds(1)),
             [RequestPriority.Normal] = new(3, TimeSpan.FromSeconds(1)),
-            [RequestPriority.Low] = new(10, TimeSpan.FromSeconds(2))
+            [RequestPriority.Low] = new(3, TimeSpan.FromSeconds(1))
         };
 
         var minInterval = _limitInfos.Values.Min(x => x.Interval);
