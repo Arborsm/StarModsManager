@@ -1,0 +1,83 @@
+<UserControl
+    x:Class="StarModsManager.Views.Customs.FormMainPageView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:items="clr-namespace:StarModsManager.ViewModels.Items"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:pages="clr-namespace:StarModsManager.ViewModels.Pages"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    x:DataType="pages:MainPageViewModel"
+    mc:Ignorable="d">
+
+    <Design.DataContext>
+        <pages:MainPageViewModel />
+    </Design.DataContext>
+
+    <DataGrid
+        GridLinesVisibility="All"
+        ItemsSource="{Binding Mods}"
+        SelectedItem="{Binding SelectedMod, Mode=TwoWay}"
+        SelectionChanged="DataGrid_OnSelectionChanged">
+        <DataGrid.Styles>
+            <Style Selector="TextBlock">
+                <Setter Property="ToolTip.Tip" Value="{Binding $self.Text}" />
+            </Style>
+        </DataGrid.Styles>
+        <DataGrid.Columns>
+            <DataGridTemplateColumn
+                Width="4*"
+                CanUserSort="True"
+                Header="Name"
+                SortMemberPath="LocalMod.Manifest.Name">
+                <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                        <TextBlock
+                            Margin="12,0"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            Classes.Red="{Binding IsDisabled}"
+                            Classes.Yellow="{Binding IsDependencyMissing}"
+                            ContextFlyout="{StaticResource ModContextMenu}"
+                            Text="{Binding LocalMod.Manifest.Name}">
+                            <TextBlock.Styles>
+                                <Style Selector="TextBlock.Yellow">
+                                    <Setter Property="Foreground" Value="Yellow" />
+                                </Style>
+                                <Style Selector="TextBlock.Red">
+                                    <Setter Property="Foreground" Value="OrangeRed" />
+                                </Style>
+                            </TextBlock.Styles>
+                        </TextBlock>
+                    </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+            <DataGridTextColumn
+                Width="3*"
+                Binding="{Binding LocalMod.Manifest.Author}"
+                Header="Author"
+                IsReadOnly="True" />
+            <DataGridTextColumn
+                Width="10*"
+                Binding="{Binding LocalMod.Manifest.Description}"
+                Header="Description"
+                IsReadOnly="True" />
+            <DataGridTextColumn
+                Width="2*"
+                Binding="{Binding LocalMod.Manifest.Version}"
+                Header="Version"
+                IsReadOnly="True" />
+            <DataGridTemplateColumn Header="Actions">
+                <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate DataType="items:ModViewModel">
+                        <Button
+                            Margin="12,2"
+                            Content="..."
+                            Flyout="{StaticResource ModContextMenu}" />
+                    </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+        </DataGrid.Columns>
+    </DataGrid>
+</UserControl>

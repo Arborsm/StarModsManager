@@ -20,37 +20,9 @@
         <items:ModViewModel />
     </Design.DataContext>
 
-    <!--  ReSharper disable Xaml.PossibleNullReferenceException  -->
     <UserControl.Resources>
         <ct:ColorToBrushConverter x:Key="ColorToBrush" />
         <lib:ModViewModelToColorConverter x:Key="ModViewModelToColorConverter" />
-
-        <ui:FAMenuFlyout x:Key="ContextMenu">
-            <ui:MenuFlyoutItem
-                Classes.EnabledMod="{Binding IsDisabled}"
-                Command="{Binding SwitchModCommand}"
-                IsVisible="{Binding !!LocalMod}" />
-            <ui:MenuFlyoutSubItem
-                IsVisible="{Binding !!LocalMod}"
-                ItemsSource="{Binding $parent[v:MainPageView].((vm:MainPageViewModel)DataContext).ModLabels}"
-                Text="{x:Static assets:Lang.AddToTag}" />
-            <ui:MenuFlyoutItem
-                Command="{Binding $parent[v:MainPageView].((vm:MainPageViewModel)DataContext).RmFromLabelCommand}"
-                IsVisible="{Binding !!LocalMod}"
-                Text="{x:Static assets:Lang.RemoveFromTag}" />
-            <ui:MenuFlyoutItem
-                Command="{Binding OpenModFolderCommand}"
-                IsVisible="{Binding !!LocalMod}"
-                Text="{x:Static assets:Lang.OpenFolder}" />
-            <ui:MenuFlyoutItem
-                Command="{Binding ChangeCoverCommand}"
-                IsVisible="{Binding !!LocalMod}"
-                Text="{x:Static assets:Lang.ChangePic}" />
-            <ui:MenuFlyoutItem Command="{Binding GetDetailCommand}" Text="{x:Static assets:Lang.Detail}" />
-            <ui:MenuFlyoutItem Command="{Binding OpenUrlCommand}" Text="{x:Static assets:Lang.OpenUrl}" />
-            <ui:MenuFlyoutItem Command="{Binding RefreshCommand}" Text="{x:Static assets:Lang.Refresh}" />
-            <ui:MenuFlyoutItem Command="{Binding DownloadCommand}" Text="{x:Static assets:Lang.DownloadLatestVersion}" />
-        </ui:FAMenuFlyout>
     </UserControl.Resources>
 
     <UserControl.DataTemplates>
@@ -62,17 +34,10 @@
                 Text="{Binding Title}" />
         </DataTemplate>
     </UserControl.DataTemplates>
-    <!--  ReSharper restore Xaml.PossibleNullReferenceException  -->
 
     <UserControl.Styles>
         <Style Selector="Border.Disabled">
             <Setter Property="BorderThickness" Value="2" />
-        </Style>
-        <Style Selector="ui|MenuFlyoutItem.EnabledMod">
-            <Setter Property="Text" Value="{x:Static assets:Lang.Enable}" />
-        </Style>
-        <Style Selector="ui|MenuFlyoutItem">
-            <Setter Property="Text" Value="{x:Static assets:Lang.Disable}" />
         </Style>
     </UserControl.Styles>
 
@@ -84,7 +49,7 @@
             BorderBrush="{Binding IsDisabled, Converter={StaticResource ModViewModelToColorConverter}}"
             Classes.Disabled="{Binding IsDisabledOrDependencyMissing}"
             ClipToBounds="True">
-            <Panel Background="Transparent" ContextFlyout="{StaticResource ContextMenu}">
+            <Panel Background="Transparent" ContextFlyout="{StaticResource ModContextMenu}">
                 <Image
                     VerticalAlignment="Center"
                     Source="{Binding Pic}"

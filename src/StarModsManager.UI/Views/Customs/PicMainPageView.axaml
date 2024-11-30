@@ -1,0 +1,31 @@
+<UserControl
+    x:Class="StarModsManager.Views.Customs.PicMainPageView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:pages="clr-namespace:StarModsManager.ViewModels.Pages"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    x:DataType="pages:MainPageViewModel"
+    mc:Ignorable="d">
+    <Design.DataContext>
+        <pages:MainPageViewModel />
+    </Design.DataContext>
+
+    <Panel>
+        <ListBox
+            AutoScrollToSelectedItem="True"
+            Background="Transparent"
+            ItemsSource="{Binding Mods}"
+            SelectedItem="{Binding SelectedMod, Mode=TwoWay}"
+            SelectedItems="{Binding SelectedMods, Mode=TwoWay}"
+            SelectionMode="Multiple">
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel />
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+        </ListBox>
+    </Panel>
+</UserControl>

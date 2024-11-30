@@ -675,4 +675,7 @@
     <data name="WithPrompt" xml:space="preserve">
         <value>With Prompt within Settings</value>
     </data>
+    <data name="FormMainPage" xml:space="preserve">
+        <value>Form</value>
+    </data>
 </root>

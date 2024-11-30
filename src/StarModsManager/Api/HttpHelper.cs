@@ -163,7 +163,6 @@ public class RateLimiter : IDisposable
         {
             var now = DateTime.UtcNow;
 
-            // 移除过期的时间戳
             while (info.RequestTimestamps.Count > 0 &&
                    now - info.RequestTimestamps.Peek() > info.Interval)
                 info.RequestTimestamps.Dequeue();

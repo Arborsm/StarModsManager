@@ -88,7 +88,7 @@
                         </ui:NavigationViewItem>
                     </ui:NavigationViewItem.MenuItems>
                     <ui:NavigationViewItem.IconSource>
-                        <fluent:SymbolIconSource Symbol="Code" />
+                        <ui:SymbolIconSource Symbol="Code" />
                     </ui:NavigationViewItem.IconSource>
                 </ui:NavigationViewItem>
             </ui:NavigationView.MenuItems>

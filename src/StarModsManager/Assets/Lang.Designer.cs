@@ -519,6 +519,15 @@ namespace StarModsManager.Assets {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Form.
+        /// </summary>
+        public static string FormMainPage {
+            get {
+                return ResourceManager.GetString("FormMainPage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Get Api Key.
         /// </summary>
         public static string GetApiKeyButton {

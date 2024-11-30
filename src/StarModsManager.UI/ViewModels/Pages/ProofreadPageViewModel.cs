@@ -57,7 +57,6 @@ public partial class ProofreadPageViewModel : MainPageViewModelBase
     public partial ModLang? SelectedItem { get; set; }
 
     [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(SearchCommand))]
     public partial string? SearchText { get; set; }
 
     public override string NavHeader => NavigationService.Check;
@@ -65,7 +64,6 @@ public partial class ProofreadPageViewModel : MainPageViewModelBase
     private static IEnumerable<LocalMod> I18NMods => ModsHelper.Instance.I18LocalMods.OrderBy(it => it.Manifest.Name);
     private static IEnumerable<LocalMod> MisMatchMods => I18NMods.Where(it => it.LazyIsMisMatch.Value is true or null);
     public ObservableCollection<LocalMod> ShowMods => new(IsFilter ? MisMatchMods : I18NMods);
-    private bool IsSearchTextNotNull => !string.IsNullOrEmpty(SearchText);
 
     public void AddEditedLang(ModLang item)
     {
@@ -95,7 +93,7 @@ public partial class ProofreadPageViewModel : MainPageViewModelBase
         });
     }
 
-    [RelayCommand(CanExecute = nameof(IsSearchTextNotNull))]
+    [RelayCommand]
     private void Search()
     {
         _filterIndex = 0;

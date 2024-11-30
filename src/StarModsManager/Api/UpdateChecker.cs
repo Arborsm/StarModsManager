@@ -19,7 +19,7 @@ public static class UpdateChecker
     public static void CheckUpdate()
     {
         SaveLastCheckTimestamp();
-        
+
         Task.Run(CheckForUpdatesAsync).ContinueWith(t =>
         {
             var (hasUpdate, latestVersion, downloadUrl) = t.Result;
@@ -40,7 +40,7 @@ public static class UpdateChecker
             var lastCheckTime = DateTime.Parse(File.ReadAllText(timestampPath));
             var timeSinceLastCheck = DateTime.Now - lastCheckTime;
             Log.Information("Skipping Auto update check, " +
-                            "last check was {TimeSinceLastCheck} minutes ago", timeSinceLastCheck.TotalMinutes);
+                            "last check was {TimeSinceLastCheck} minutes ago", (int)timeSinceLastCheck.TotalMinutes);
             return timeSinceLastCheck.TotalMinutes < CheckIntervalMinutes;
         }
         catch (Exception ex)
@@ -62,7 +62,7 @@ public static class UpdateChecker
             Log.Error(ex, "Error saving update check timestamp");
         }
     }
-    
+
 
     private static async Task<(bool hasUpdate, string latestVersion, string downloadUrl)> CheckForUpdatesAsync()
     {

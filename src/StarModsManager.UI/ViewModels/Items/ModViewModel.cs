@@ -36,8 +36,6 @@ public partial class ModViewModel : ViewModelBase
     public ModViewModel() : this(
         new OnlineMod())
     {
-        Pic = new Bitmap(
-            "D:\\Users\\26537\\AppData\\Roaming\\StarModsManager\\Cache\\14070\\14070-1665488527-1800567611.bmp");
         IsDisabled = true;
     }
 

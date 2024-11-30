@@ -52,6 +52,10 @@ public partial class ItemLabelViewModel : ViewModelBase
     [JsonIgnore]
     public ObservableCollection<ModViewModel> Items { get; set; }
 
+    [JsonIgnore]
+    [ObservableProperty]
+    public partial bool IsSelected { get; set; } = false;
+
     partial void OnTitleChanged(string oldValue, string newValue)
     {
         if (oldValue == newValue || _isInit) return;

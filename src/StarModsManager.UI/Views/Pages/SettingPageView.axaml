@@ -114,8 +114,6 @@
                         <ToggleSwitch IsChecked="{Binding MainConfig.Debug}" />
                         <Label Content="{x:Static assets:Lang.AutoCheckUpdates}" />
                         <ToggleSwitch IsChecked="{Binding MainConfig.AutoCheckUpdates}" />
-                        <Button Command="{Binding OpenBackupFolderCommand}"
-                                Content="{x:Static assets:Lang.BackupFolder}" />
                     </StackPanel>
                 </ui:SettingsExpanderItem>
             </ui:SettingsExpander>

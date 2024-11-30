@@ -15,25 +15,30 @@
     <UserControl.Resources>
         <converters:ColorToBrushConverter x:Key="ColorToBrush" />
     </UserControl.Resources>
-    <Border
-        MinWidth="80"
-        Margin="5"
+    <ToggleButton
         Padding="5"
-        BorderBrush="{Binding BorderColor, Converter={StaticResource ColorToBrush}}"
-        BorderThickness="2"
-        CornerRadius="6">
-        <Panel HorizontalAlignment="Center">
-            <TextBlock
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center"
-                IsVisible="{Binding !IsEditing}"
-                Text="{Binding Title}" />
-            <TextBox
-                Name="MainTextBox"
-                MinWidth="0"
-                MinHeight="0"
-                IsVisible="{Binding IsEditing}"
-                Text="{Binding Title}" />
-        </Panel>
-    </Border>
+        Background="Transparent"
+        BorderThickness="0"
+        IsChecked="{Binding IsSelected}">
+        <Border
+            Height="40"
+            MinWidth="80"
+            BorderBrush="{Binding BorderColor, Converter={StaticResource ColorToBrush}}"
+            BorderThickness="2"
+            CornerRadius="6">
+            <Panel HorizontalAlignment="Center">
+                <TextBlock
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    IsVisible="{Binding !IsEditing}"
+                    Text="{Binding Title}" />
+                <TextBox
+                    Name="MainTextBox"
+                    MinWidth="0"
+                    MinHeight="0"
+                    IsVisible="{Binding IsEditing}"
+                    Text="{Binding Title}" />
+            </Panel>
+        </Border>
+    </ToggleButton>
 </UserControl>

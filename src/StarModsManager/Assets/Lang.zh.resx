@@ -675,4 +675,7 @@
     <data name="WithPrompt" xml:space="preserve">
         <value>带有设置中的提示词</value>
     </data>
+    <data name="FormMainPage" xml:space="preserve">
+        <value>列表</value>
+    </data>
 </root>

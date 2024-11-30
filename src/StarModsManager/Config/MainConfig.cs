@@ -106,6 +106,12 @@ public class MainConfig : ConfigBase
         set => SetProperty(ref field, value);
     }
 
+    public bool FormMainPage
+    {
+        get;
+        set => SetProperty(ref field, value);
+    }
+
     protected override JsonTypeInfo GetJsonTypeInfo()
     {
         return ConfigContent.Default.MainConfig;
